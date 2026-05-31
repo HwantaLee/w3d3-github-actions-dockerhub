@@ -54,6 +54,7 @@
 
 저장 위치:
 - `week1/day2/assets/lesson-05-local-server-prep.png`
+- `week1/day2/assets/lesson-05-sample-app-screenshot.png`
 
 ![로컬 웹 서버 실행 준비](./assets/lesson-05-local-server-prep.png)
 
@@ -128,6 +129,20 @@ cat README.md
 ```bash
 curl --version
 ```
+
+## 정상 실행 화면 예시
+아래 화면은 `week1/day2/sample-app`에서 로컬 웹 서버를 실행한 뒤 브라우저로 접속했을 때 보이는 결과다. 5교시에서는 이 화면을 목표 상태로 먼저 확인하고, 6교시에서 실제로 서버를 실행한다.
+
+저장 위치:
+- `week1/day2/assets/lesson-05-sample-app-screenshot.png`
+
+![샘플 앱 실행 결과 화면](./assets/lesson-05-sample-app-screenshot.png)
+
+정상 상태에서 확인할 것:
+- 페이지 제목이 `Local Server Lab`으로 보인다.
+- 본문에 로컬 웹 서버가 파일을 응답하고 있다는 문장이 보인다.
+- `localhost:8000`이라는 접속 주소가 보인다.
+- `Status: HTTP 응답 확인 준비 완료` 메시지가 보인다.
 
 ## 실행 전 체크리스트
 | 항목 | 확인 방법 | 상태 |

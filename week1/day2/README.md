@@ -85,6 +85,7 @@ flowchart TD
 - `lesson-08.md`: 원인 분석 라이프사이클
 - `sample-app/`: 로컬 웹 서버 실습용 정적 웹 앱
 - `assets/`: 교안용 이미지와 시각 자료
+- `assets/lesson-05-sample-app-screenshot.png`: 샘플 앱 정상 실행 화면
 
 ## Deliverables
 - `sample-app`을 로컬 웹 서버로 실행한 화면
