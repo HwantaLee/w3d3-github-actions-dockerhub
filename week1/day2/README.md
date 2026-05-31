@@ -24,7 +24,7 @@
 - 5교시: 로컬 웹 서버 실행 준비 - 런타임 설치 여부 확인, 샘플 앱 확인, 실행 명령 확인
 - 6교시: 로컬 웹 서버 실행 실습 - 브라우저와 `curl` 접속 확인, 포트 충돌 관찰
 - 7교시: 로그와 설정의 기본 - stdout 로그, 에러 메시지, config, secret, `.env`
-- 8교시: 원인 분석 기본 라이프사이클 - 재현, 관찰, 가설, 검증, 수정, 기록
+- 8교시: 관찰 가능성과 원인 분석 실습 - 로그, 메트릭, 가설, 수정 기록
 
 ## Official References
 - GNU Coreutils Manual  
@@ -82,8 +82,9 @@ flowchart TD
 - `lesson-05.md`: 로컬 웹 서버 실행 준비
 - `lesson-06.md`: 로컬 웹 서버 실행 실습
 - `lesson-07.md`: 로그와 설정
-- `lesson-08.md`: 원인 분석 라이프사이클
+- `lesson-08.md`: 관찰 가능성과 원인 분석 실습
 - `sample-app/`: 로컬 웹 서버 실습용 정적 웹 앱
+- `observability-app/`: 8교시 로그, 메트릭, 장애 분석 실습용 체크아웃 API 앱
 - `assets/`: 교안용 이미지와 시각 자료
 - `assets/lesson-05-sample-app-screenshot.png`: 샘플 앱 정상 실행 화면
 
@@ -93,7 +94,7 @@ flowchart TD
 - `curl http://localhost:8000` 실행 결과
 - 포트 충돌 또는 접속 실패 상황 1개 관찰 기록
 - 로그/설정/환경변수 개념 정리
-- 원인 분석 기록 1개
+- `observability-app` 기반 원인 분석 기록 1개
 
 ## End-Of-Day Checklist
 - `pwd`, `ls`, `cd`, `cat`, `grep`을 사용할 수 있다.
