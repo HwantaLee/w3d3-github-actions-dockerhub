@@ -1,0 +1,215 @@
+# Week 1 Glossary: Cloud Native 기본기와 운영 마인드셋
+
+## Cloud And Infrastructure
+
+### Cloud Native
+- 한 줄 뜻: 클라우드 환경에 맞게 빠르게 배포하고 안정적으로 운영하는 접근
+- 왜 중요한가: Docker, Kubernetes, MSA, Observability, IaC를 하나의 운영 흐름으로 연결한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 4 Kubernetes, Week 5 AWS
+- 공식 참고: https://glossary.cncf.io/
+
+### Cloud Computing
+- 한 줄 뜻: 필요한 컴퓨팅 자원을 빌려 쓰는 사용량 기반 컴퓨팅
+- 왜 중요한가: 서버 구매 중심 사고에서 서비스 조합과 비용 최적화 사고로 전환한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/what-is-cloud-computing.html
+
+### Compute
+- 한 줄 뜻: 프로그램이 실행되는 계산 자원
+- 왜 중요한가: Docker container, Kubernetes Pod, EC2, ECS, EKS를 이해하는 바닥 개념이다.
+- 수업에서 다시 나오는 곳: Week 2 Docker, Week 4 Kubernetes, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/compute-services.html
+
+### Network
+- 한 줄 뜻: 요청과 응답이 이동하는 통신 경로
+- 왜 중요한가: 포트, DNS, Security Group, Service, Ingress, VPC를 이해하는 기반이다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 3 MSA, Week 4 Kubernetes, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/networking-services.html
+
+### Storage
+- 한 줄 뜻: 데이터가 저장되고 유지되는 공간
+- 왜 중요한가: 컨테이너 삭제, 볼륨, S3, EBS, RDS의 차이를 이해하게 한다.
+- 수업에서 다시 나오는 곳: Week 2 Docker volume, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/storage-services.html
+
+### Managed Service
+- 한 줄 뜻: 운영 일부를 클라우드 제공자가 대신 관리하는 서비스
+- 왜 중요한가: 운영 부담은 줄지만 비용, 제약, 책임 경계는 반드시 이해해야 한다.
+- 수업에서 다시 나오는 곳: Week 4 Kubernetes plugins, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/introduction.html
+
+## Local Execution And Web Basics
+
+### CPU
+- 한 줄 뜻: 명령을 계산하고 처리하는 장치
+- 왜 중요한가: 요청 처리, 암호화, 압축, 데이터 계산의 병목을 이해한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 4 Kubernetes requests/limits, Week 5 EC2
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/compute-services.html
+
+### Memory
+- 한 줄 뜻: 실행 중인 데이터가 잠시 올라가는 공간
+- 왜 중요한가: 애플리케이션 실행, 캐시, 프로세스 종료 원인을 이해한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker, Week 4 Kubernetes
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/compute-services.html
+
+### Disk
+- 한 줄 뜻: 파일과 데이터를 저장하는 공간
+- 왜 중요한가: 로그, 정적 파일, 데이터베이스, 볼륨의 바닥 개념이다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker volume, Week 5 EBS/S3
+- 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/storage-services.html
+
+### Process
+- 한 줄 뜻: 실행 중인 프로그램
+- 왜 중요한가: 웹 서버 실행, 포트 점유, 로그 출력, 종료 처리를 이해한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker container, Week 4 Pod
+- 공식 참고: https://www.kernel.org/doc/man-pages/
+
+### CLI
+- 한 줄 뜻: Command Line Interface, 명령어로 컴퓨터를 조작하는 인터페이스
+- 왜 중요한가: 서버 상태 확인, 자동화, Docker/Kubernetes/Terraform 명령의 기반이다.
+- 수업에서 다시 나오는 곳: 전체 실습
+- 공식 참고: https://www.gnu.org/software/coreutils/manual/coreutils.html
+
+### HTTP
+- 한 줄 뜻: 웹 요청과 응답을 주고받는 프로토콜
+- 왜 중요한가: 브라우저 접속, API 호출, status code, 장애 분석의 기본이다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 3 MSA, Week 4 Ingress
+- 공식 참고: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview
+
+### DNS
+- 한 줄 뜻: 도메인 이름을 IP 주소로 찾는 체계
+- 왜 중요한가: 접속 실패가 이름 조회 문제인지 서버 문제인지 구분한다.
+- 수업에서 다시 나오는 곳: Week 3 MSA, Week 4 Kubernetes DNS, Week 5 Route 53
+- 공식 참고: https://developer.mozilla.org/en-US/docs/Learn/Common_questions/Web_mechanics/What_is_a_domain_name
+
+### Port
+- 한 줄 뜻: 한 컴퓨터 안에서 서비스 입구를 구분하는 번호
+- 왜 중요한가: 로컬 서버, Docker port binding, Kubernetes Service를 이해한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker, Week 4 Kubernetes
+- 공식 참고: https://www.iana.org/assignments/service-names-port-numbers/service-names-port-numbers.xhtml
+
+### localhost
+- 한 줄 뜻: 내 컴퓨터 자신을 가리키는 이름
+- 왜 중요한가: 로컬 실행과 외부 접속 가능 상태를 구분한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker networking
+- 공식 참고: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview
+
+### Environment Variable
+- 한 줄 뜻: 실행 시점에 주입하는 설정값
+- 왜 중요한가: 이미지나 코드 안에 환경별 설정을 박아 넣지 않게 한다.
+- 수업에서 다시 나오는 곳: Week 2 Docker, Week 4 Kubernetes ConfigMap/Secret, Week 6 Terraform
+- 공식 참고: https://12factor.net/config
+
+### Secret
+- 한 줄 뜻: 노출되면 위험한 비밀번호, token, key 같은 민감정보
+- 왜 중요한가: GitHub, Docker image, Terraform state에 잘못 남기면 보안 사고가 된다.
+- 수업에서 다시 나오는 곳: Week 2 Docker, Week 4 Kubernetes Secret, Week 5 IAM
+- 공식 참고: https://12factor.net/config
+
+### stdout
+- 한 줄 뜻: 프로그램의 일반 출력 통로
+- 왜 중요한가: 컨테이너와 서버 로그 수집의 기본 출력 경로다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, Week 2 Docker logs, Week 5 CloudWatch
+- 공식 참고: https://www.gnu.org/software/coreutils/manual/coreutils.html
+
+### Root Cause Analysis
+- 한 줄 뜻: 증상 뒤의 실제 원인을 증거 기반으로 찾는 분석 과정
+- 왜 중요한가: 재발 방지와 운영 기록을 만든다.
+- 수업에서 다시 나오는 곳: Week 1 Day 2, 전체 장애 분석 실습
+- 공식 참고: https://sre.google/sre-book/monitoring-distributed-systems/
+
+## Cost And Cloud Economics
+
+### CAPEX
+- 한 줄 뜻: Capital Expenditure, 초기 투자 비용
+- 왜 중요한가: 서버와 데이터센터를 직접 구매하는 방식의 비용 구조를 이해한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1 Lesson 3, Week 5 FinOps
+- 공식 참고: https://aws.amazon.com/economics/
+
+### OPEX
+- 한 줄 뜻: Operational Expenditure, 운영 중 계속 발생하는 비용
+- 왜 중요한가: 클라우드는 사용량 기반 운영 비용 중심으로 비용 구조가 바뀐다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1 Lesson 3, Week 5 FinOps
+- 공식 참고: https://aws.amazon.com/economics/
+
+### TCO
+- 한 줄 뜻: Total Cost of Ownership, 총소유비용
+- 왜 중요한가: 서버 가격뿐 아니라 전력, 공간, 인력, 장애 대응, 폐기 비용까지 함께 본다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1 Lesson 3, Week 5 FinOps
+- 공식 참고: https://aws.amazon.com/economics/
+
+### ROI
+- 한 줄 뜻: Return on Investment, 투자 대비 효과
+- 왜 중요한가: 클라우드 전환이 비용, 속도, 안정성 측면에서 의미 있는지 판단한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1 Lesson 3, Week 5 FinOps
+- 공식 참고: https://aws.amazon.com/economics/
+
+## DevOps
+
+### DevOps
+- 한 줄 뜻: 개발과 운영이 같은 목표로 빠르고 안정적인 전달을 만드는 문화와 실천
+- 왜 중요한가: 이 과정의 모든 도구를 협업, 자동화, 관찰, 피드백 루프로 연결한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 6 Terraform
+- 공식 참고: https://aws.amazon.com/devops/what-is-devops/
+
+### Deployment Frequency
+- 한 줄 뜻: 얼마나 자주 배포하는지 나타내는 지표
+- 왜 중요한가: 배포 절차가 작고 안정적으로 반복되는지 보여준다.
+- 수업에서 다시 나오는 곳: Week 1 Day 5, Week 4 Kubernetes rollout
+- 공식 참고: https://cloud.google.com/devops
+
+### Lead Time For Changes
+- 한 줄 뜻: 변경이 운영 환경에 도달하기까지 걸리는 시간
+- 왜 중요한가: 개발부터 배포까지 병목이 어디 있는지 보여준다.
+- 수업에서 다시 나오는 곳: Week 1 Day 5, Week 6 Terraform
+- 공식 참고: https://cloud.google.com/devops
+
+### Change Failure Rate
+- 한 줄 뜻: 변경이 장애를 만드는 비율
+- 왜 중요한가: 배포 안정성과 검증 품질을 판단한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 5, Week 4 Kubernetes
+- 공식 참고: https://cloud.google.com/devops
+
+### Time To Restore Service
+- 한 줄 뜻: 장애 후 서비스를 복구하는 데 걸리는 시간
+- 왜 중요한가: 관찰 가능성, rollback, runbook의 효과를 보여준다.
+- 수업에서 다시 나오는 곳: Week 1 Day 5, Week 5 Observability
+- 공식 참고: https://cloud.google.com/devops
+
+## Tools And Collaboration
+
+### GitHub
+- 한 줄 뜻: Git 저장소를 원격에서 관리하고 협업하는 서비스
+- 왜 중요한가: 코드, README, 실습 기록, 장애 기록을 남기는 기본 협업 공간이다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, 전체 실습
+- 공식 참고: https://docs.github.com/
+
+### Repository
+- 한 줄 뜻: 코드와 문서, 변경 이력을 담는 저장소
+- 왜 중요한가: 실습 산출물과 운영 기록을 한 곳에 모은다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 6 Terraform
+- 공식 참고: https://docs.github.com/en/repositories
+
+### VS Code
+- 한 줄 뜻: 코드와 문서를 편집하고 터미널을 함께 쓰는 개발 도구
+- 왜 중요한가: 실습 파일 작성, README 수정, 터미널 명령 실행의 기본 도구다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, 전체 실습
+- 공식 참고: https://code.visualstudio.com/docs
+
+### Git
+- 한 줄 뜻: 파일 변경 이력을 기록하고 되돌릴 수 있게 하는 버전 관리 도구
+- 왜 중요한가: 인프라 코드와 문서 변경도 추적 가능하게 만든다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 6 Terraform
+- 공식 참고: https://git-scm.com/book/en/v2
+
+### Commit
+- 한 줄 뜻: 변경 내용을 이유와 함께 저장한 기록
+- 왜 중요한가: 누가, 언제, 왜 바꿨는지 운영 이력을 남긴다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, Week 6 Terraform
+- 공식 참고: https://docs.github.com/en/get-started/using-git/about-git
+
+### Push
+- 한 줄 뜻: 로컬 변경 기록을 원격 저장소에 올리는 작업
+- 왜 중요한가: 개인 작업을 팀과 공유 가능한 상태로 만든다.
+- 수업에서 다시 나오는 곳: Week 1 Day 1, 전체 실습
+- 공식 참고: https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository
