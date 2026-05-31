@@ -6,7 +6,7 @@
 
 ```bash
 cp .env.example .env
-python3 app.py
+python3 app2.py
 ```
 
 다른 터미널에서 확인한다.
@@ -33,5 +33,5 @@ FAIL_STEP=payment
 ```
 
 ```bash
-python3 app.py
+python3 app2.py
 ```

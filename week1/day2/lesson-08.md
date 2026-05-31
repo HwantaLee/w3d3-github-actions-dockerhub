@@ -23,7 +23,7 @@
 | 항목 | 값 |
 |---|---|
 | 실습 앱 | `week1/day2/observability-app` |
-| 실행 파일 | `app.py` |
+| 실행 파일 | `app2.py` |
 | 설정 파일 | `.env` |
 | 기본 포트 | `8010` |
 | 로그 파일 | `logs/app.log` |
@@ -101,7 +101,7 @@ FAIL_STEP=none
 앱을 실행한다.
 
 ```bash
-python3 app.py
+python3 app2.py
 ```
 
 다른 터미널에서 상태를 확인한다.
@@ -197,7 +197,7 @@ sed -i 's/INVENTORY_LIMIT=5/INVENTORY_LIMIT=100/' .env
 실행 중인 서버를 `Ctrl+C`로 종료한 뒤 다시 실행한다.
 
 ```bash
-python3 app.py
+python3 app2.py
 curl -i "http://localhost:8010/api/checkout?item=book&qty=99"
 ```
 
@@ -211,7 +211,7 @@ curl -i "http://localhost:8010/api/checkout?item=book&qty=99"
 ```bash
 sed -i 's/SLOW_MS=0/SLOW_MS=800/' .env
 sed -i 's/SLOW_THRESHOLD_MS=500/SLOW_THRESHOLD_MS=500/' .env
-python3 app.py
+python3 app2.py
 ```
 
 요청을 보낸다.
@@ -239,7 +239,7 @@ curl http://localhost:8010/metrics
 
 ```bash
 sed -i 's/FAIL_STEP=none/FAIL_STEP=payment/' .env
-python3 app.py
+python3 app2.py
 ```
 
 요청을 보낸다.
@@ -269,7 +269,7 @@ sed -i 's/FAIL_STEP=payment/FAIL_STEP=none/' .env
 서버를 재기동하고 같은 요청을 다시 보낸다.
 
 ```bash
-python3 app.py
+python3 app2.py
 curl -i "http://localhost:8010/api/checkout?item=book&qty=1"
 ```
 
@@ -278,7 +278,7 @@ curl -i "http://localhost:8010/api/checkout?item=book&qty=1"
 
 ```bash
 sed -i 's/PORT=8010/PORT=abc/' .env
-python3 app.py
+python3 app2.py
 ```
 
 기대 오류:
@@ -302,7 +302,7 @@ tail -n 10 logs/app.log
 
 ```bash
 sed -i 's/PORT=abc/PORT=8010/' .env
-python3 app.py
+python3 app2.py
 ```
 
 ## 가설 수립 기준표
