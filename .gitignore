@@ -1,3 +1,5 @@
 .omx/
 .agents/
 .codex/
+__pycache__
+.env
