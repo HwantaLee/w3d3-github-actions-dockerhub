@@ -98,6 +98,24 @@
 - 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS, Week 6 Terraform
 - 공식 참고: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
+### AWS Well-Architected Framework
+- 한 줄 뜻: 클라우드 workload를 운영, 보안, 안정성, 성능, 비용, 지속 가능성 관점에서 검토하는 AWS의 공식 질문 체계
+- 왜 중요한가: 서비스 목록을 외우는 대신 설계의 위험과 trade-off를 질문으로 찾게 한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS, Week 6 Terraform
+- 공식 참고: https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html
+
+### Pillar
+- 한 줄 뜻: Well-Architected Framework에서 아키텍처를 검토하는 큰 관점
+- 왜 중요한가: 비용만 보거나 보안만 보는 편향을 줄이고 운영 판단을 균형 있게 만든다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/wellarchitected/latest/framework/the-pillars-of-the-framework.html
+
+### Workload
+- 한 줄 뜻: 함께 동작해 사용자 또는 비즈니스 가치를 만드는 애플리케이션과 인프라 리소스 묶음
+- 왜 중요한가: 개별 EC2나 RDS가 아니라 서비스 전체를 운영 단위로 검토하게 한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS, Week 6 Terraform
+- 공식 참고: https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html
+
 ## Local Execution And Web Basics
 
 ### CPU

@@ -13,7 +13,7 @@
 - AWS 계정 생성 전 확인할 과금 구조, Free Tier, 결제 수단, MFA, root 계정 주의사항을 설명한다.
 - AWS 콘솔 로그인, MFA 설정, Billing 접근 확인, 비용 알림 확인 흐름을 따라간다.
 - CAPEX, OPEX, TCO, ROI와 사용량 기반 과금의 차이를 간단한 계산으로 비교한다.
-- 최소 권한, secret 관리, 공식 문서 검증, AI 답변 크로스체크를 실습 전 습관으로 만든다.
+- AWS Well-Architected Framework의 6개 pillar를 사용해 3-tier 설계를 질문으로 점검한다.
 - AWS 계정, MFA, Billing, Docker 실행 상태를 개인별로 점검하고 문제를 기록한다.
 - 만들고 싶은 서비스 아이디어를 필요한 리소스, 비용 위험, 보안 위험, 1주차 범위 조정 관점에서 정리한다.
 
@@ -23,7 +23,7 @@
 - 3교시: AWS 계정 생성 전 안내 - 과금 구조, Free Tier, 결제 수단, MFA, root 계정 주의사항
 - 4교시: AWS 계정 생성 101 가이드 - 기존 계정 조사, Free/Paid plan, MFA, Billing, Budget, 리소스 생성 금지
 - 5교시: AWS Pricing Calculator 실습 - 표준 3-tier 아키텍처 월 비용 계산
-- 6교시: 보안 기본 원칙과 공식 Documentation 읽는 법 - 최소 권한, secret 관리, AI 답변 검증, 버전과 전제 조건 확인
+- 6교시: AWS Well-Architected Framework - AWS를 쓰기 전에 아키텍처를 질문으로 점검하기
 - 7교시: 개인 면담 및 환경 점검 - AWS 계정, MFA, Billing 알림, Docker 실행 상태 확인
 - 8교시: 프로젝트 아이디어 면담 - 만들고 싶은 서비스, 필요한 리소스, 예상 위험 요소 정리
 
@@ -46,10 +46,20 @@
   https://aws.amazon.com/free/
 - AWS Pricing Calculator
   https://calculator.aws/
+- AWS Well-Architected Framework
+  https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html
+- AWS Well-Architected Framework: Operational Excellence pillar
+  https://docs.aws.amazon.com/wellarchitected/latest/operational-excellence-pillar/welcome.html
 - AWS Well-Architected Framework: Security pillar
   https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/welcome.html
+- AWS Well-Architected Framework: Reliability pillar
+  https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html
+- AWS Well-Architected Framework: Performance Efficiency pillar
+  https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/welcome.html
 - AWS Well-Architected Framework: Cost Optimization pillar
   https://docs.aws.amazon.com/wellarchitected/latest/cost-optimization-pillar/welcome.html
+- AWS Well-Architected Framework: Sustainability pillar
+  https://docs.aws.amazon.com/wellarchitected/latest/sustainability-pillar/welcome.html
 - AWS Shared Responsibility Model
   https://aws.amazon.com/compliance/shared-responsibility-model/
 
@@ -66,6 +76,7 @@
 - Always Free: 일부 서비스가 제공하는 월별 무료 사용량 또는 상시 무료 범위
 - Billing: 사용량과 비용 청구를 확인하는 영역
 - Shared Responsibility Model: 클라우드 제공자와 사용자의 보안 책임 분담 모델
+- Well-Architected Framework: 클라우드 아키텍처를 운영, 보안, 안정성, 성능, 비용, 지속 가능성 관점에서 검토하는 공식 질문 체계
 - Least Privilege: 필요한 작업에 필요한 최소 권한만 부여하는 원칙
 - CAPEX: 초기 투자 비용
 - OPEX: 운영 중 계속 발생하는 비용
@@ -89,7 +100,7 @@
 - `lesson-03.md`: AWS 계정 생성 전 과금/보안 안내
 - `lesson-04.md`: AWS 계정 생성 101 가이드
 - `lesson-05.md`: AWS Pricing Calculator 실습
-- `lesson-06.md`: 보안 원칙과 공식 문서 읽는 법
+- `lesson-06.md`: AWS Well-Architected Framework와 3-tier 설계 리뷰
 - `lesson-07.md`: 개인 면담 및 환경 점검
 - `lesson-08.md`: 프로젝트 아이디어 면담
 - `assets/week1-day4-overview.png`: 4일차 클라우드 안전 지도 인포그래픽
@@ -98,6 +109,7 @@
 - `assets/lesson-03-aws-cost-security-guardrails.png`: AWS 계정 생성 전 비용·보안 가드레일 인포그래픽
 - `assets/lesson-04-aws-account-setup-101.png`: AWS 계정 생성 101 흐름 인포그래픽
 - `assets/lesson-05-pricing-calculator-workflow.png`: AWS Pricing Calculator 실습 흐름 인포그래픽
+- `assets/lesson-06-well-architected-framework.png`: Well-Architected Framework 6개 pillar 인포그래픽
 
 ## Deliverables
 - 클라우드 기본 구성요소 매핑표
@@ -106,7 +118,7 @@
 - 기존 AWS 계정 조사표, MFA와 Billing/Budget 접근 확인 기록
 - 교육용 비용 계산 예제와 낭비 리소스 점검표
 - 표준 3-tier AWS Pricing Calculator estimate와 트래픽/EBS/S3 비용 가정 README 기록
-- 공식 문서 검증 기록
+- Well-Architected mini review와 공식 문서 검증 기록
 - 개인 환경 점검표
 - 프로젝트 아이디어 리소스/비용/보안 위험 분석표
 
@@ -119,5 +131,5 @@
 - Billing 또는 비용 확인 화면 접근 가능 여부를 확인했다.
 - AWS 신규 고객 크레딧과 일부 서비스의 무료 사용량이 "무조건 무료"와 다르다는 점을 설명할 수 있다.
 - 클라우드 비용을 시간당 비용, 월 비용, 유휴 리소스 비용으로 계산할 수 있다.
-- AI 답변을 공식 문서의 전제 조건, 날짜, 리전, 서비스명으로 검증할 수 있다.
+- 3-tier 설계를 Well-Architected Framework의 6개 pillar 질문으로 검토할 수 있다.
 - 만들고 싶은 프로젝트의 필요한 리소스와 비용/보안 위험을 1차로 줄여 설명할 수 있다.
