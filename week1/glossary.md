@@ -35,8 +35,62 @@
 ### Managed Service
 - 한 줄 뜻: 운영 일부를 클라우드 제공자가 대신 관리하는 서비스
 - 왜 중요한가: 운영 부담은 줄지만 비용, 제약, 책임 경계는 반드시 이해해야 한다.
-- 수업에서 다시 나오는 곳: Week 4 Kubernetes plugins, Week 5 AWS
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 4 Kubernetes plugins, Week 5 AWS
 - 공식 참고: https://docs.aws.amazon.com/whitepapers/latest/aws-overview/introduction.html
+
+### Region
+- 한 줄 뜻: 클라우드 리소스가 배치되는 지리적 지역
+- 왜 중요한가: 지연 시간, 서비스 제공 여부, 비용, 규제 조건에 영향을 준다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+
+### Availability Zone
+- 한 줄 뜻: 한 Region 안에서 분리된 데이터센터 묶음
+- 왜 중요한가: 단일 장애 지점을 줄이고 고가용성 구조를 이해하는 기본 단위다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html
+
+### IAM
+- 한 줄 뜻: Identity and Access Management, AWS 접근 권한 관리 서비스
+- 왜 중요한가: 누가 어떤 리소스를 만들고 변경할 수 있는지 통제하는 보안 경계다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS, Week 6 Terraform
+- 공식 참고: https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html
+
+### Root User
+- 한 줄 뜻: AWS 계정의 모든 권한을 가진 최상위 사용자
+- 왜 중요한가: 일상 작업에 사용하면 실수나 탈취의 피해 범위가 계정 전체로 커진다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html
+
+### MFA
+- 한 줄 뜻: Multi-Factor Authentication, 비밀번호 외 추가 인증
+- 왜 중요한가: 비밀번호가 노출되어도 계정 탈취 위험을 줄이는 기본 보호 장치다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html
+
+### Free Tier
+- 한 줄 뜻: 조건을 만족하는 사용량에 적용되는 무료 범위
+- 왜 중요한가: 무조건 무료가 아니므로 서비스, 기간, 사용량, 초과 비용을 확인해야 한다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://aws.amazon.com/free/
+
+### Billing
+- 한 줄 뜻: 클라우드 사용량과 비용 청구를 확인하는 영역
+- 왜 중요한가: 비용을 보지 못하면 안전한 실습과 운영 판단을 할 수 없다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/billing-what-is.html
+
+### Shared Responsibility Model
+- 한 줄 뜻: 클라우드 제공자와 사용자의 보안 책임 분담 모델
+- 왜 중요한가: 관리형 서비스를 써도 계정, 데이터, 권한, 설정 책임은 사용자에게 남는다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS
+- 공식 참고: https://aws.amazon.com/compliance/shared-responsibility-model/
+
+### Least Privilege
+- 한 줄 뜻: 필요한 작업에 필요한 최소 권한만 부여하는 원칙
+- 왜 중요한가: 실수나 침해가 발생했을 때 피해 범위를 줄인다.
+- 수업에서 다시 나오는 곳: Week 1 Day 4, Week 5 AWS, Week 6 Terraform
+- 공식 참고: https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
 
 ## Local Execution And Web Basics
 
