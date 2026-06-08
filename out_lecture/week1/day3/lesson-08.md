@@ -1,169 +1,180 @@
-# 8교시: 컴퓨팅 spine 매핑 노트
+# 8교시: Day 5 발표 챌린지 - AI로 간단한 정적 웹사이트 초안 만들기
 
 ## 수업 목표
-- Day2~3에서 관찰한 process, file, port, HTTP, log를 Docker/Kubernetes/AWS/Terraform preview에 연결한다.
-- 이후 기술 용어가 같은 구성요소의 다른 추상화임을 설명한다.
-- Week 1 후반 미니앱 구현 전에 운영 spine을 고정한다.
+- AI Coding Tool을 사용해 아주 작은 정적 웹사이트 초안을 만든다.
+- AI가 만든 결과를 그대로 믿지 않고 실행 조건, 파일 구조, 보안/비용 위험, 브라우저 evidence로 검증한다.
+- Day 5 발표에서 사용할 수 있도록 "무엇을 만들었고, 어떻게 확인했고, 무엇을 제외했는지"를 기록한다.
+
+## 범위 제한
+이 챌린지는 Day 5 발표 재료를 만들기 위한 별도 실습이다. 범위를 넘기면 완성도가 아니라 재현성이 무너진다.
+
+| 허용 | 제외 |
+|---|---|
+| `index.html`, `style.css`, `app.js` | backend server 구현 |
+| 로컬 정적 서버 실행 | database |
+| 더미 데이터 또는 하드코딩된 예시 | paid API |
+| 브라우저/curl 확인 | authentication |
+| README에 실행/검증/위험 기록 | cloud deploy |
+| AI prompt와 수정 내역 기록 | secret/token 입력 |
 
 ## 50분 흐름
-| Time | Activity |
-|---|---|
-| 0-5분 | AI verification note 확인 |
-| 5-15분 | spine mapping의 목적 설명 |
-| 15-30분 | Day2~3 evidence를 표에 매핑 |
-| 30-40분 | 각 기술에서 바뀌는 이름과 유지되는 질문 정리 |
-| 40-50분 | Day4 구현 시작 전 체크리스트 작성 |
+| Time | Activity | 산출물 |
+|---|---|---|
+| 0-5분 | 챌린지 범위와 Day5 발표 기준 확인 | scope note |
+| 5-12분 | 웹사이트 아이디어 1개 선택 | one-sentence concept |
+| 12-22분 | AI에게 정적 웹사이트 초안 요청 | prompt record |
+| 22-35분 | 파일로 저장하고 로컬 서버에서 실행 | `index.html`, optional CSS/JS, run evidence |
+| 35-43분 | 결과 검증과 위험 제거 | verification note |
+| 43-50분 | Day5 발표 카드 작성 | presentation card draft |
 
-## 0-5분 AI verification note 확인
+## 0-5분 챌린지 범위와 Day5 발표 기준 확인
 
-- 진행: AI verification note 확인
+- 진행: 오늘 만든 결과는 Day5에 3분 발표한다.
+- 완료 조건: 아래 범위 문장을 본인 README 또는 note에 남긴다.
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
-
-### 상세 설명
-새로운 도구를 배울 때 가장 큰 어려움은 이름이 바뀌면 개념도 완전히 새롭다고 느끼는 것이다. 하지만 Docker, Kubernetes, AWS, Terraform은 모두 compute, memory, storage, network, config, log를 다른 수준에서 다룬다. spine mapping은 같은 질문을 유지하게 해준다.
-
-예를 들어 Day3의 `python3 -m http.server 8000`은 process와 port를 만든다. Docker에서는 container process와 port binding으로, Kubernetes에서는 Pod와 Service로, AWS에서는 compute service와 security group/Load Balancer로, Terraform에서는 resource와 rule로 표현된다. 질문은 같다. 무엇이 실행되는가, 어디에 파일이 있는가, 어떤 port로 들어오는가, 어떤 log로 확인하는가.
-
-
-
-### Visual 1: Computing spine overview
-![Computing spine mapping](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week1/assets/week1-computing-spine.png)
-
-그림의 핵심은 도구 이름이 아니라 반복되는 질문이다. compute, storage, network, config, log를 어디에서 어떻게 표현하는지만 바뀐다.
-
-## 5-15분 spine mapping의 목적 설명
-
-- 진행: spine mapping의 목적 설명
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
-
-### Visual 2: Local evidence에서 플랫폼 언어로
-![Mermaid diagram 1](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/out_lecture/mermaid-assets/week1__day3__lesson-08--diagram-01.png)
-
-Day4 구현 전에 이 매핑을 먼저 고정한다. 구현을 넓히기보다 이미 관찰한 evidence를 여러 플랫폼의 말로 번역하는 것이 오늘의 목표다.
-
-## 15-30분 Day2~3 evidence를 표에 매핑
-
-- 진행: Day2~3 evidence를 표에 매핑
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
-
-### 매핑 활동
-| Week 1 evidence | Docker | Kubernetes | AWS | Terraform |
-|---|---|---|---|---|
-| process | container main process | Pod/container | EC2/ECS/Lambda | compute resource |
-| command | `CMD`/`ENTRYPOINT` | container command/args | user data/task config | resource arguments |
-| file path | image filesystem/volume | ConfigMap/Volume | S3/EBS/EFS/RDS | storage resource |
-| port | port publishing | Service/Ingress | security group/ALB | SG rule/listener |
-| HTTP status | container health check | readiness/liveness | target health | validation output |
-| log | container log 조회 | events/logs | CloudWatch | output/drift evidence |
-| config | env/env file | ConfigMap | Parameter Store | variables |
-| secret | secret mount/env | Secret | Secrets Manager/IAM | sensitive variables |
-
-
-
-### 명령 절차
-Day2~3에서 이미 실행한 명령을 새로 늘리지 않고, README와 evidence table에서 다음 값을 다시 찾아 표에 옮긴다.
-
-```bash
-pwd
-python3 --version
-curl -I http://localhost:8000
-env | grep -E 'SHELL|HOME|PATH'
+### 챌린지 선언
+```text
+나는 Day3 8교시 챌린지에서 AI를 사용해 작은 정적 웹사이트 초안을 만든다.
+backend, database, paid API, authentication, cloud deploy는 제외한다.
+Day5에는 결과물보다 실행 evidence와 검증 과정을 중심으로 발표한다.
 ```
 
-서버가 이미 종료된 상태라면 `curl`은 실패할 수 있다. 이 경우 새 기능을 만들지 말고 "server stopped"를 evidence로 기록하거나, Day3 1교시 절차대로 정적 서버만 다시 실행한다.
+## 5-12분 웹사이트 아이디어 1개 선택
 
-## 30-40분 각 기술에서 바뀌는 이름과 유지되는 질문 정리
+- 진행: 너무 큰 서비스를 고르지 않고, 한 화면짜리 정적 사이트로 줄인다.
+- 완료 조건: 한 문장 concept와 포함할 정보 3개를 정한다.
 
-- 진행: 각 기술에서 바뀌는 이름과 유지되는 질문 정리
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
-
-### 명령 회고
-오늘까지 사용한 evidence 명령을 다시 분류한다.
-
-| Command | Spine component |
+### 선택 가능한 주제
+| 주제 | 한 화면에 들어갈 내용 |
 |---|---|
-| `pwd` | path/storage |
-| `ls -la` | file/permission |
-| `python3 -m http.server 8000` | process/command/port |
-| `curl -I` | HTTP/status/network |
-| `env` filtered | config |
-| server terminal log | log/observability |
+| 개인 학습 포트폴리오 | 이름/목표, 이번 주 배운 것, 다음 질문 |
+| DevOps 용어 카드 | 용어 3개, 의미, 확인 명령 |
+| 로컬 서버 실행 가이드 | start/check/stop, 흔한 에러, evidence 예시 |
+| 팀 프로젝트 소개 | 문제, 대상 사용자, 기능 3개 |
+| 수업 회고 페이지 | 오늘의 성과, blocker, 내일 할 일 |
 
-
-
-### 확인 질문
-- Day3 local server의 process는 Docker에서 무엇으로 표현될까?
-- `PORT` config와 API token secret은 Kubernetes에서 어떻게 다르게 다룰까?
-- HTTP 404 evidence는 AWS ALB 뒤에서도 어떤 식으로 추적해야 할까?
-
-
-
-### 예상 결과
-- `pwd`는 repository 또는 실습 directory path를 보여준다.
-- `python3 --version`은 runtime evidence가 된다.
-- `curl -I`은 서버 실행 상태에 따라 200 status 또는 connection failure를 보여준다.
-- filtered `env`는 config key 관찰 예시가 되며 secret value를 포함하지 않아야 한다.
-- 완성된 spine table은 Week 1 evidence를 Docker/Kubernetes/AWS/Terraform 용어로 한 줄씩 번역한다.
-
-
-
-### 흔한 오해
-| 오해 | 교정 |
+### 아이디어 작성 카드
+| 항목 | 내 답 |
 |---|---|
-| Docker부터 배워야 클라우드가 이해된다. | local process/file/port/log를 알아야 Docker도 이해된다. |
-| Terraform은 코딩 도구라 오늘 내용과 무관하다. | Terraform은 오늘의 실행 조건과 infrastructure 선택을 코드로 고정한다. |
-| Kubernetes는 완전히 새로운 세계다. | 이름은 바뀌지만 process, port, config, secret 질문은 유지된다. |
+| 웹사이트 이름 | |
+| 대상 사용자 | |
+| 한 문장 설명 | |
+| 반드시 들어갈 정보 3개 | |
+| 제외할 기능 | backend, DB, login, paid API, cloud deploy |
 
-## 40-50분 Day4 구현 시작 전 체크리스트 작성
+## 12-22분 AI에게 정적 웹사이트 초안 요청
 
-- 진행: Day4 구현 시작 전 체크리스트 작성
+- 진행: AI에게 한 번에 큰 앱을 맡기지 않고, 파일 범위와 제외 조건을 명확히 말한다.
+- 완료 조건: 사용한 prompt와 AI 답변에서 채택/수정/삭제한 항목을 기록한다.
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
+### 추천 프롬프트
+```text
+HTML, CSS, JavaScript만 사용해서 한 화면짜리 정적 웹사이트 초안을 만들어줘.
+주제는 [내 주제]이고 대상 사용자는 [대상 사용자]야.
+파일은 index.html, style.css, app.js 세 개로 나눠줘.
+backend, database, login, paid API, external CDN, cloud deploy는 쓰지 마.
+브라우저에서 바로 확인할 수 있게 만들고, 더미 데이터만 사용해.
+초보자가 읽을 수 있도록 코드에 필요한 주석만 짧게 달아줘.
+```
 
+### AI 답변 검토표
+| Check | 결과 |
+|---|---|
+| 파일이 1~3개로 제한되는가 | |
+| 외부 API/CDN을 쓰지 않는가 | |
+| secret/token을 요구하지 않는가 | |
+| 실행 방법이 설명되어 있는가 | |
+| Day5에 설명 가능한 크기인가 | |
 
+## 22-35분 파일로 저장하고 로컬 서버에서 실행
 
-### 다음 주차 매핑
-Day4부터 미니앱 범위를 정하고 구현을 시작한다. 구현을 시작하기 전 Day2~3 evidence가 준비되어 있어야 한다: repository, README, 실행 조건, HTTP check, log, RCA, AI 검증표, spine mapping.
+- 진행: AI 답변을 그대로 붙여 넣기 전에 파일명을 정하고 실행 절차를 기록한다.
+- 완료 조건: 브라우저 또는 `curl -I` evidence를 남긴다.
 
+### 권장 폴더 구조
+```text
+challenge-site/
+  index.html
+  style.css
+  app.js
+  README.md
+```
 
+### 실행 명령
+```bash
+cd challenge-site
+python3 -m http.server 8000
+```
 
-### 실습 Evidence
+다른 터미널에서 확인한다.
+
+```bash
+curl -I http://localhost:8000
+```
+
+### 실행 Evidence
 | Evidence | Value |
 |---|---|
-| completed mapping table | |
-| 가장 약한 개념 1개 | |
-| Day4 시작 전 확인할 blocker | |
-| 구현 보류 항목 | mini app implementation deferred to Day4 |
+| project path | |
+| start command | |
+| check command | |
+| HTTP status 또는 browser 확인 | |
+| server log에서 확인한 요청 | |
 
+## 35-43분 결과 검증과 위험 제거
 
+- 진행: 화면이 보이는지만 확인하지 않고 운영 위험을 줄인다.
+- 완료 조건: 제거한 위험과 남은 한계를 기록한다.
 
-### 학술 근거와 DevOps insight
-개념 매핑은 전이 학습을 돕는다. 한 환경에서 배운 관찰 질문을 다른 환경으로 옮길 수 있으면 도구 변화에 덜 흔들린다. 현업 DevOps 엔지니어는 특정 명령만 아는 사람이 아니라 실행 조건, 변경 조건, 실패 조건을 여러 플랫폼 언어로 번역할 수 있는 사람이다.
+### 검증 질문
+- 새로 생긴 파일을 모두 설명할 수 있는가?
+- `index.html`이 `style.css`, `app.js`를 올바른 상대 경로로 불러오는가?
+- browser console에 에러가 없는가?
+- secret, token, API key, real personal data가 들어 있지 않은가?
+- 외부 네트워크가 없어도 열리는가?
+- Day5 발표에서 3분 안에 설명 가능한가?
 
+### 수정 기록
+| 항목 | 내용 |
+|---|---|
+| AI가 만든 것 | |
+| 사람이 수정한 것 | |
+| 삭제한 위험 | |
+| 아직 부족한 점 | |
 
+## 43-50분 Day5 발표 카드 작성
 
-### 평가 기준
+- 진행: Day5 발표는 "예쁜 결과"보다 "검증 가능한 실행 과정"을 말한다.
+- 완료 조건: 아래 발표 카드 초안을 작성한다.
+
+### Day5 발표 카드
+| 발표 항목 | 내용 |
+|---|---|
+| 만든 웹사이트 | |
+| 대상 사용자와 목적 | |
+| AI에게 준 prompt 핵심 | |
+| 실행 방법 | |
+| 확인 evidence | |
+| 제거한 위험 | |
+| 다음에 개선할 점 | |
+
+### 발표 문장 템플릿
+```text
+제가 만든 것은 [웹사이트 이름]입니다.
+AI에게 [프롬프트 핵심]을 요청했고, 결과를 [파일 구조]로 저장했습니다.
+실행은 [명령]으로 했고, [브라우저/curl/log evidence]로 확인했습니다.
+범위 밖인 [제외 항목]은 넣지 않았습니다.
+Day5 이후 개선한다면 [다음 개선점]을 하겠습니다.
+```
+
+## 평가 기준
 | 기준 | 2점 evidence |
 |---|---|
-| 50분 참여 | 시간 흐름에 맞춰 설명, 활동, 산출물 작성에 참여했다. |
-| 증거 산출 | 수업에서 요구한 note, command, table, blocker 중 해당 산출물을 구체적으로 남겼다. |
-| 전이 연결 | 오늘 개념이 Week2~6 기술 또는 자기 산출물과 어떻게 연결되는지 한 문장 이상 설명했다. |
+| 범위 통제 | backend, DB, paid API, auth, cloud deploy를 제외했다. |
+| AI 사용 기록 | prompt와 AI 답변의 채택/수정/삭제 항목을 남겼다. |
+| 실행 가능성 | 로컬 정적 서버 또는 브라우저로 열리는 상태를 확인했다. |
+| 보안/비용 검증 | secret, real personal data, paid API가 없음을 확인했다. |
+| Day5 발표 준비 | 3분 발표 카드 초안을 작성했다. |
 
-
-
-### 공식/학술 근거 링크
-- CMU Eberly Center: Bloom's Taxonomy, https://www.cmu.edu/teaching/designteach/design/bloomsTaxonomy.html - Day3 마감 점검을 이해, 적용, 분석 수준으로 구분하는 기준이다.
-- Monash Constructive Alignment, https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment - 산출물, 활동, 평가 evidence를 맞추는 기준이다.
-- MIT Missing Semester, https://missing.csail.mit.edu/ - shell, Git, debugging evidence가 Day4 구현 준비의 선행 역량인 근거다.
+## 다음 연결
+Day4에는 챌린지 초안을 더 안정적인 미니앱 산출물로 다듬고, Day5에는 실행 evidence와 함께 발표한다. Week2 Docker에서는 이 폴더가 build context가 될 수 있으며, 오늘의 `index.html`, `style.css`, `app.js`, `README.md`가 image 안에 들어갈 파일 후보가 된다.

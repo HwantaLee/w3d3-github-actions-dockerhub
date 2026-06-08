@@ -16,17 +16,11 @@
 
 ## 0-5분 CLI evidence table 확인
 
-- 진행: CLI evidence table 확인
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 상세 설명
 Compute는 계산을 수행하는 자원이다. CPU는 명령을 실행하고, program은 실행 가능한 코드나 스크립트이며, process는 program이 실제로 실행 중인 상태다. thread는 process 내부에서 실행되는 더 작은 흐름이다. Week 1에서는 thread를 깊게 구현하지 않고, "하나의 process 안에도 여러 실행 흐름이 있을 수 있다"는 수준으로 이해한다.
 
 명령을 실행하면 shell은 process를 만들고, process가 끝나면 exit code를 남긴다. exit code 0은 보통 성공, 0이 아닌 값은 실패를 의미한다. 운영 자동화에서 exit code는 매우 중요하다. CI/CD pipeline은 사람처럼 화면을 읽지 않고 exit code로 다음 단계를 계속할지 멈출지 판단한다.
-
 
 
 ### Visual 1: compute 실행 단위
@@ -45,11 +39,6 @@ flowchart LR
 
 ## 5-15분 compute, program, process, thread 개념 설명
 
-- 진행: compute, program, process, thread 개념 설명
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 핵심 개념
 | 개념 | 설명 | Week 1 evidence |
@@ -61,7 +50,6 @@ flowchart LR
 | Exit code | command 종료 결과 | `$?` |
 
 
-
 ### Visual 2: exit code 관찰 지점
 | 캡처할 순간 | 읽어야 할 단서 |
 |---|---|
@@ -71,11 +59,6 @@ flowchart LR
 
 ## 15-30분 command 실행과 exit code 확인
 
-- 진행: command 실행과 exit code 확인
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### Visual 3: compute 개념 연결 카드
 | 오늘 개념 | 로컬 evidence | 이후 확장 |
@@ -83,7 +66,6 @@ flowchart LR
 | command | 입력한 명령 | container command |
 | process | `ps` 출력 | Pod 안 실행 단위 |
 | exit code | `echo $?` | CI/CD 성공/실패 판단 |
-
 
 
 ### 명령 절차
@@ -98,7 +80,6 @@ ps
 ```
 
 
-
 ### 확인 질문
 - `ls no-such-file`의 symptom과 exit code evidence는 무엇인가?
 - CI/CD가 exit code를 사용하는 이유는 무엇인가?
@@ -106,15 +87,9 @@ ps
 
 ## 30-40분 process 관찰과 종료 개념 정리
 
-- 진행: process 관찰과 종료 개념 정리
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 다음 주차 매핑
 Docker container는 일반적으로 하나의 주 process를 실행한다. Kubernetes Pod는 container를 감싸고 재시작 정책을 적용한다. AWS ECS, Lambda, EC2도 compute 실행 단위를 제공한다.
-
 
 
 ### 예상 결과
@@ -122,7 +97,6 @@ Docker container는 일반적으로 하나의 주 process를 실행한다. Kuber
 - `ls no-such-file`은 파일이 없다는 오류를 출력한다.
 - 실패한 `ls` 뒤의 `echo $?`는 보통 `0`이 아닌 값을 출력한다.
 - `ps`는 현재 shell과 실행 중인 process 목록을 보여준다.
-
 
 
 ### 흔한 오해
@@ -134,11 +108,6 @@ Docker container는 일반적으로 하나의 주 process를 실행한다. Kuber
 
 ## 40-50분 container/Pod preview mapping
 
-- 진행: container/Pod preview mapping
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 실습 Evidence
 | Command | Observation | Exit code |
@@ -149,10 +118,8 @@ Docker container는 일반적으로 하나의 주 process를 실행한다. Kuber
 | `ps` | | |
 
 
-
 ### 학술 근거와 DevOps insight
 CS systems 교육에서 process와 resource 관리는 운영체제 이해의 핵심이다. DevOps 현업에서는 process가 죽었는지, 재시작되었는지, 어떤 exit code로 끝났는지 확인해야 장애 원인을 좁힐 수 있다. Kubernetes의 restart, readiness, liveness도 결국 process 상태와 연결된다.
-
 
 
 ### 평가 기준
@@ -161,7 +128,6 @@ CS systems 교육에서 process와 resource 관리는 운영체제 이해의 핵
 | 50분 참여 | 시간 흐름에 맞춰 설명, 활동, 산출물 작성에 참여했다. |
 | 증거 산출 | 수업에서 요구한 note, command, table, blocker 중 해당 산출물을 구체적으로 남겼다. |
 | 전이 연결 | 오늘 개념이 Week2~6 기술 또는 자기 산출물과 어떻게 연결되는지 한 문장 이상 설명했다. |
-
 
 
 ### 공식/학술 근거 링크

@@ -16,17 +16,11 @@
 
 ## 0-5분 공식 문서 읽기 evidence 확인
 
-- 진행: 공식 문서 읽기 evidence 확인
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 상세 설명
 CLI는 "검은 화면"이 아니라 시스템 상태를 직접 묻는 인터페이스다. `pwd`는 내가 어디에 있는지, `ls`는 어떤 파일이 있는지, `cat`은 파일 내용이 무엇인지, `grep`은 증거 문자열이 어디에 있는지 확인한다. `curl`은 HTTP 응답을 확인하고, `ps`는 실행 중인 process를 확인한다. `env`는 실행 환경에 들어온 설정 값을 보여준다.
 
 좋은 운영자는 명령 이름보다 질문을 먼저 생각한다. "서버가 안 된다"는 질문을 "파일이 있는가", "process가 떠 있는가", "port로 응답하는가", "config가 들어왔는가"로 나누면 CLI 명령이 자연스럽게 선택된다.
-
 
 
 ### Visual 1: 운영 질문에서 CLI 선택하기
@@ -50,11 +44,6 @@ flowchart TD
 
 ## 5-15분 CLI를 운영 관찰 도구로 설명
 
-- 진행: CLI를 운영 관찰 도구로 설명
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### Visual 2: CLI 관찰 화면
 | 관찰 화면 | evidence로 남길 최소 내용 |
@@ -65,11 +54,6 @@ flowchart TD
 
 ## 15-35분 명령 실행, 결과 관찰, 표 작성
 
-- 진행: 명령 실행, 결과 관찰, 표 작성
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### Visual 3: 안전한 CLI 기록 기준
 | 주의 표시 | 학생 행동 |
@@ -77,7 +61,6 @@ flowchart TD
 | `env` 출력에 token/key가 보임 | 전체 복사하지 말고 key 이름만 기록한다. |
 | `ps` 출력이 길게 나옴 | 오늘 실행한 shell/process 중심으로 요약한다. |
 | `kill` 대상이 불명확함 | 종료하지 않고 `kill -l` 개념 확인만 한다. |
-
 
 
 ### 명령 매핑
@@ -92,7 +75,6 @@ flowchart TD
 | `ps` | process | 실행 중인 program이 있는가? |
 | `kill` | process lifecycle | 종료해야 할 process는 무엇인가? |
 | `env` | environment | 어떤 설정이 들어왔는가? |
-
 
 
 ### 명령 절차
@@ -113,12 +95,21 @@ curl -I https://example.com
 kill -l
 ```
 
+### 초보자 안전 순서
+처음 CLI를 쓰는 학생은 한 번에 모든 명령을 붙여 넣지 않는다. 아래 순서대로 한 줄씩 실행하고, 출력이 예상과 다르면 멈춰서 기록한다.
+
+| 순서 | 명령 | 성공 기준 |
+|---:|---|---|
+| 1 | `pwd` | 현재 위치가 출력된다 |
+| 2 | `ls` | 현재 폴더의 파일 목록이 출력된다 |
+| 3 | `printf ... > cli-evidence.txt` | 파일이 생성된다 |
+| 4 | `cat cli-evidence.txt` | `status=ok`, `port=8000`이 보인다 |
+| 5 | `grep port cli-evidence.txt` | `port=8000` 한 줄이 보인다 |
+| 6 | `curl -I https://example.com` | HTTP status line이 보인다 |
+
+`ps`, `env`, `kill`은 출력이 길거나 위험할 수 있으므로 강사 설명을 들은 뒤 필요한 부분만 기록한다.
+
 ## 35-45분 실패 메시지와 권한/경로 문제 구분
-
-- 진행: 실패 메시지와 권한/경로 문제 구분
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 확인 질문
@@ -127,10 +118,8 @@ kill -l
 - `ps`와 `env`가 각각 보여주는 상태는 무엇인가?
 
 
-
 ### 다음 주차 매핑
 이후 주차의 container 상태 조회, cluster 상태 조회, cloud identity 확인, infrastructure 변경 검토도 모두 CLI로 시스템 상태를 묻는 확장판이다.
-
 
 
 ### 예상 결과
@@ -138,7 +127,6 @@ kill -l
 - `grep port cli-evidence.txt`는 `port=8000` 줄만 출력한다.
 - `curl -I https://example.com`은 HTTP header와 status line을 출력한다.
 - `env | grep ...`은 secret 값이 아니라 일반 환경 키 일부만 보여야 한다.
-
 
 
 ### 흔한 오해
@@ -149,11 +137,6 @@ kill -l
 | `env` 출력은 전부 README에 붙여도 된다. | token, key, credential이 섞일 수 있으므로 필요한 key 이름만 기록한다. |
 
 ## 45-50분 다음 교시 process 개념으로 연결
-
-- 진행: 다음 교시 process 개념으로 연결
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 실습 Evidence
@@ -168,10 +151,8 @@ kill -l
 | `env` filtered | config keys | |
 
 
-
 ### 학술 근거와 현업 DevOps insight
 운영 자동화는 수동 관찰 절차를 코드로 바꾸는 일에서 시작한다. CLI evidence를 읽지 못하면 CI log, container log, Kubernetes event도 읽기 어렵다. 오늘의 명령은 이후 자동화 스크립트와 health check의 원형이다.
-
 
 
 ### 평가 기준
@@ -180,7 +161,6 @@ kill -l
 | 50분 참여 | 시간 흐름에 맞춰 설명, 활동, 산출물 작성에 참여했다. |
 | 증거 산출 | 수업에서 요구한 note, command, table, blocker 중 해당 산출물을 구체적으로 남겼다. |
 | 전이 연결 | 오늘 개념이 Week2~6 기술 또는 자기 산출물과 어떻게 연결되는지 한 문장 이상 설명했다. |
-
 
 
 ### 공식/학술 근거 링크

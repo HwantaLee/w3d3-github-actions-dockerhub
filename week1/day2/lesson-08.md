@@ -16,17 +16,11 @@
 
 ## 0-5분 memory/storage evidence 확인
 
-- 진행: memory/storage evidence 확인
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 상세 설명
 Network는 process와 process가 서로 통신하게 해주는 연결 구조다. IP는 host를 찾는 주소이고, DNS는 사람이 읽기 쉬운 이름을 IP로 바꾸는 체계다. Port는 같은 host 안에서 어떤 process로 연결할지 구분하는 입구다. Protocol은 대화 규칙이며, HTTP는 web에서 request와 response를 주고받는 대표적인 protocol이다.
 
 `localhost`는 내 컴퓨터 자신을 가리키는 이름이다. Day3에서 `python3 -m http.server 8000`을 실행하면 내 컴퓨터의 8000번 port로 HTTP 요청을 받는 process가 생긴다. 이때 process가 떠 있어도 firewall, port 충돌, 잘못된 URL 때문에 접근이 실패할 수 있다.
-
 
 
 ### Visual 1: process에서 HTTP response까지
@@ -45,15 +39,9 @@ flowchart LR
 
 ## 5-15분 주소, port, protocol의 역할 설명
 
-- 진행: 주소, port, protocol의 역할 설명
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 공식 참고
 - MDN HTTP Overview: https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview
-
 
 
 ### 핵심 개념
@@ -68,7 +56,6 @@ flowchart LR
 | Status code | 요청 결과를 어떻게 분류하는가? |
 
 
-
 ### Visual 2: URL 구성요소 읽기
 | URL 조각 | 의미 | Day3에서 확인할 예 |
 |---|---|---|
@@ -79,11 +66,6 @@ flowchart LR
 
 ## 15-30분 HTTP header와 status code 관찰
 
-- 진행: HTTP header와 status code 관찰
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### Visual 3: HTTP status triage
 | Status | 초급 해석 | 먼저 볼 곳 |
@@ -91,7 +73,6 @@ flowchart LR
 | 200 | 요청한 resource를 받음 | 파일 내용과 화면 |
 | 404 | 경로 또는 파일을 찾지 못함 | URL path, 파일 위치 |
 | 500 | 서버 내부 처리 실패 | server log, 실행 오류 |
-
 
 
 ### 명령 절차
@@ -109,7 +90,6 @@ port: 8000
 path: /index.html
 
 
-
 ### 확인 질문
 - `localhost:8000`에서 `8000`은 무엇을 의미하는가?
 - 200, 404, 500은 각각 어떤 종류의 단서인가?
@@ -117,22 +97,15 @@ path: /index.html
 
 ## 30-40분 200/404/500 의미와 오해 정리
 
-- 진행: 200/404/500 의미와 오해 정리
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 다음 주차 매핑
 Docker의 port publishing, Kubernetes Service/Ingress, AWS security group/ALB, Terraform security group rule은 모두 오늘 배운 host, port, protocol, status 개념 위에 올라간다. Day3는 이 개념으로 로컬 정적 서버를 실행한다.
-
 
 
 ### 예상 결과
 - 첫 번째 `curl -I`은 보통 `HTTP/1.1 200 OK` 또는 HTTP/2의 200 status를 보여준다.
 - 없는 path 요청은 서버 설정에 따라 404 또는 다른 redirect/status가 나올 수 있다. 핵심은 status line을 읽는 것이다.
 - `curl -I`은 body가 아니라 header 중심으로 응답 상태를 확인한다.
-
 
 
 ### 흔한 오해
@@ -144,11 +117,6 @@ Docker의 port publishing, Kubernetes Service/Ingress, AWS security group/ALB, T
 
 ## 40-50분 Day3 로컬 정적 서버 실행 준비
 
-- 진행: Day3 로컬 정적 서버 실행 준비
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 실습 Evidence
 | 질문 | 내 답 |
@@ -158,10 +126,8 @@ Docker의 port publishing, Kubernetes Service/Ingress, AWS security group/ALB, T
 | Day3에서 열 port는 무엇인가? | |
 
 
-
 ### 학술 근거와 DevOps insight
 네트워크 문제 분석은 계층을 나누는 사고에서 시작한다. host를 찾지 못하는 문제, port가 닫힌 문제, HTTP status가 실패인 문제는 서로 다르다. 현업에서 "접속이 안 된다"는 보고는 URL, status, port, process evidence가 있어야 빠르게 처리된다.
-
 
 
 ### 평가 기준

@@ -17,7 +17,6 @@
 | 40-50분 | 실패 증상과 인증 blocker 기록 |
 
 ## 0-5분 Git/VS Code 준비 evidence 확인
-- 진행: 이전 교시에서 확인한 `git --version`, `pwd`, VS Code terminal 상태를 다시 확인한다.
 - 완료 조건: Git CLI와 VS Code terminal 준비 상태를 말할 수 있다.
 
 ### 준비 확인
@@ -55,7 +54,6 @@ sequenceDiagram
 ```
 
 ## 5-15분 repository, commit, remote, 인증 흐름 설명
-- 진행: GitHub repository, local repository, commit, remote, credential의 역할을 구분한다.
 - 완료 조건: 학생이 GitHub password, MFA, PAT, credential manager의 차이를 구분한다.
 
 Git commit은 단순 저장이 아니라 "어떤 변경을 어떤 이유로 남겼는가"를 기록하는 단위다. GitHub repository는 그 기록을 다른 사람과 공유하는 원격 장소다. README는 repository에 들어온 사람이 가장 먼저 읽는 실행 설명서이자 evidence index다.
@@ -79,7 +77,6 @@ MFA는 GitHub 계정 로그인을 보호하는 장치다. PAT는 HTTPS push나 A
 | push 직후 | GitHub README 표시 | 팀원이 같은 evidence를 볼 수 있다. |
 
 ## 15-28분 repository 생성, clone, VS Code 열기, README 작성
-- 진행: GitHub 웹에서 새 repository를 만들고, 로컬로 clone한 뒤 VS Code에서 연다.
 - 완료 조건: repository 폴더가 로컬에 있고, VS Code에서 README를 수정한다.
 
 GitHub 웹에서 새 repository를 만든 뒤 `<YOUR_REPOSITORY_URL>`을 자신의 주소로 바꿔 실행한다.
@@ -120,7 +117,6 @@ flowchart TD
 ```
 
 ## 28-40분 MFA 확인, PAT 생성 기준, commit/push
-- 진행: MFA 설정 상태를 확인하고, 필요한 경우 최소 권한 PAT를 준비한 뒤 commit/push를 수행한다.
 - 완료 조건: push 성공 또는 인증 blocker를 안전하게 기록한다.
 
 ### MFA 설정 기준
@@ -168,7 +164,6 @@ git push
 - token 값은 terminal 출력, README, screenshot, 채팅에 남기지 않는다.
 
 ## 40-50분 실패 증상과 인증 blocker 기록
-- 진행: push 성공 여부를 확인하고, 실패했다면 secret 없이 증상만 기록한다.
 - 완료 조건: GitHub README visible 여부와 auth blocker를 evidence로 남긴다.
 
 ### 실패 증상 triage

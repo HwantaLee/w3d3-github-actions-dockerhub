@@ -11,6 +11,14 @@
 
 Docker는 운영 문제를 모두 없애는 도구가 아니다. 실행 환경을 더 명시적으로 포장하고, 실행 조건을 문서와 명령으로 재현 가능하게 만드는 도구다. 따라서 이번 주의 평가는 명령어 암기가 아니라 실행 증거, 장애 기록, README handoff, 비용/보안/정리 기준을 기준으로 한다.
 
+## 처음이면 여기부터
+Week 2는 Docker가 반드시 필요하다. macOS는 Docker Desktop을 기본 경로로 진행하고, Linux는 Docker Desktop 또는 Docker Engine 중 하나를 선택한다. 설치가 끝난 뒤에는 "앱을 열었다"가 아니라 CLI evidence로 확인한다.
+
+- macOS/Linux 설치 절차: [필수 소프트웨어 설치 가이드](../docs/software-installation-guide.md)
+- Docker 최소 확인 명령: `docker version`, `docker compose version`, `docker run --rm hello-world`
+- Linux에서 권한 문제가 나면 `sudo docker run --rm hello-world` 성공 여부와 Docker post-install 적용 여부를 구분해 기록한다.
+- Docker Hub password, access token, MFA code는 README, terminal history, screenshot에 남기지 않는다.
+
 ## Learning Goals
 - Docker가 해결하려는 실행 환경 차이, 배포 재현성, 의존성 충돌 문제를 설명한다.
 - image와 container의 차이를 파일 묶음과 실행 중인 process 관점으로 구분한다.

@@ -18,7 +18,7 @@
 | 3교시 | 현업 DevOps handoff | handoff package |
 | 4교시 | 미니 앱 완성 실습 | final mini app, final README |
 | 5교시 | 통합 체크리스트, 평가 증거, 2~6주차 기술 매핑 | evaluation checklist, residual risk |
-| 6교시 | 미니 발표 | presentation card, peer feedback |
+| 6교시 | AI 웹사이트 챌린지 및 미니앱 발표 | presentation card, peer feedback |
 | 7교시 | 발표 피드백 및 live Q&A | Q&A notes, patched package |
 | 8교시 | 2주차 Docker preview | Docker readiness note |
 
@@ -29,6 +29,7 @@
 | computing spine mapping note | file/process/port/data/evidence map |
 | handoff package | summary, run, verify, risks, gaps, next step |
 | completed mini app | fresh run evidence |
+| Day3 AI website challenge | prompt, static site files, run evidence, risk removal note |
 | evaluation evidence | checklist with complete/partial/missing |
 | presentation card | 3-minute evidence-centered structure |
 | Docker readiness note | build context, port, files, risks, Week2 question |

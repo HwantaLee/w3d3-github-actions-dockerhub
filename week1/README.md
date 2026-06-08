@@ -9,6 +9,14 @@
 내 로컬 컴퓨터에서 실행되는 작은 서비스는 compute, memory, storage, network, configuration, identity, observability 관점에서 어떻게 설명되는가?
 ```
 
+## 처음이면 여기부터
+수업을 시작하기 전에 GitHub 계정, Git, VS Code, Python 3, curl이 준비되어야 한다. 설치가 막히면 혼자 추측하지 말고 OS, 실행한 명령, 에러 메시지, 확인한 공식 문서 URL을 기록한다.
+
+- macOS/Linux A-to-Z 설치 절차: [필수 소프트웨어 설치 가이드](../docs/software-installation-guide.md)
+- Week 1 최소 확인 명령: `git --version`, `python3 --version`, `curl -I https://example.com`
+- VS Code는 `code --version`이 실패해도 VS Code 안의 terminal에서 `pwd`와 `git --version`이 되면 진행 가능하다.
+- password, token, MFA code, verification code는 README와 스크린샷에 남기지 않는다.
+
 ## Learning Goals
 - Cloud Native와 DevOps를 도구 목록이 아니라 운영 가능한 서비스를 만드는 관점으로 설명한다.
 - compute, memory, storage, network, process lifecycle, configuration, identity/access, observability, cost/resource boundary를 구분한다.
@@ -20,9 +28,9 @@
 ## Schedule Index
 - Day 1: 과정별 OT, 6주 로드맵, Cloud Native/DevOps 마인드셋, 아이스브레이킹, 학습 준비
 - Day 2: 컴퓨팅 구성요소 spine, Linux/CLI, process, filesystem, network, HTTP, log/config/secret
-- Day 3: 로컬 정적 서버 실행 조건, 재현성, 관찰 가능성, RCA, AI 보조 개발 검증, spine 매핑
+- Day 3: 로컬 정적 서버 실행 조건, 재현성, 관찰 가능성, RCA, AI 보조 개발 검증, AI 정적 웹사이트 챌린지
 - Day 4: 미니 앱 scope, skeleton, 구현, 실행 증거, 운영 위험 분류, README/runbook, 7~8교시 개인 면담
-- Day 5: 산출물 통합, 컴퓨팅 spine 최종 매핑, handoff, 발표, Docker preview
+- Day 5: 산출물 통합, 컴퓨팅 spine 최종 매핑, handoff, AI 웹사이트 챌린지 발표, Docker preview
 
 ## Computing Component Spine
 ![Week 1 computing component spine](./assets/week1-computing-spine.png)
@@ -67,6 +75,9 @@
 - One RCA record
 - Risk classification table
 - Docker readiness note for Week 2
+
+## Glossary
+1주차 용어는 [glossary.md](./glossary.md)를 기준으로 정리한다. 처음 읽을 때는 정의를 외우기보다 각 용어가 어떤 command, output, path, URL evidence로 확인되는지 함께 본다.
 
 ## Week 1 Boundaries
 - Docker command practice starts in Week 2.

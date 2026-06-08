@@ -16,19 +16,13 @@
 
 ## 0-10분 위험 유형 소개
 
-- 진행: 위험 유형 소개
-
 - 초점: 위험을 겁주는 말이 아니라 판단 기준으로 설명한다.
 
 - 학생 산출: risk type 이해
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 핵심 설명
 README는 새 환경에서 실행하는 사람을 위한 문서이고, runbook은 문제가 생겼을 때 확인할 절차다. Week1에서는 둘을 한 파일에 작성해도 되지만, 목적은 구분해야 한다.
-
 
 
 ### Visual 1: 구조 다이어그램
@@ -50,14 +44,9 @@ flowchart TB
 
 ## 10-25분 개인 앱 위험 찾기
 
-- 진행: 개인 앱 위험 찾기
-
 - 초점: 앱별 비용/보안/재현성 위험을 질문한다.
 
 - 학생 산출: risk table
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Visual 2: README/runbook 질문 카드
@@ -70,14 +59,9 @@ flowchart TB
 
 ## 25-35분 README/runbook 구분
 
-- 진행: README/runbook 구분
-
 - 초점: start/check와 troubleshoot를 분리한다.
 
 - 학생 산출: 문서 구조
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Visual 3: 위험 분류
@@ -89,7 +73,6 @@ flowchart TB
 | Operational | port 충돌, JSON 오류, 파일명 불일치 | troubleshoot 절차 작성 |
 
 
-
 ### 활동 절차
 1. 자신의 앱에서 외부 의존성이 있는지 표시한다.
 2. secret, 개인정보, 비용 발생 가능성을 찾아 제거한다.
@@ -98,19 +81,13 @@ flowchart TB
 5. runbook에 실패 증상, 확인 명령, 해결 방법을 쓴다.
 
 
-
 ### Runbook 템플릿
 
 ## 35-45분 runbook 작성
 
-- 진행: runbook 작성
-
 - 초점: 흔한 실패 3개와 확인 절차를 직접 적는다.
 
 - 학생 산출: runbook 초안
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Runbook
@@ -125,7 +102,6 @@ flowchart TB
 - Fix: correct the path or JSON syntax.
 
 
-
 ### 흔한 오해
 | 오해 | 교정 |
 |---|---|
@@ -135,21 +111,15 @@ flowchart TB
 
 ## 45-50분 제출 전 점검
 
-- 진행: 제출 전 점검
-
 - 초점: evidence 누락을 표시한다.
 
 - 학생 산출: 보완 목록
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 산출물
 - risk classification table
 - README/runbook 초안
 - 보완해야 할 evidence 목록
-
 
 
 ### 평가 기준
@@ -161,10 +131,8 @@ flowchart TB
 | 흔한 장애 증상과 확인 절차가 있다. | |
 
 
-
 ### 현업 DevOps insight
 현업의 운영 품질은 거창한 도구보다 "누가 봐도 같은 판단을 할 수 있는 기록"에서 시작한다. DORA와 Well-Architected는 나중에 더 체계적으로 다루지만, Week1에서는 변경 증거, 재현성, 위험 인식이라는 실무 습관만 사용한다.
-
 
 
 ### 학술 근거
@@ -173,15 +141,12 @@ flowchart TB
 - NIST NICE-style task: 민감정보와 접근 위험을 식별하고 줄인다.
 
 
-
 ### 다음 주차 연결
 Week2 컨테이너 실행에서는 port mapping, image tag, container logs가 runbook 항목으로 추가된다. 오늘의 위험 분류가 그 틀이 된다.
 
 
-
 ### 다음 연결
 다음 7~8교시는 새 진도를 나가지 않고 개인 면담과 보충 실습으로 blocker를 해결한다.
-
 
 
 ### 공식/학술 근거 링크

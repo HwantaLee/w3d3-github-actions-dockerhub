@@ -16,19 +16,13 @@
 
 ## 0-5분 실행 증거 기준 소개
 
-- 진행: 실행 증거 기준 소개
-
 - 초점: "봤다"와 "재현 가능하다"를 구분한다.
 
 - 학생 산출: evidence 기준
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 핵심 설명
 실행 증거는 스크린샷 하나가 아니라 다른 사람이 같은 결과를 재현할 수 있게 하는 기록이다. 최소 증거는 command, working directory, port, URL, expected result, observed result다.
-
 
 
 ### Visual 1: 구조 다이어그램
@@ -46,18 +40,12 @@ flowchart LR
 
 ## 5-15분 서버 실행
 
-- 진행: 서버 실행
-
 - 초점: 경로와 port 충돌을 점검한다.
 
 - 학생 산출: 실행 command
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### README 섹션 예시
-
 
 
 ### Start
@@ -66,22 +54,18 @@ Run from the mini-app directory:
 python3 -m http.server 8000
 
 
-
 ### Check
 Open http://localhost:8000 and confirm the item list appears.
 Run curl -I http://localhost:8000 and confirm HTTP 200.
-
 
 
 ### Stop
 Press Ctrl+C in the server terminal.
 
 
-
 ### Troubleshoot
 - Port already in use: use another port and update the URL.
 - Data does not load: check data.json path and JSON syntax.
-
 
 
 ### Visual 2: 실행 증거 quartet
@@ -94,14 +78,9 @@ Press Ctrl+C in the server terminal.
 
 ## 15-25분 curl 확인
 
-- 진행: curl 확인
-
 - 초점: HTTP status와 header를 읽게 한다.
 
 - 학생 산출: curl 결과
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Visual 3: README evidence table
@@ -113,14 +92,12 @@ Press Ctrl+C in the server terminal.
 | Troubleshoot | port/path/data 실패 대응 |
 
 
-
 ### 활동 절차
 1. `mini-app` 폴더에서 정적 서버를 실행한다.
 2. `curl -I http://localhost:8000`로 status를 확인한다.
 3. browser에서 앱 화면과 data rendering을 확인한다.
 4. 서버 중지 방법을 기록한다.
 5. port 충돌, 파일 경로 오류, JSON syntax error의 해결 방법을 README에 적는다.
-
 
 
 ### 실행 증거 표
@@ -137,14 +114,9 @@ Press Ctrl+C in the server terminal.
 
 ## 25-35분 browser 확인
 
-- 진행: browser 확인
-
 - 초점: 화면과 console을 확인한다.
 
 - 학생 산출: browser evidence
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 흔한 오해
@@ -156,21 +128,15 @@ Press Ctrl+C in the server terminal.
 
 ## 35-50분 README 작성
 
-- 진행: README 작성
-
 - 초점: start/check/stop/troubleshoot를 채운다.
 
 - 학생 산출: README 초안
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 산출물
 - README start/check/stop/troubleshoot
 - execution evidence table
 - curl 또는 browser 확인 결과
-
 
 
 ### 평가 기준
@@ -182,10 +148,8 @@ Press Ctrl+C in the server terminal.
 | 중지와 문제 해결 절차가 있다. | |
 
 
-
 ### 현업 DevOps insight
 운영 문서는 장애가 난 뒤에 쓰면 늦다. 앱 실행 시점부터 실행 계약을 기록해야 다음 사람이 환경 차이를 빠르게 찾을 수 있다.
-
 
 
 ### 학술 근거
@@ -194,15 +158,12 @@ Press Ctrl+C in the server terminal.
 - Professional communication: 명령과 결과를 모호하지 않게 전달한다.
 
 
-
 ### 다음 주차 연결
 Week2 Docker에서는 start command가 container 실행 절차로 바뀐다. 오늘 만든 README 구조는 그대로 container 실행 runbook으로 확장된다.
 
 
-
 ### 다음 연결
 다음 교시는 운영 위험 분류와 README/runbook을 완성한다.
-
 
 
 ### 공식/학술 근거 링크

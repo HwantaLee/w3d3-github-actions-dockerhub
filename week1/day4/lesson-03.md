@@ -16,19 +16,13 @@
 
 ## 0-5분 skeleton 실행 확인
 
-- 진행: skeleton 실행 확인
-
 - 초점: 서버가 켜진 상태를 확인한다.
 
 - 학생 산출: 실행 URL
 
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
-
 
 ### 핵심 설명
 이 교시의 완성 기준은 예쁜 디자인이 아니라 데이터가 파일에서 화면으로 이동하는 흐름을 증명하는 것이다. 학생은 `data.json -> fetch -> DOM rendering -> browser 확인` 흐름을 말로 설명할 수 있어야 한다.
-
 
 
 ### Visual 1: 구조 다이어그램
@@ -50,14 +44,9 @@ sequenceDiagram
 
 ## 5-15분 HTML 영역 설계
 
-- 진행: HTML 영역 설계
-
 - 초점: title, controls, list, status 영역을 잡는다.
 
 - 학생 산출: semantic section
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Visual 2: 렌더링 관찰 지점
@@ -70,14 +59,9 @@ sequenceDiagram
 
 ## 15-25분 CSS 기본 정리
 
-- 진행: CSS 기본 정리
-
 - 초점: 읽기 쉬운 layout과 상태 색을 만든다.
 
 - 학생 산출: 기본 스타일
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### Visual 3: 책임 분리 카드
@@ -88,14 +72,12 @@ sequenceDiagram
 | JS | 동작과 렌더링 | 경로/데이터 오류 추적 어려움 |
 
 
-
 ### 활동 절차
 1. `index.html`에 앱 제목, 설명, 목록 영역, 상태 메시지 영역을 만든다.
 2. `styles.css`에 body, main, list, status class를 정의한다.
 3. `app.js`에서 `fetch("data.json")`로 데이터를 읽는다.
 4. 각 item을 카드나 리스트 항목으로 렌더링한다.
 5. browser devtools console에 오류가 없는지 확인한다.
-
 
 
 ### 구현 예시
@@ -118,14 +100,9 @@ loadItems();
 
 ## 25-40분 JS fetch/render
 
-- 진행: JS fetch/render
-
 - 초점: JSON을 읽고 DOM에 표시한다.
 
 - 학생 산출: 렌더링 코드
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 흔한 오해
@@ -137,21 +114,15 @@ loadItems();
 
 ## 40-50분 증거 캡처
 
-- 진행: 증거 캡처
-
 - 초점: browser 화면과 console 오류를 확인한다.
 
 - 학생 산출: 구현 evidence
-
-- 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
-
 
 
 ### 산출물
 - data rendering이 보이는 browser 화면
 - `app.js`의 fetch/render 코드
 - console 오류 없음 확인 메모
-
 
 
 ### 평가 기준
@@ -163,10 +134,8 @@ loadItems();
 | 렌더링 결과를 evidence로 남겼다. | |
 
 
-
 ### 현업 DevOps insight
 운영에서 중요한 것은 "내 컴퓨터에서 봤다"가 아니라 데이터 흐름을 재현 가능한 방식으로 설명하는 것이다. 정적 앱에서도 파일 경로, HTTP 응답, console error는 실제 서비스 운영의 기본 관찰 지점이다.
-
 
 
 ### 학술 근거
@@ -175,15 +144,12 @@ loadItems();
 - CS2023: client-side programming과 data representation을 함께 다룬다.
 
 
-
 ### 다음 주차 연결
 Docker preview에서는 container 내부 경로와 browser에서 보이는 HTTP 경로를 구분해야 한다. 오늘의 `data.json` 경로 확인이 그 준비다.
 
 
-
 ### 다음 연결
 다음 교시는 사용자 흐름, 필터링 또는 상태 표시, error state를 추가한다.
-
 
 
 ### 공식/학술 근거 링크

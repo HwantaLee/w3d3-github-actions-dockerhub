@@ -7,6 +7,16 @@
 - Docker Hub 로그인과 credential 보호 기준을 이해한다.
 - 설치 실패를 OS 종류, Mac chip, 권한, daemon 상태, error message 기준으로 기록한다.
 
+## 설치 가이드
+Docker 설치 절차는 OS와 CPU architecture에 따라 달라진다. 수업 중에는 아래 가이드를 먼저 열고, 자신의 환경에 맞는 macOS 또는 Linux 절차를 따른다.
+
+- macOS/Linux 설치 가이드: [필수 소프트웨어 설치 가이드](../../docs/software-installation-guide.md)
+- Docker Mac 공식 설치 문서: https://docs.docker.com/desktop/setup/install/mac-install/
+- Docker Linux 공식 설치 문서: https://docs.docker.com/desktop/setup/install/linux/
+- Docker Engine Ubuntu 공식 설치 문서: https://docs.docker.com/engine/install/ubuntu/
+
+설치 완료 판단은 Docker Desktop 창이 열리는 것만으로 하지 않는다. `docker version`, `docker compose version`, `docker run --rm hello-world` 중 어디까지 성공했는지 기록한다.
+
 ## 선행 지식
 | 이미 알고 있어야 할 것 | 오늘 새로 확인할 것 |
 |---|---|

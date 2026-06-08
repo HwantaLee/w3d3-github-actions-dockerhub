@@ -28,9 +28,9 @@
 ## Schedule Index
 - Day 1: 과정별 OT, 6주 로드맵, Cloud Native/DevOps 마인드셋, 아이스브레이킹, 학습 준비
 - Day 2: 컴퓨팅 구성요소 spine, Linux/CLI, process, filesystem, network, HTTP, log/config/secret
-- Day 3: 로컬 정적 서버 실행 조건, 재현성, 관찰 가능성, RCA, AI 보조 개발 검증, spine 매핑
+- Day 3: 로컬 정적 서버 실행 조건, 재현성, 관찰 가능성, RCA, AI 보조 개발 검증, AI 정적 웹사이트 챌린지
 - Day 4: 미니 앱 scope, skeleton, 구현, 실행 증거, 운영 위험 분류, README/runbook, 7~8교시 개인 면담
-- Day 5: 산출물 통합, 컴퓨팅 spine 최종 매핑, handoff, 발표, Docker preview
+- Day 5: 산출물 통합, 컴퓨팅 spine 최종 매핑, handoff, AI 웹사이트 챌린지 발표, Docker preview
 
 ## Computing Component Spine
 ![Week 1 computing component spine](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week1/assets/week1-computing-spine.png)
