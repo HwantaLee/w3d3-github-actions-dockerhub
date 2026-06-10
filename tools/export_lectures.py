@@ -193,7 +193,7 @@ def markdown_sources(repo_root: Path, roots: list[str]) -> list[Path]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", default="output_lecture")
+    parser.add_argument("--out", default="out_lecture")
     parser.add_argument("--branch")
     parser.add_argument("--remote")
     parser.add_argument("--no-render-mermaid", action="store_true")
