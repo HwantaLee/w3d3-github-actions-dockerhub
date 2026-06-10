@@ -15,8 +15,7 @@
 | `week1/day1/assets/lesson-01-ot-flow.png` | Day 1 OT의 입장, 소통, evidence, safety 흐름을 한 장에서 읽을 수 있음 | Pass |
 | `week1/day1/assets/lesson-02-roadmap.png` | 5주 로드맵을 Week1 computing spine에서 Week2~5 기술로 연결함 | Pass |
 | `week1/day1/assets/lesson-03-ai-service-boundary.png` | AI coding agent와 business/service 운영 책임의 경계를 시각적으로 구분함 | Pass |
-| `week1/day1/assets/lesson-04-intro-card.png` | 자기소개 카드의 수업 관련 항목만 설명함 | Pass |
-| `week1/day1/assets/lesson-05-day1-checklist.png` | Day 1 마감 checklist와 다음 행동을 구조화함 | Pass |
+| `week1/day1/assets/lesson-04-datacenter-vs-cloud.png` | 데이터센터와 클라우드의 책임 이동, CAPEX/OPEX/TCO/Cloud Cost 관점을 설명함 | Pass |
 | `week1/day2/assets/lesson-02-git-vscode-roles.png` | GitHub, Git, VS Code의 책임과 clone/commit/push 경계를 설명함 | Pass |
 | `week1/day2/assets/lesson-03-mfa-pat-git-flow.png` | MFA, PAT, Git push 인증 흐름을 단계별로 보여주며 토큰 값 기록 금지를 명시함 | Pass |
 | `week1/day2/assets/lesson-04-ai-doc-verification.png` | AI 답변을 공식 문서, 명령 출력, README evidence로 검증하는 경로를 설명함 | Pass |

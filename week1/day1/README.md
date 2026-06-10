@@ -1,7 +1,7 @@
 # Week 1 Day 1: 과정별 OT, 5주 로드맵, DevOps 마인드셋, 데이터센터와 클라우드
 
 ## Day Goal
-학생은 과정 운영 방식, 5주 로드맵, Week 1 컴퓨팅 spine의 의미, DevOps 학습 태도, 데이터센터와 클라우드의 운영 책임 차이, 개인 목표와 blocker 기록 방식을 이해한다.
+학생은 과정 운영 방식, 5주 로드맵, Week 1 컴퓨팅 spine의 의미, DevOps 학습 태도, 데이터센터와 클라우드의 운영 책임/비용 구조 차이를 이해하고, Live QA로 남은 질문을 정리한다.
 
 ## Confirmed Schedule
 - 일시: 2026-06-10(수) 12:00~18:00
@@ -25,14 +25,13 @@
 | 14:00~15:00 | 5주 커리큘럼 로드맵 | Week 1 컴퓨팅 spine과 Week 2~5 기술 연결 |
 | 15:00~16:00 | 마인드셋 특강 | AI coding agent 시대의 개발, 비즈니스 서비스화 과정, DevOps/인프라 절차 |
 | 16:00~17:00 | 데이터센터 vs 클라우드 | 운영 책임, 비용 구조, 변경 속도, 공유 책임 모델 |
-| 17:00~18:00 | 학습 준비와 다음 액션 | 개인 목표, 환경 준비 체크, blocker 기록 |
+| 17:00~18:00 | 데이터센터 vs 클라우드 확장 + Live QA | CAPEX/OPEX/TCO/Cloud Cost, 규모의 경제, 학생 질문 정리 |
 
 ## Lesson Index
 - 1세션: 과정별 OT 개요 - 강사 소개, 운영 방식, 평가 증거 원칙
 - 2세션: 5주 커리큘럼 로드맵 - Week 1 spine과 Week 2~5 기술 연결
 - 3세션: AI coding agent 시대의 Cloud Native/DevOps 마인드셋 특강
 - 4세션: 데이터센터 vs 클라우드 - 운영 책임이 어디로 이동하는가
-- 5세션: 학습 준비와 다음 액션
 
 ## Official References
 - AWS: What is DevOps? https://aws.amazon.com/devops/what-is-devops/
@@ -48,5 +47,5 @@
 - 개인 학습 목표 3문장
 - 데이터센터 vs 클라우드 비교표
 - 5주 로드맵에서 기대/불안 요소 1개씩
-- 환경 준비 blocker note
+- 데이터센터/클라우드 비용 개념 질문과 답변 메모
 - 운영팀 공유용 상세 타임테이블
