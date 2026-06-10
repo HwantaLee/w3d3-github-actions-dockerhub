@@ -6,7 +6,7 @@ Day 1은 기술 실습 시작일이 아니라 과정별 OT다. 학술 기준은 
 ## Crosswalk
 | Standard | Observable action | Evidence |
 |---|---|---|
-| ABET-style communication | 자기 배경, 목표, 질문을 명확히 표현한다. | 자기소개 카드 |
+| ABET-style communication | 기술 선택의 책임, 비용, 위험을 명확히 설명한다. | 데이터센터 vs 클라우드 비교표 |
 | ABET-style professional responsibility | 온라인 강의실에서 공유 가능한 정보와 민감정보를 구분한다. | 개인정보/민감정보 주의 note |
 | CS2023 professional practice | 협업 규칙과 질문 문화를 수용한다. | participation note |
 | NIST NICE-style task | 학습 환경 접근과 blocker를 식별한다. | blocker note |

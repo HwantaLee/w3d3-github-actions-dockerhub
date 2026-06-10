@@ -1,7 +1,7 @@
-# Week 1 Day 1: 과정별 OT, 5주 로드맵, DevOps 마인드셋, 아이스브레이킹
+# Week 1 Day 1: 과정별 OT, 5주 로드맵, DevOps 마인드셋, 데이터센터와 클라우드
 
 ## Day Goal
-학생은 과정 운영 방식, 5주 로드맵, Week 1 컴퓨팅 spine의 의미, DevOps 학습 태도, 개인 목표와 blocker 기록 방식을 이해한다.
+학생은 과정 운영 방식, 5주 로드맵, Week 1 컴퓨팅 spine의 의미, DevOps 학습 태도, 데이터센터와 클라우드의 운영 책임 차이, 개인 목표와 blocker 기록 방식을 이해한다.
 
 ## Confirmed Schedule
 - 일시: 2026-06-10(수) 12:00~18:00
@@ -12,10 +12,10 @@
 ## Computing Spine Focus
 | Component | Day 1 focus |
 |---|---|
-| Identity/access | ZEP/학습 채널 접근, 자기소개 시 개인정보 노출 주의 |
+| Identity/access | ZEP/학습 채널 접근, 클라우드 권한 책임의 기초 |
 | Configuration | 개인 학습 환경과 운영 채널 확인 |
 | Observability | 학습 목표, blocker, 질문을 기록 가능한 형태로 남김 |
-| Handoff | 운영팀/강사/동료가 파악 가능한 자기소개와 준비 상태 공유 |
+| Handoff | 운영팀/강사/동료가 파악 가능한 준비 상태와 책임 범위 공유 |
 
 ## Timetable
 | Time | Session | Focus |
@@ -24,14 +24,14 @@
 | 13:00~14:00 | 점심시간 | - |
 | 14:00~15:00 | 5주 커리큘럼 로드맵 | Week 1 컴퓨팅 spine과 Week 2~5 기술 연결 |
 | 15:00~16:00 | 마인드셋 특강 | AI coding agent 시대의 개발, 비즈니스 서비스화 과정, DevOps/인프라 절차 |
-| 16:00~17:00 | 아이스브레이킹 및 자기소개 | 배경, 목표, 협업 규칙, 질문 문화 |
+| 16:00~17:00 | 데이터센터 vs 클라우드 | 운영 책임, 비용 구조, 변경 속도, 공유 책임 모델 |
 | 17:00~18:00 | 학습 준비와 다음 액션 | 개인 목표, 환경 준비 체크, blocker 기록 |
 
 ## Lesson Index
 - 1세션: 과정별 OT 개요 - 강사 소개, 운영 방식, 평가 증거 원칙
 - 2세션: 5주 커리큘럼 로드맵 - Week 1 spine과 Week 2~5 기술 연결
 - 3세션: AI coding agent 시대의 Cloud Native/DevOps 마인드셋 특강
-- 4세션: 아이스브레이킹 및 자기소개
+- 4세션: 데이터센터 vs 클라우드 - 운영 책임이 어디로 이동하는가
 - 5세션: 학습 준비와 다음 액션
 
 ## Official References
@@ -46,7 +46,7 @@
 
 ## Deliverables
 - 개인 학습 목표 3문장
-- 자기소개 카드
+- 데이터센터 vs 클라우드 비교표
 - 5주 로드맵에서 기대/불안 요소 1개씩
 - 환경 준비 blocker note
 - 운영팀 공유용 상세 타임테이블
