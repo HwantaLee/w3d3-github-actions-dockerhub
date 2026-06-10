@@ -17,7 +17,7 @@
 | 2교시 | 컴퓨팅 spine 최종 매핑 | final spine map |
 | 3교시 | 현업 DevOps handoff | handoff package |
 | 4교시 | 미니 앱 완성 실습 | final mini app, final README |
-| 5교시 | 통합 체크리스트, 평가 증거, 2~6주차 기술 매핑 | evaluation checklist, residual risk |
+| 5교시 | 통합 체크리스트, 평가 증거, 2~5주차 기술 매핑 | evaluation checklist, residual risk |
 | 6교시 | AI 웹사이트 챌린지 및 미니앱 발표 | presentation card, peer feedback |
 | 7교시 | 발표 피드백 및 live Q&A | Q&A notes, patched package |
 | 8교시 | 2주차 Docker preview | Docker readiness note |

@@ -23,10 +23,10 @@
 - 로컬 웹 서비스를 실행하고 command, port, HTTP status, log, file path로 증거를 남긴다.
 - GitHub, Git, VS Code, README를 이용해 다른 사람이 재현 가능한 handoff 문서를 만든다.
 - 작은 정적 웹앱과 더미 JSON을 만들고, 비용/보안/재현성 위험을 기록한다.
-- Week 2~6의 Docker, MSA, Kubernetes, AWS, Terraform 개념을 Week 1 컴퓨팅 spine에 연결한다.
+- Week 2~5의 Docker, MSA, Kubernetes, AWS, Terraform 개념을 Week 1 컴퓨팅 spine에 연결한다.
 
 ## Schedule Index
-- Day 1: 과정별 OT, 6주 로드맵, Cloud Native/DevOps 마인드셋, 아이스브레이킹, 학습 준비
+- Day 1: 과정별 OT, 5주 로드맵, Cloud Native/DevOps 마인드셋, 아이스브레이킹, 학습 준비
 - Day 2: 컴퓨팅 구성요소 spine, Linux/CLI, process, filesystem, network, HTTP, log/config/secret
 - Day 3: 로컬 정적 서버 실행 조건, 재현성, 관찰 가능성, RCA, AI 보조 개발 검증, AI 정적 웹사이트 챌린지
 - Day 4: 미니 앱 scope, skeleton, 구현, 실행 증거, 운영 위험 분류, README/runbook, 7~8교시 개인 면담
@@ -35,17 +35,17 @@
 ## Computing Component Spine
 ![Week 1 computing component spine](./assets/week1-computing-spine.png)
 
-| Component | Week 1 local evidence | Week 2 Docker | Week 4 Kubernetes | Week 5 AWS | Week 6 Terraform |
-|---|---|---|---|---|---|
-| Compute | process, command, exit code | container process | Pod, Deployment | EC2, ECS, Lambda | compute resource |
-| Memory | process memory note | memory limit | requests/limits | instance memory | variable |
-| Storage | file path, data path | image layer, volume | Volume, ConfigMap mount | S3, EBS, EFS, RDS | bucket/volume/db |
-| Network | localhost, port, HTTP status | port binding, bridge | Service, Ingress | VPC, SG, ALB, Route 53 | VPC/SG resource |
-| Lifecycle | start/stop/recheck | run/stop/restart | rollout/probe | service scaling | plan/apply/destroy |
-| Configuration | env var, config file | `-e`, `.env` | ConfigMap, Secret | Parameter Store | variable/sensitive |
-| Identity/access | account, permission, token risk | registry auth | ServiceAccount/RBAC | IAM/MFA/role | provider/IAM |
-| Observability | log, status, RCA | logs/inspect/stats | logs/events/probes | CloudWatch/CloudTrail | output/drift |
-| Cost boundary | local limits, excluded paid API | running resource count | node capacity | billing/budget | cost assumption |
+| Component | Week 1 local evidence | Week 2 Docker | Week 4 Kubernetes | Week 5 AWS + Terraform/IaC |
+|---|---|---|---|---|
+| Compute | process, command, exit code | container process | Pod, Deployment | EC2, ECS, Lambda, compute resource |
+| Memory | process memory note | memory limit | requests/limits | instance memory, variable |
+| Storage | file path, data path | image layer, volume | Volume, ConfigMap mount | S3, EBS, EFS, RDS, bucket/volume/db resource |
+| Network | localhost, port, HTTP status | port binding, bridge | Service, Ingress | VPC, SG, ALB, Route 53, VPC/SG resource |
+| Lifecycle | start/stop/recheck | run/stop/restart | rollout/probe | service scaling, plan/apply/destroy |
+| Configuration | env var, config file | `-e`, `.env` | ConfigMap, Secret | Parameter Store, variable/sensitive |
+| Identity/access | account, permission, token risk | registry auth | ServiceAccount/RBAC | IAM/MFA/role, provider/IAM |
+| Observability | log, status, RCA | logs/inspect/stats | logs/events/probes | CloudWatch/CloudTrail, output/drift |
+| Cost boundary | local limits, excluded paid API | running resource count | node capacity | billing/budget, cost assumption |
 
 ## Official And Academic Foundations
 - ABET Criteria for Accrediting Computing Programs, Student Outcomes  

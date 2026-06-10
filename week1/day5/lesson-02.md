@@ -3,14 +3,14 @@
 ## 수업 목표
 - Week1 활동을 computing spine의 핵심 개념과 연결한다.
 - 파일, 프로세스, 네트워크, 데이터, 증거의 관계를 설명한다.
-- Week2~6 기술이 어떤 문제를 해결하는지 예고한다.
+- Week2~5 기술이 어떤 문제를 해결하는지 예고한다.
 
 ## 50분 운영
 | 시간 | 활동 | 학습 초점 | 학생 산출 |
 |---|---|---|---|
 | 0-10분 | spine 개념 회상 | Day1~4 활동을 질문으로 끌어낸다. | 개념 목록 |
 | 10-25분 | 개인 매핑 작성 | 자기 앱 evidence와 spine을 연결한다. | mapping table |
-| 25-35분 | Week2~6 연결 | Docker/CI/CD/cloud/security를 문제 해결 관점으로 예고한다. | 기술 연결 |
+| 25-35분 | Week2~5 연결 | Docker/CI/CD/cloud/security를 문제 해결 관점으로 예고한다. | 기술 연결 |
 | 35-45분 | 짝 설명 | 상대에게 2분 설명한다. | 설명 피드백 |
 | 45-50분 | 최종 수정 | 모호한 용어를 evidence로 바꾼다. | final map |
 
@@ -59,9 +59,9 @@ flowchart TD
     E --> W[Week2 Docker preview]
 ```
 
-## 25-35분 Week2~6 연결
+## 25-35분 Week2~5 연결
 
-- 진행: Week2~6 연결
+- 진행: Week2~5 연결
 
 - 초점: Docker/CI/CD/cloud/security를 문제 해결 관점으로 예고한다.
 

@@ -1,6 +1,6 @@
 # 개요
 
-- 주차 : 6주
+- 주차 : 5주
 - 일별 수업 시간 : 일 8시간, 50분 수업 10분 휴식, 매 정시 시작
 - 1주차 1일차 과정별 OT는 운영 확정 일정에 따라 2026-06-10(수) 12:00~18:00, 점심시간 13:00~14:00, 총 5시간으로 진행한다.
 - 수업 범위 : Devops, Cloud(AWS), Docker, Kubernetes, MSA, IaC, Observability, Kubernetes Known plugins
@@ -47,7 +47,7 @@
 
 - 12:00~13:00 : 과정별 OT 개요 - 강사 소개, 운영 방식, ZEP/소통 채널, 평가 증거 원칙
 - 13:00~14:00 : 점심시간
-- 14:00~15:00 : 6주 커리큘럼 로드맵 - Week 1 컴퓨팅 spine과 Week 2~6 기술 연결
+- 14:00~15:00 : 5주 커리큘럼 로드맵 - Week 1 컴퓨팅 spine과 Week 2~5 기술 연결
 - 15:00~16:00 : AI coding agent 시대의 Cloud Native/DevOps 마인드셋 특강 - Claude Code/Codex로 작은 앱은 쉬워졌지만 비즈니스 서비스화에는 인프라, 보안, 배포, 관찰, 비용, 장애 대응 절차가 필요하다는 인사이트
 - 16:00~17:00 : 아이스브레이킹 및 자기소개 - 배경, 목표, 불안 요소, 협업 규칙
 - 17:00~18:00 : 학습 준비와 다음 액션 - 개인 목표, 환경 준비 체크, blocker 기록, 운영팀 공유용 안내 정리
@@ -91,7 +91,7 @@
 - 2교시 : 컴퓨팅 spine 최종 매핑 - 내 앱을 compute/storage/network/config/observability 관점으로 설명
 - 3교시 : 현업 DevOps handoff - 다른 사람이 실행, 확인, 문제 대응할 수 있는 문서 기준
 - 4교시 : 미니 앱 완성 실습 - 기능 마감, JSON 수정, 오류 처리, README/runbook 보완
-- 5교시 : 통합 체크리스트와 평가 증거 - command evidence, log/status, risk table, blocker log, 2~6주차 기술 매핑
+- 5교시 : 통합 체크리스트와 평가 증거 - command evidence, log/status, risk table, blocker log, 2~5주차 기술 매핑
 - 6교시 : 미니 발표 - 문제, 사용자 흐름, 실행 방법, evidence, risk, 다음 기술 연결
 - 7교시 : 발표 피드백 및 live Q&A - 기술 피드백, 위험 triage, Docker readiness
 - 8교시 : 2주차 Docker preview - Week 1 spine 중 process/filesystem/network/config가 container로 확장되는 이유
@@ -440,6 +440,10 @@
 - console
 - cloudwatch
 - cost explorer
+- terraform
+- iac
+- state
+- drift
 
 ## 5주차 목표
 - 1주차에 배운 컴퓨팅 구성요소를 AWS 클라우드 서비스 이름과 역할로 확장한다.
@@ -447,14 +451,14 @@
 - AWS Console을 이용해 직접 리소스를 만들고 연결하면서 수작업 구성의 흐름과 불편함을 체감한다.
 - 비용이 발생하는 지점을 예측하고 Budget, Cost Explorer, 태그 기반 비용 관리의 필요성을 이해한다.
 - CloudWatch Logs, Metrics, Alarm, Dashboard를 이용해 기본적인 관찰 가능성 실습을 수행한다.
-- 6주차 Terraform IaC로 전환하기 위해 콘솔 작업 절차, 설정값, 의존 관계를 문서화한다.
+- 5주차 후반 Terraform/IaC로 전환하기 위해 콘솔 작업 절차, 설정값, 의존 관계를 문서화한다.
 
 ## 5주차 운영 원칙
 - 5주차 실습은 AWS Console 기준으로 진행한다.
 - 모든 리소스는 정해진 리전과 공통 태그를 사용하고, 실습 종료 시 삭제 또는 중지 절차를 반드시 확인한다.
 - FinOps와 Observability는 별도 이론으로 분리하지 않고, 리소스 선택과 운영 판단 안에 함께 다룬다.
 - 복잡한 프로덕션 구성이 아니라 "AWS 서비스가 어떤 컴퓨팅 구성요소를 대체하거나 확장하는가"에 집중한다.
-- 콘솔 수작업의 반복성, 누락 위험, 재현 어려움을 기록해 6주차 IaC 전환의 근거로 사용한다.
+- 콘솔 수작업의 반복성, 누락 위험, 재현 어려움을 기록해 5주차 후반 IaC 전환의 근거로 사용한다.
 - 매주 1일차와 4일차 7~8교시는 개인 면담, 환경 점검, 보충 실습, 진도 회복 시간으로 둔다.
 
 ## 1일차
@@ -505,7 +509,7 @@
 - 5교시 : Terraform 전환 준비 - 콘솔 설정값 목록화, 리소스 의존성, 변수화할 값, 민감정보 분리
 - 6교시 : 5주차 발표 - AWS 서비스 매핑, 구성 절차, 비용/관찰 지점, 콘솔 수작업의 불편함 설명
 - 7교시 : 발표 피드백 및 라이브 Q&A - 서비스 선택, 비용 위험, 관찰 가능성, IaC 전환 범위 점검
-- 8교시 : 차주 수업내용 Overview - Terraform으로 동일한 AWS 구성을 재현하고 변경/삭제까지 관리
+- 8교시 : 전체 과정 회고 및 Terraform/IaC 전환 Overview - 동일한 AWS 구성을 코드로 재현하고 변경/삭제까지 관리하는 관점 정리
 
 ## 5주차 산출물
 - AWS Console로 구성한 실습 아키텍처 다이어그램
@@ -514,7 +518,7 @@
 - CloudWatch Logs/Metrics/Alarm/Dashboard 실습 기록
 - 장애 주입 및 관찰 기록 1개
 - 콘솔 구성 절차와 설정값 목록
-- 6주차 Terraform 전환 대상 리소스 목록
+- Terraform 전환 대상 리소스 목록
 - 비용 발생 리소스 정리 체크리스트
 
 ## 5주차 환경 준비 체크리스트
@@ -526,101 +530,3 @@
 - VPC, security group, EC2 또는 ECS 리소스 생성 가능
 - CloudWatch Logs/Metrics/Alarm 접근 가능
 - 실습 종료 후 삭제/중지할 리소스 목록 확인
-
-# 6주차
-## Keyword
-- terraform
-- iac
-- aws
-- state
-- plan
-- apply
-- destroy
-- module
-- variables
-- drift
-
-## 6주차 목표
-- 5주차 AWS Console 구성에서 느낀 반복성, 누락 위험, 재현 어려움을 IaC로 해결한다.
-- Terraform의 provider, resource, variable, output, state, plan/apply/destroy 흐름을 이해한다.
-- 5주차에 만든 AWS 네트워크, compute, security, observability 구성 일부를 Terraform으로 재현한다.
-- Terraform plan을 통해 변경 전 검토하고, apply/destroy로 생성과 정리를 통제한다.
-- state 관리, drift, secret 처리, 비용 위험 등 IaC 운영 시 주의할 점을 이해한다.
-- 최종적으로 Console과 IaC 방식의 차이, FinOps/Observability를 코드에 반영하는 방법을 설명한다.
-
-## 6주차 운영 원칙
-- 6주차는 새로운 아키텍처를 만드는 주차가 아니라 5주차 콘솔 구성을 코드로 재현하는 주차로 운영한다.
-- Terraform 실습 범위는 비용과 위험을 통제할 수 있는 작은 AWS 구성으로 제한한다.
-- 모든 apply 전 plan을 읽고, 모든 실습 후 destroy 또는 정리 상태를 확인한다.
-- 민감정보는 코드에 직접 넣지 않고 변수, 환경변수, AWS 관리 기능으로 분리하는 원칙을 지킨다.
-- IaC 코드에는 비용 추적을 위한 태그와 관찰 가능성을 위한 로그/알림 설정을 가능한 범위에서 포함한다.
-- 매주 1일차와 4일차 7~8교시는 개인 면담, 환경 점검, 보충 실습, 진도 회복 시간으로 둔다.
-
-## 1일차
-- 1교시 : 5주차 복습 및 IaC가 필요한 이유 - 콘솔 수작업의 문제, 재현성, 리뷰, 변경 이력
-- 2교시 : Terraform 기본 개념 - provider, resource, data source, variable, output, state
-- 3교시 : Terraform 설치 및 AWS 인증 준비 - terraform version, AWS CLI 또는 환경변수, 권한 확인
-- 4교시 : 첫 Terraform 실습 - provider 설정, 간단한 resource 작성, init, fmt, validate
-- 5교시 : plan/apply/destroy 흐름 - 변경 미리보기, 생성, 삭제, 실패 시 확인 방법
-- 6교시 : state 파일 이해 - local state, remote state 개념, state에 민감정보가 남을 수 있는 위험
-- 7교시 : 개인 면담 및 환경 점검 - Terraform 설치, AWS 인증, 권한, provider init 문제 해결
-- 8교시 : 보충 실습 - init/plan/apply 실패 학생 진도 회복
-
-## 2일차
-- 1교시 : 5주차 네트워크 구성을 Terraform으로 옮기기 - VPC, subnet, route table, internet gateway
-- 2교시 : security group 코드화 - ingress/egress, 최소 오픈 포트, 이름과 태그 규칙
-- 3교시 : 변수와 출력값 - region, project name, CIDR, port, tags를 variable/output으로 분리
-- 4교시 : EC2 구성 코드화 - AMI, instance type, key pair 또는 user data, 태그
-- 5교시 : user data와 부트스트랩 - 간단한 웹 서비스 실행, 로그 확인, 재생성 시 동작 확인
-- 6교시 : Terraform으로 생성한 리소스 검증 - Console, curl, CloudWatch, terraform state 비교
-- 7교시 : 변경 실습 - instance type, tag, security group rule 변경 후 plan 차이 읽기
-- 8교시 : 정리 실습 - destroy 전 비용 영향 확인, destroy 후 잔여 리소스 확인
-
-## 3일차
-- 1교시 : ALB 또는 ECS 구성 코드화 전략 - 어떤 리소스부터 IaC로 옮길지 범위 결정
-- 2교시 : ALB 기본 구성 - target group, listener, health check, security group 관계
-- 3교시 : S3 또는 RDS 구성 코드화 - 비용과 삭제 위험을 고려한 실습 범위 선택
-- 4교시 : CloudWatch 코드화 - log group, alarm, dashboard 또는 metric alarm 기본 구성
-- 5교시 : FinOps를 IaC에 반영하기 - 필수 태그, Budget은 Console/API 한계 설명, 비용 알림 운영 기준
-- 6교시 : drift 개념 실습 - Console에서 수동 변경 후 terraform plan으로 차이 확인
-- 7교시 : drift 대응 - 되돌릴지, 코드에 반영할지, 운영 변경 절차를 어떻게 둘지 정리
-- 8교시 : IaC 운영 기록 작성 - plan 결과, apply 결과, drift 확인 내용을 문서화
-
-## 4일차
-- 1교시 : Terraform 코드 구조화 - main.tf, variables.tf, outputs.tf, locals, naming 규칙
-- 2교시 : module 개념 - 반복되는 네트워크/컴퓨트 구성을 묶는 이유와 과도한 추상화의 위험
-- 3교시 : 환경 분리 전략 - dev/stage/prod 디렉터리, workspace 개념, 변수 파일
-- 4교시 : state 관리 전략 - local state의 한계, S3 backend와 DynamoDB lock 개념 소개
-- 5교시 : 보안과 secret 관리 - tfvars 주의, Git에 올리면 안 되는 파일, IAM 권한 최소화
-- 6교시 : IaC 리뷰 관점 - plan 리뷰, 비용 리뷰, 보안 리뷰, observability 누락 리뷰
-- 7교시 : 개인 면담 및 환경 점검 - 코드 구조, state, drift, destroy, 권한 문제 확인
-- 8교시 : 보충 실습 - Terraform 코드 정리, plan 실패, destroy 실패, 잔여 리소스 확인
-
-## 5일차
-- 1교시 : 최종 통합 실습 안내 - 5주차 콘솔 구성을 Terraform으로 재현하고 운영 관점으로 설명
-- 2교시 : 최종 Terraform apply - 네트워크, compute, 보안 그룹, 관찰 가능성 일부 구성 생성
-- 3교시 : 서비스 검증 - 접속 확인, 로그/메트릭/알람 확인, 태그/비용 추적 기준 확인
-- 4교시 : 장애 또는 변경 실습 - 포트 변경, instance type 변경, alarm threshold 변경 후 plan/apply 확인
-- 5교시 : 최종 정리 - destroy, 잔여 리소스 점검, 비용 발생 가능성 확인
-- 6교시 : 최종 발표 - Console vs Terraform 비교, 재현성, 비용 관리, 관찰 가능성, 남은 리스크 설명
-- 7교시 : 전체 과정 회고 및 Q&A - Docker, MSA, Kubernetes, AWS, Terraform이 연결되는 흐름 정리
-- 8교시 : 수료 전 개인 피드백 - 포트폴리오 정리 방향, 면접에서 설명할 수 있는 운영 사례 정리
-
-## 6주차 산출물
-- 5주차 AWS 콘솔 구성을 재현하는 Terraform 코드
-- `terraform init/fmt/validate/plan/apply/destroy` 실행 기록
-- 변수, 출력값, 태그, 보안 그룹 규칙 설명 문서
-- CloudWatch 또는 비용 추적 관련 IaC 구성 기록
-- drift 확인 및 대응 기록 1개
-- Console 수작업과 Terraform 방식 비교 회고
-- 최종 리소스 삭제/정리 체크리스트
-
-## 6주차 환경 준비 체크리스트
-- Terraform 설치 및 `terraform version` 확인
-- AWS 인증 설정 가능
-- `terraform init` 성공
-- `terraform fmt`와 `terraform validate` 성공
-- `terraform plan` 결과를 읽고 변경 내용을 설명 가능
-- `terraform apply`로 작은 AWS 구성 생성 가능
-- `terraform destroy` 후 잔여 리소스 확인 가능
-- state 파일과 민감정보 취급 주의사항 이해

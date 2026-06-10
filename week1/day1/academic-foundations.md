@@ -10,7 +10,7 @@ Day 1은 기술 실습 시작일이 아니라 과정별 OT다. 학술 기준은 
 | ABET-style professional responsibility | 온라인 강의실에서 공유 가능한 정보와 민감정보를 구분한다. | 개인정보/민감정보 주의 note |
 | CS2023 professional practice | 협업 규칙과 질문 문화를 수용한다. | participation note |
 | NIST NICE-style task | 학습 환경 접근과 blocker를 식별한다. | blocker note |
-| Bloom understand/analyze | 6주 로드맵에서 자신의 강점/불안 요소를 분석한다. | expectation/risk note |
+| Bloom understand/analyze | 5주 로드맵에서 자신의 강점/불안 요소를 분석한다. | expectation/risk note |
 | Bloom evaluate | AI가 만든 작은 앱을 비즈니스 서비스로 확장할 때 필요한 절차를 평가한다. | AI-to-business insight note |
 
 ## DevOps Practitioner Lens
