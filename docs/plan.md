@@ -7,6 +7,24 @@
 - 과목 명 : Cloud Native
 - 대상자 : 전공 막학기 학생, 비전공 취업준비생, 전직 개발자 (클라우드 직군 이직 희망자)
 
+## 5주 운영 구조
+| 주차 | 핵심 주제 | 주차 산출물 |
+|---|---|---|
+| 1주차 | 컴퓨팅 펀더멘털, DevOps 마인드셋, 로컬 서비스 실행 증거 | 미니 웹앱, README/runbook, 실행 증거, RCA, 컴퓨팅 spine 매핑 |
+| 2주차 | Docker, 이미지/컨테이너, Dockerfile, Compose | Dockerfile, compose.yaml, 이미지 실행 기록, 컨테이너 장애 분석 |
+| 3주차 | MSA, 서비스 경계, API/데이터 의존성, 다중 서비스 운영 | MSA 실습 앱 실행 기록, 서비스 계약, 의존성/장애 전파 분석 |
+| 4주차 | Kubernetes, manifest, rollout, service discovery, 운영 플러그인 | Kubernetes manifest, Helm/plugin 기록, rollout/rollback, 클러스터 장애 분석 |
+| 5주차 | AWS 서비스 매핑, FinOps, Observability, Terraform/IaC 기초 | AWS 아키텍처 다이어그램, 비용/관찰 기록, Terraform 코드/plan/destroy 기록 |
+
+## 일차 운영 리듬
+| 일차 | 공통 흐름 |
+|---|---|
+| 1일차 | 전주 산출물 복습, 주차 핵심 개념, 환경 점검 |
+| 2일차 | 핵심 구성요소 실습 1, 실행 증거 작성 |
+| 3일차 | 핵심 구성요소 실습 2, 연결/관찰/장애 분석 |
+| 4일차 | 운영 관점 확장, 장애 주입, 개인 면담/보충 실습 |
+| 5일차 | 통합 실습, 산출물 정리, 발표/피드백, 다음 단계 연결 |
+
 # 1주차
 
 ## keyword
@@ -189,8 +207,8 @@
 - 4교시 : 이미지 배포 흐름 - build, tag, push, pull, run으로 보는 배포 파이프라인
 - 5교시 : 2주차 통합 실습 - 표준 실습 앱을 Dockerfile과 Compose로 실행 가능하게 정리
 - 6교시 : 2주차 발표 - Docker로 실행하는 방법, 겪은 장애, 해결 과정, 남은 문제 공유
-- 7교시 : 발표 피드백 및 라이브 Q&A - Dockerfile/Compose 개선점, 다음 주차 클라우드 배포 연결
-- 8교시 : 차주 수업내용 Overview - AWS 기반 배포 또는 Kubernetes 진입 전 필요한 개념 정리
+- 7교시 : 발표 피드백 및 라이브 Q&A - Dockerfile/Compose 개선점, 다음 주차 MSA 연결
+- 8교시 : 3주차 MSA Overview - Compose로 여러 서비스를 실행할 때 service boundary, API, DB, worker가 왜 중요해지는지 정리
 
 ## 2주차 산출물
 - 표준 실습 애플리케이션용 Dockerfile
@@ -289,7 +307,7 @@
 - 5교시 : 장애 복구 실습 - 원인 분석, 설정 복구, 서비스 재시작, 개발팀 전달사항 정리
 - 6교시 : 3주차 발표 - 서비스 토폴로지, 실행 조건, 발생한 장애, 운영 대응, Kubernetes가 필요해지는 지점 설명
 - 7교시 : 발표 피드백 및 라이브 Q&A - 인프라/개발 협업 요청사항, 운영 복잡도, 다음 주차 Kubernetes 연결
-- 8교시 : 차주 수업내용 Overview - Kubernetes의 Pod, Deployment, Service, ConfigMap, Secret이 등장하는 이유
+- 8교시 : 4주차 Kubernetes Overview - Pod, Deployment, Service, ConfigMap, Secret이 등장하는 이유
 
 ## 3주차 산출물
 - MSA 실습 애플리케이션 실행 가능한 compose.yaml
@@ -397,7 +415,7 @@
 - 5교시 : 운영 문서 작성 - 배포 방법, Helm release, 확인 명령, 장애 확인 명령, rollback 절차 정리
 - 6교시 : 4주차 발표 - Kubernetes 리소스 구조, 플러그인 역할, 트래픽/보안/관찰 흐름, 장애 분석 설명
 - 7교시 : 발표 피드백 및 라이브 Q&A - manifest와 Helm 개선점, 플러그인 운영 위험, 클라우드 이전 시 고려사항
-- 8교시 : 차주 수업내용 Overview - 컴퓨팅 구성요소를 AWS 서비스로 확장하고 FinOps, Observability와 연결
+- 8교시 : 5주차 AWS/Terraform Overview - 컴퓨팅 구성요소를 AWS 서비스로 확장하고 FinOps, Observability, IaC와 연결
 
 ## 4주차 산출물
 - MSA 실습 앱을 배포할 Kubernetes manifest 세트
@@ -451,14 +469,16 @@
 - AWS Console을 이용해 직접 리소스를 만들고 연결하면서 수작업 구성의 흐름과 불편함을 체감한다.
 - 비용이 발생하는 지점을 예측하고 Budget, Cost Explorer, 태그 기반 비용 관리의 필요성을 이해한다.
 - CloudWatch Logs, Metrics, Alarm, Dashboard를 이용해 기본적인 관찰 가능성 실습을 수행한다.
-- 5주차 후반 Terraform/IaC로 전환하기 위해 콘솔 작업 절차, 설정값, 의존 관계를 문서화한다.
+- Terraform의 provider, resource, variable, output, state, plan/apply/destroy 흐름을 이해한다.
+- AWS Console 구성 일부를 Terraform 코드로 재현하고, 변경 검토와 정리 절차를 기록한다.
 
 ## 5주차 운영 원칙
-- 5주차 실습은 AWS Console 기준으로 진행한다.
+- 5주차 전반은 AWS Console 기준으로 진행하고, 후반은 동일한 구성을 Terraform/IaC 관점으로 전환한다.
 - 모든 리소스는 정해진 리전과 공통 태그를 사용하고, 실습 종료 시 삭제 또는 중지 절차를 반드시 확인한다.
 - FinOps와 Observability는 별도 이론으로 분리하지 않고, 리소스 선택과 운영 판단 안에 함께 다룬다.
 - 복잡한 프로덕션 구성이 아니라 "AWS 서비스가 어떤 컴퓨팅 구성요소를 대체하거나 확장하는가"에 집중한다.
-- 콘솔 수작업의 반복성, 누락 위험, 재현 어려움을 기록해 5주차 후반 IaC 전환의 근거로 사용한다.
+- 콘솔 수작업의 반복성, 누락 위험, 재현 어려움을 Terraform plan/state/drift 개념과 연결한다.
+- 모든 Terraform apply 전 plan을 읽고, 실습 후 destroy 또는 잔여 리소스 확인을 수행한다.
 - 매주 1일차와 4일차 7~8교시는 개인 면담, 환경 점검, 보충 실습, 진도 회복 시간으로 둔다.
 
 ## 1일차
@@ -495,21 +515,21 @@
 - 1교시 : 운영 대시보드 기본 - CloudWatch Dashboard, 서비스별 핵심 지표, 장애 확인 순서
 - 2교시 : FinOps 실습 - Cost Explorer, Budget 알림, 태그별 비용 추적, 리소스별 비용 발생 지점 확인
 - 3교시 : 보안 운영 기본 - IAM 최소 권한, security group 검토, secret 노출 위험, public resource 점검
-- 4교시 : 장애 주입과 관찰 - security group 포트 차단, target health 실패, 인스턴스 중지 후 CloudWatch/ALB 확인
-- 5교시 : 콘솔 작업의 한계 정리 - 클릭 순서 누락, 설정값 불일치, 재현 어려움, 리뷰 불가능성
-- 6교시 : IaC가 필요한 이유 - 5주차 콘솔 구성을 Terraform으로 옮길 때의 이점과 주의점
-- 7교시 : 개인 면담 및 환경 점검 - AWS 리소스 상태, 비용 알림, CloudWatch, 삭제 대상 확인
-- 8교시 : 보충 실습 - 리소스 연결 실패, 알림 설정, 비용 확인, 보안 그룹 문제 해결
+- 4교시 : 콘솔 작업의 한계 정리 - 클릭 순서 누락, 설정값 불일치, 재현 어려움, 리뷰 불가능성
+- 5교시 : Terraform 기본 개념 - provider, resource, variable, output, state, plan/apply/destroy
+- 6교시 : Terraform 설치 및 인증 준비 - terraform version, AWS 인증, provider init, fmt, validate
+- 7교시 : 개인 면담 및 환경 점검 - AWS 리소스 상태, 비용 알림, CloudWatch, Terraform init 문제 확인
+- 8교시 : 보충 실습 - 리소스 연결 실패, 알림 설정, 비용 확인, provider 인증 문제 해결
 
 ## 5일차
-- 1교시 : 5주차 통합 실습 안내 - 콘솔로 구성한 AWS 아키텍처를 운영 관점에서 점검
-- 2교시 : 아키텍처 다이어그램 작성 - VPC, subnet, EC2/ECS, ALB, S3/RDS, CloudWatch, 비용 경계 표시
-- 3교시 : 운영 Runbook 작성 - 배포 확인, 장애 확인, 로그/메트릭 확인, 비용 확인, 정리 절차
-- 4교시 : 리소스 정리 실습 - 비용 발생 리소스 삭제/중지, 삭제 보호, snapshot, EIP, NAT 등 잔여 비용 확인
-- 5교시 : Terraform 전환 준비 - 콘솔 설정값 목록화, 리소스 의존성, 변수화할 값, 민감정보 분리
-- 6교시 : 5주차 발표 - AWS 서비스 매핑, 구성 절차, 비용/관찰 지점, 콘솔 수작업의 불편함 설명
+- 1교시 : Terraform 전환 범위 결정 - 콘솔 설정값 목록화, 리소스 의존성, 변수화할 값, 민감정보 분리
+- 2교시 : 작은 AWS 구성 코드화 - region, tag, security group, EC2 또는 S3 등 비용 통제 가능한 리소스 작성
+- 3교시 : Terraform plan 검토 - 변경 전 미리보기, 비용/보안/태그/관찰 가능성 누락 확인
+- 4교시 : Terraform apply 및 검증 - Console, curl, CloudWatch, terraform state 비교
+- 5교시 : 변경/drift/정리 실습 - tag 또는 rule 변경, plan 차이 확인, destroy 후 잔여 리소스 점검
+- 6교시 : 5주차 발표 - AWS 서비스 매핑, 구성 절차, 비용/관찰 지점, Console vs Terraform 비교
 - 7교시 : 발표 피드백 및 라이브 Q&A - 서비스 선택, 비용 위험, 관찰 가능성, IaC 전환 범위 점검
-- 8교시 : 전체 과정 회고 및 Terraform/IaC 전환 Overview - 동일한 AWS 구성을 코드로 재현하고 변경/삭제까지 관리하는 관점 정리
+- 8교시 : 전체 과정 회고 - Docker, MSA, Kubernetes, AWS, Terraform이 하나의 운영 흐름으로 연결되는 방식 정리
 
 ## 5주차 산출물
 - AWS Console로 구성한 실습 아키텍처 다이어그램
@@ -518,7 +538,9 @@
 - CloudWatch Logs/Metrics/Alarm/Dashboard 실습 기록
 - 장애 주입 및 관찰 기록 1개
 - 콘솔 구성 절차와 설정값 목록
-- Terraform 전환 대상 리소스 목록
+- Terraform 전환 대상 리소스 목록과 최소 Terraform 코드
+- `terraform init/fmt/validate/plan/apply/destroy` 실행 기록
+- state, drift, secret, 비용 위험에 대한 운영 note
 - 비용 발생 리소스 정리 체크리스트
 
 ## 5주차 환경 준비 체크리스트
@@ -529,4 +551,8 @@
 - 공통 태그 규칙 확인
 - VPC, security group, EC2 또는 ECS 리소스 생성 가능
 - CloudWatch Logs/Metrics/Alarm 접근 가능
+- Terraform 설치 및 `terraform version` 확인
+- AWS 인증을 Terraform provider에서 사용할 수 있음
+- `terraform init`, `terraform fmt`, `terraform validate` 실행 가능
+- `terraform plan` 결과를 읽고 변경 내용을 설명 가능
 - 실습 종료 후 삭제/중지할 리소스 목록 확인
