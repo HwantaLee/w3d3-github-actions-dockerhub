@@ -22,7 +22,7 @@
 | 1일차 | 전주 산출물 복습, 주차 핵심 개념, 환경 점검 |
 | 2일차 | 핵심 구성요소 실습 1, 실행 증거 작성 |
 | 3일차 | 핵심 구성요소 실습 2, 연결/관찰/장애 분석 |
-| 4일차 | 운영 관점 확장, 장애 주입, 개인 면담/보충 실습 |
+| 4일차 | 운영 관점 확장, 장애 주입, 최초 1:1 개인 면담/멘토링 |
 | 5일차 | 통합 실습, 산출물 정리, 발표/피드백, 다음 단계 연결 |
 
 # 1주차
@@ -44,7 +44,7 @@
 - Docker, Kubernetes, AWS, Terraform은 미래 anchor로만 언급하고, 모든 언급은 Week 1 컴퓨팅 spine에 연결한다.
 - 모든 활동은 관찰 가능한 증거를 남긴다. "완료"라는 말만으로는 통과하지 않는다.
 - 비유는 최소화하고 공식 문서, 학술 기준, 현업 DevOps/SRE 기준, 실행 증거를 우선한다.
-- 매주 4일차 7~8교시는 개인 면담, 환경 점검, 보충 실습, 진도 회복 시간으로 둔다.
+- 1주차 4일차 7~8교시는 최초 1:1 개인 면담과 기본 멘토링 시간으로 둔다. 샘플앱 진행 상태는 면담 자료로만 사용하고, 새 진도나 별도 과제처럼 운영하지 않는다.
 
 ## 1주차 컴퓨팅 spine
 | Fundamental | Local computer | Docker로 확장 | Kubernetes로 확장 | AWS로 확장 | Terraform/IaC로 확장 |
@@ -94,23 +94,23 @@
 
 ## 4일차
 
-- 1교시 : 미니 앱 요구사항과 범위 경계 - static frontend, dummy JSON, no backend, no paid API
-- 2교시 : 미니 앱 skeleton 생성 - file tree, README 초안, data path, start command
-- 3교시 : 미니 앱 구현 1 - HTML 구조, CSS, JS, dummy JSON 연결
-- 4교시 : 미니 앱 구현 2 - 사용자 흐름, data rendering, error state
-- 5교시 : 실행 증거 작성 - 명령, port, URL, curl/browser 확인 기록, screenshot filename
-- 6교시 : 운영 위험 분류와 README/runbook 기초 - cost, security, reliability, reproducibility, handoff risk
-- 7교시 : 개인 면담 및 환경 점검 - Git, CLI, local server, README, 미니 앱 막힘 기록 해결
-- 8교시 : 개인 면담 및 보충 실습 - 범위 조정, 실행 실패 복구, 다음 단계 상담
+- 1교시 : 공통 샘플앱 구조 읽기 - HTML, CSS, JS, data.json, README의 역할과 실행 조건 확인
+- 2교시 : 샘플앱 로컬 서버 실행 - `python3 -m http.server`, browser/curl/status/server log 확인
+- 3교시 : 성공 상태 관찰 - 정상 화면, data rendering, console/network, 실행 확인 기록 작성
+- 4교시 : 실패 1 - 잘못된 URL과 404 관찰, 서버 죽음과 resource 없음 구분
+- 5교시 : 실패 2 - data.json 경로/JSON 오류 체험, browser console/network로 원인 후보 찾기
+- 6교시 : README/runbook 작성 - start/check/stop/troubleshoot, cost/security/reproducibility/handoff risk
+- 7교시 : 최초 1:1 개인 면담 1 - 학습 배경, 환경 상태, 관심/불안, 샘플앱 진행 상태 확인
+- 8교시 : 최초 1:1 개인 면담 2 및 기본 멘토링 - 학습 목표, 막힘 유형, 보완 계획, Day5 통합 이월 메모
 
 ## 5일차
 
-- 1교시 : 1주차 산출물 통합 - repo, README, mini app, data, 확인 기록, RCA
-- 2교시 : 컴퓨팅 spine 최종 매핑 - 내 앱을 compute/storage/network/config/observability 관점으로 설명
+- 1교시 : 1주차 산출물 통합 - repo, README, Day3 챌린지, Day4 샘플앱 운영 기록, 확인 기록, RCA
+- 2교시 : 컴퓨팅 spine 최종 매핑 - Day3 챌린지와 Day4 샘플앱을 compute/storage/network/config/observability 관점으로 설명
 - 3교시 : 현업 DevOps handoff - 다른 사람이 실행, 확인, 문제 대응할 수 있는 문서 기준
-- 4교시 : 미니 앱 완성 실습 - 기능 마감, JSON 수정, 오류 처리, README/runbook 보완
-- 5교시 : 통합 체크리스트와 평가 증거 - 명령 확인 기록, log/status, risk table, 막힘 기록 log, 2~5주차 기술 매핑
-- 6교시 : 미니 발표 - 문제, 사용자 흐름, 실행 방법, 확인 기록, risk, 다음 기술 연결
+- 4교시 : 샘플앱 운영 기록 보완 - 성공/실패/오류 관찰 기록, README/runbook 보완
+- 5교시 : 통합 체크리스트와 평가 기준 - 명령 확인 기록, log/status, risk table, 막힘 기록 log, 2~5주차 기술 매핑
+- 6교시 : Day3 챌린지와 Day4 운영 기록 발표 - 문제, 사용자 흐름, 실행 방법, 확인 기록, risk, 다음 기술 연결
 - 7교시 : 발표 피드백 및 live Q&A - 기술 피드백, 위험 분류, Docker readiness
 - 8교시 : 2주차 Docker preview - Week 1 spine 중 process/filesystem/network/config가 container로 확장되는 이유
 

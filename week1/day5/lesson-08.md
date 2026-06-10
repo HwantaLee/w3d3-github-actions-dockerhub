@@ -1,9 +1,22 @@
 # 8교시: 2주차 실행 환경 표준화 preview
 
 ## 수업 목표
-- 실행 환경 표준화가 Week1 미니 앱의 어떤 문제를 해결하는지 설명한다.
+- 실행 환경 표준화가 Day4 샘플앱 운영에서 드러난 어떤 문제를 해결하는지 설명한다.
 - 실행 단위, 실행 조건, 외부 접근 경로를 미리 연결한다.
 - Week2 실습을 위한 readiness note를 작성한다.
+
+## 오늘 반드시 가져갈 것
+| 필수 개념 | 왜 필수인가 | 놓치면 생기는 문제 | 확인 기록 |
+|---|---|---|---|
+| 실행 환경 표준화 | 같은 앱을 다른 환경에서도 같은 조건으로 실행하게 만든다. | 내 컴퓨터에서만 되는 상태로 Week2를 시작한다. | readiness note |
+| Build context | 앱 폴더가 다음 주 Docker build의 입력이 된다. | 필요한 파일과 불필요한 파일을 구분하지 못한다. | file list |
+| Port mapping | 로컬 포트와 컨테이너 포트를 구분할 준비를 한다. | 접속 주소 문제를 앱 오류로 오해한다. | port note |
+| Week1 마감 | Week1 확인 기록이 Week2 실습의 출발점이다. | 다음 주차에서 기존 누락을 다시 찾는다. | Week2 question |
+
+### 챌린저 복구 기준
+- 오늘은 Docker 명령을 외우는 시간이 아니라 왜 필요한지 정리하는 시간이다.
+- readiness note에는 앱 폴더, 시작 명령, 포트, 확인 방법, 남은 위험을 적는다.
+- Week2 질문은 추상 질문보다 내 앱 기준으로 쓴다.
 
 ## 50분 운영
 | 시간 | 활동 | 학습 초점 | 학생 산출 |
@@ -11,7 +24,7 @@
 | 0-10분 | Docker 필요성 질문 | "왜 내 컴퓨터에서는 되는데?" 문제를 확인한다. | 문제 인식 |
 | 10-20분 | 개념 preview | 실행 단위, 실행 조건, 외부 접근 경로를 Week1 용어로 설명한다. | 용어 매핑 |
 | 20-35분 | 실행 조건 카드 읽기 | 완성 문법을 외우지 않고 필요한 입력 정보의 역할을 읽는다. | concept notes |
-| 35-45분 | readiness note | 자기 앱이 표준 실행 환경으로 옮겨질 준비가 되었는지 점검한다. | readiness note |
+| 35-45분 | readiness note | Day4 샘플앱이 표준 실행 환경으로 옮겨질 준비가 되었는지 점검한다. | readiness note |
 | 45-50분 | Week1 마감 | 제출물과 남은 위험을 확정한다. | final risk |
 
 ## 0-10분 Docker 필요성 질문
@@ -34,7 +47,7 @@
 ### 시각 자료 1: Docker Preview Mapping
 ![Week1 Docker preview mapping](../assets/week1-docker-preview-mapping.png)
 
-이 이미지는 Week1의 app folder, start command, port, evidence가 Week2의 container 개념으로 옮겨지는 관계만 보여준다.
+이 이미지는 Week1의 app folder, start command, port, 확인 기록이 Week2의 container 개념으로 옮겨지는 관계만 보여준다.
 
 ## 10-20분 개념 preview
 
@@ -55,13 +68,13 @@
 | start command | 표준 실행 조건 |
 | localhost port | 외부 접근 경로 |
 | README run step | 재현 가능한 실행 절차 |
-| curl evidence | 서비스 확인 기준 |
+| curl 확인 기록 | 서비스 확인 기준 |
 | runbook | 관찰, 중지, 재확인 절차 |
 
 
 
 ### Preview 실행 조건 카드
-| 구성 요소 | 오늘 이해할 역할 | Week1 evidence 연결 |
+| 구성 요소 | 오늘 이해할 역할 | Week1 확인 기록 연결 |
 |---|---|---|
 | 실행 재료 | 어떤 파일이 실행에 필요한가 | file path/data path |
 | 실행 조건 | 어떤 명령과 환경이 필요한가 | runtime note |
@@ -70,7 +83,7 @@
 
 
 ### Preview 실행 개념
-오늘은 다음 주차에 등장할 표준 실행 환경의 질문을 로컬 실행 evidence와 연결해 읽는다. 실제 container 실행은 Week2의 단계별 실습에서 다룬다.
+오늘은 다음 주차에 등장할 표준 실행 환경의 질문을 로컬 실행 확인 기록과 연결해 읽는다. 실제 container 실행은 Week2의 단계별 실습에서 다룬다.
 
 | Week2에서 다룰 질문 | 오늘 이해할 질문 |
 |---|---|
@@ -121,13 +134,13 @@ flowchart LR
 | app folder 위치 | 실행 재료 범위 | path를 적는다 |
 | 현재 실행 방식 | 실행 조건 | command 의미만 설명한다 |
 | 현재 port/URL | 외부 접근 경로 | port 번호를 기록한다 |
-| 확인 evidence | 서비스 확인 기준 | 정상 기준을 적는다 |
+| 확인 기록 | 서비스 확인 기준 | 정상 기준을 적는다 |
 
 
 
 ### 활동 절차
-1. Week1 앱의 start command와 URL을 다시 확인한다.
-2. preview map에 자기 앱 정보를 대입한다.
+1. Day4 샘플앱의 start command와 URL을 다시 확인한다.
+2. preview map에 Day4 샘플앱 정보를 대입한다.
 3. 실행 조건 카드의 각 구성 요소가 무엇을 하는지 적는다.
 4. 아직 Week2 명령을 외우려 하지 말고 필요한 입력 파일을 확인한다.
 5. Week2 전에 보완할 readiness 항목을 적는다.
@@ -136,7 +149,7 @@ flowchart LR
 
 - 진행: readiness note
 
-- 초점: 자기 앱이 표준 실행 환경으로 옮겨질 준비가 되었는지 점검한다.
+- 초점: Day4 샘플앱이 표준 실행 환경으로 옮겨질 준비가 되었는지 점검한다.
 
 - 학생 산출: readiness note
 
@@ -171,7 +184,7 @@ flowchart LR
 |---|---|
 | 실행 환경 표준화를 독립 이론이 아니라 Week1 문제 해결과 연결했다. | |
 | 실행 재료, 실행 조건, 접근 경로를 예시로 설명한다. | |
-| 자기 앱의 Week2 readiness를 점검했다. | |
+| Day4 샘플앱의 Week2 readiness를 점검했다. | |
 | Week2 질문을 1개 이상 남겼다. | |
 
 
@@ -189,16 +202,16 @@ flowchart LR
 
 
 ### 다음 주차 연결
-Week2는 이 preview를 실제 hands-on으로 확장한다. 학생은 자신의 Week1 앱을 표준 실행 환경으로 옮기고, 실행 결과와 HTTP evidence를 남긴다.
+Week2는 이 preview를 실제 hands-on으로 확장한다. 학생은 Day4 샘플앱을 표준 실행 환경으로 옮기고, 실행 결과와 HTTP 확인 기록을 남긴다.
 
 
 
 ### 다음 연결
-Week1은 여기서 마감한다. 다음 주차는 실행 환경 표준화와 service evidence로 시작한다.
+Week1은 여기서 마감한다. 다음 주차는 실행 환경 표준화와 service 확인 기록으로 시작한다.
 
 
 
 ### 공식/학술 근거 링크
 - MIT Missing Semester, https://missing.csail.mit.edu/ - Week1에서 정리한 shell, Git, debugging 기초가 Week2 실습의 선행 역량인 근거다.
 - Docker Docs: What is a container?, https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-a-container/ - Week2에서 실행 환경 표준화를 다룰 때 연결할 공식 기준이다.
-- Google Cloud DevOps guidance, https://docs.cloud.google.com/architecture/devops - Week1 evidence habit이 이후 delivery/operations 개선과 연결되는 근거다.
+- Google Cloud DevOps guidance, https://docs.cloud.google.com/architecture/devops - Week1 확인 기록 habit이 이후 delivery/operations 개선과 연결되는 근거다.

@@ -2,15 +2,28 @@
 
 ## 수업 목표
 - Day1~4 산출물을 하나의 repository 기준으로 정리한다.
-- 누락된 evidence를 찾아 보완한다.
+- 누락된 확인 기록을 찾아 보완한다.
 - 제출물이 다음 작업자에게 전달 가능한지 판단한다.
+
+## 오늘 반드시 가져갈 것
+| 필수 개념 | 왜 필수인가 | 놓치면 생기는 문제 | 확인 기록 |
+|---|---|---|---|
+| 통합 inventory | 흩어진 산출물을 한 목록으로 모은다. | 제출물이 있는데도 어디 있는지 설명하지 못한다. | file/path/status 표 |
+| 확인 기록 gap | 누락된 실행, URL, 상태 코드, 스크린샷을 찾는다. | 앱은 있지만 평가 가능한 근거가 없다. | gap list |
+| README 통합 | 실행, 확인, 중지, 문제 해결을 한 곳에 둔다. | 다음 사람이 실행 흐름을 따라가지 못한다. | final README checklist |
+| 제출 상태 | complete, partial, missing을 숨기지 않는다. | 부족한 부분이 Day5 후반에 다시 드러난다. | 제출 상태 표 |
+
+### 챌린저 복구 기준
+- 파일을 찾는 데 시간이 걸리면 먼저 저장소 루트 기준 경로를 표로 만든다.
+- 확인 기록이 없으면 기능 수정이 아니라 실행 명령과 결과 캡처부터 한다.
+- partial은 실패가 아니라 보완할 위치를 명확히 표시한 상태다.
 
 ## 50분 운영
 | 시간 | 활동 | 학습 초점 | 학생 산출 |
 |---|---|---|---|
 | 0-5분 | Day5 목표 소개 | 통합과 handoff 중심으로 기준을 고정한다. | 목표 확인 |
 | 5-15분 | 파일 inventory | 누락 파일과 중복 파일을 찾게 한다. | inventory table |
-| 15-30분 | evidence gap 찾기 | command, URL, status, screenshot/notes를 확인한다. | gap list |
+| 15-30분 | 확인 기록 gap 찾기 | command, URL, status, screenshot/notes를 확인한다. | gap list |
 | 30-40분 | README 통합 | Day별 기록을 하나의 흐름으로 정리한다. | README 수정 |
 | 40-50분 | 제출 상태 표시 | complete/partial/missing으로 표시한다. | readiness note |
 
@@ -31,10 +44,10 @@ Day5는 새 기능을 많이 추가하는 날이 아니라 1주차 산출물을 
 
 
 
-### 시각 자료 1: Evidence Flow
-![Week1 service evidence flow](../assets/week1-service-evidence-flow.png)
+### 시각 자료 1: 확인 기록 흐름
+![Week1 service 확인 기록 flow](../assets/week1-service-evidence-flow.png)
 
-이 이미지는 앱 실행, 확인, 문서화가 따로 떨어진 일이 아니라 하나의 evidence 흐름이라는 점을 보여준다.
+이 이미지는 앱 실행, 확인, 문서화가 따로 떨어진 일이 아니라 하나의 확인 기록 흐름이라는 점을 보여준다.
 
 ## 5-15분 파일 inventory
 
@@ -49,22 +62,23 @@ Day5는 새 기능을 많이 추가하는 날이 아니라 1주차 산출물을 
 
 
 ### 통합 항목
-| Artifact | Required Evidence |
+| Artifact | Required 확인 기록 |
 |---|---|
 | README | start/check/stop/troubleshoot |
-| mini app | static files and local URL |
-| data | dummy JSON rendered in browser |
+| Day3 AI website challenge | static files and local URL |
+| Day4 sample app operation note | success, 404, data/JSON error |
 | RCA | one failure record |
 | mapping | computing spine |
 | risk | cost/security/reproducibility |
-| interview | Day4 blocker and recovery note |
+| interview | Day4 1:1 interview and mentoring note |
 
 
 
 ### Week 1 Integration Inventory
-| Item | Path | Status | Evidence |
+| Item | Path | Status | 확인 기록 |
 |---|---|---|---|
-| mini app | | complete/partial/missing | |
+| Day3 challenge | | complete/partial/missing | |
+| Day4 sample app operation note | | complete/partial/missing | |
 | README | | complete/partial/missing | |
 | RCA | | complete/partial/missing | |
 | risk table | | complete/partial/missing | |
@@ -76,7 +90,7 @@ Day5는 새 기능을 많이 추가하는 날이 아니라 1주차 산출물을 
 ```mermaid
 flowchart LR
     A[Day1~4 산출물] --> B[파일 inventory]
-    B --> C{Evidence 있음?}
+    B --> C{확인 기록 있음?}
     C -- 있음 --> D[README에 연결]
     C -- 없음 --> E[gap list에 기록]
     E --> F[보완 또는 residual risk]
@@ -84,9 +98,9 @@ flowchart LR
     F --> G
 ```
 
-## 15-30분 evidence gap 찾기
+## 15-30분 확인 기록 gap 찾기
 
-- 진행: evidence gap 찾기
+- 진행: 확인 기록 gap 찾기
 
 - 초점: command, URL, status, screenshot/notes를 확인한다.
 
@@ -107,9 +121,9 @@ flowchart LR
 
 
 ### 활동 절차
-1. repository root와 mini app 폴더 위치를 확인한다.
+1. repository root와 Day3 챌린지/Day4 샘플앱 폴더 위치를 확인한다.
 2. Day1~4에서 만든 산출물을 목록화한다.
-3. 각 산출물에 evidence가 붙어 있는지 확인한다.
+3. 각 산출물에 확인 기록이 붙어 있는지 확인한다.
 4. 중복되거나 범위 밖인 내용을 제거한다.
 5. README에 최종 실행 경로와 확인 절차를 통합한다.
 
@@ -128,7 +142,7 @@ flowchart LR
 ### 흔한 오해
 | 오해 | 교정 |
 |---|---|
-| 산출물이 있으면 evidence는 나중에 채워도 된다. | evidence는 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
+| 산출물이 있으면 확인 기록은 나중에 채워도 된다. | 확인 기록은 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
 | Week1에서 모든 기술을 깊게 익혀야 한다. | Week1은 컴퓨팅 spine과 운영 증거를 만드는 주차이며, 깊은 hands-on은 각 기술 주차에서 진행한다. |
 | 막힌 내용을 숨기는 것이 좋다. | blocker를 증상, 시도한 일, 다음 조치로 기록하는 것이 현업식 진행 관리다. |
 
@@ -151,7 +165,7 @@ flowchart LR
 | 기준 | 충족 |
 |---|---|
 | Day1~4 산출물이 하나의 목록으로 정리되었다. | |
-| evidence 누락이 명시되었다. | |
+| 확인 기록 누락이 명시되었다. | |
 | README가 최종 실행 기준을 제공한다. | |
 | 삭제하거나 제외할 범위 초과 항목을 식별했다. | |
 
@@ -182,4 +196,4 @@ Week2 Docker에서는 통합된 앱 폴더가 container build 대상이 된다. 
 ### 공식/학술 근거 링크
 - GitHub Docs: About READMEs, https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes - 통합 산출물이 실행과 도움 경로를 제공해야 하는 기준이다.
 - Pro Git: About Version Control, https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control - 통합 과정에서 변경 이력과 협업 증거를 남기는 이유다.
-- Monash Constructive Alignment, https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment - 목표, 활동, 평가 evidence를 하나의 artifact로 맞추는 기준이다.
+- Monash Constructive Alignment, https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment - 목표, 활동, 평가 확인 기록을 하나의 artifact로 맞추는 기준이다.

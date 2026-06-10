@@ -5,12 +5,25 @@
 - 학생 질문을 실행, 문서, 위험, 다음 주차 연결로 분류한다.
 - Week1 제출 전 마지막 수정 우선순위를 정한다.
 
+## 오늘 반드시 가져갈 것
+| 필수 개념 | 왜 필수인가 | 놓치면 생기는 문제 | 확인 기록 |
+|---|---|---|---|
+| Q&A 분류 | 질문을 개념, 실행, 문서, 위험으로 나눈다. | 모든 질문이 흩어져 수정으로 이어지지 않는다. | Q&A board |
+| 즉시 보완 | 답변은 README, risk, 확인 기록 수정으로 닫는다. | 말로는 답했지만 제출물은 그대로다. | patched package |
+| Recheck | 수정 후 다시 실행 또는 확인한다. | 수정이 실제로 도움이 됐는지 모른다. | recheck note |
+| Docker 질문 저장 | 다음 주차로 넘길 질문을 명확히 한다. | Week2 시작 질문이 흐려진다. | Docker preview question |
+
+### 챌린저 복구 기준
+- 질문을 받으면 먼저 어느 분류인지 표시하고 답한다.
+- 즉시 고칠 수 없는 내용은 residual risk나 Week2 question으로 남긴다.
+- 수정 후 recheck가 없으면 아직 완료가 아니다.
+
 ## 50분 운영
 | 시간 | 활동 | 학습 초점 | 학생 산출 |
 |---|---|---|---|
 | 0-10분 | 발표 피드백 요약 | 공통 누락을 3~5개로 묶는다. | issue list |
 | 10-25분 | live Q&A | 질문을 유형별로 분류한다. | answer notes |
-| 25-40분 | 즉시 보완 | README, risk, evidence를 수정한다. | patched package |
+| 25-40분 | 즉시 보완 | README, risk, 확인 기록을 수정한다. | patched package |
 | 40-47분 | 재확인 | 수정 후 실행 또는 문서 확인을 한다. | recheck note |
 | 47-50분 | Docker preview 연결 | 다음 교시 질문을 정리한다. | Docker question |
 
@@ -27,19 +40,19 @@
 
 
 ### 핵심 설명
-Q&A는 새 강의가 아니라 제출물 품질을 높이는 피드백 시간이다. 질문은 가능한 한 README 또는 evidence 개선으로 연결한다.
+Q&A는 새 강의가 아니라 제출물 품질을 높이는 피드백 시간이다. 질문은 가능한 한 README 또는 확인 기록 개선으로 연결한다.
 
 
 
 ### 시각 자료 1: 질문에서 수정까지
 ![질문, 수정, 재확인 흐름](./assets/lesson-07-feedback-recheck.png)
 
-이 이미지는 질문을 많이 받기 위한 장치가 아니라 들어온 질문을 개념, 실행, 문서 문제로 분류하고 수정 후 재확인 evidence를 남기는 절차다. 발표 후 변경 사항은 반드시 recheck note로 닫는다.
+이 이미지는 질문을 많이 받기 위한 장치가 아니라 들어온 질문을 개념, 실행, 문서 문제로 분류하고 수정 후 재확인 기록을 남기는 절차다. 발표 후 변경 사항은 반드시 recheck note로 닫는다.
 
 ```mermaid
 flowchart TD
     Q[발표 질문] --> C[질문 유형 분류]
-    C --> R[README/evidence/risk 위치 찾기]
+    C --> R[README/확인 기록/risk 위치 찾기]
     R --> P[작은 수정]
     P --> V[recheck note]
     V --> D[Docker preview question]
@@ -61,7 +74,7 @@ flowchart TD
 | 질문 유형 | board에 적을 형식 | 즉시 보완 위치 |
 |---|---|---|
 | Execution | 실행 위치 또는 port가 모호함 | README start |
-| Verification | 정상 기준이 보이지 않음 | evidence table |
+| Verification | 정상 기준이 보이지 않음 | 확인 기록 table |
 | Risk | secret, API, 비용 질문 | risk note |
 | Scope | backend/auth/DB 추가 요구 | known gaps |
 | Next week | Docker로 무엇이 바뀌는가 | readiness question |
@@ -70,7 +83,7 @@ flowchart TD
 
 - 진행: 즉시 보완
 
-- 초점: README, risk, evidence를 수정한다.
+- 초점: README, risk, 확인 기록을 수정한다.
 
 - 학생 산출: patched package
 
@@ -82,7 +95,7 @@ flowchart TD
 | 수정한 항목 | 다시 확인할 증거 | 기록 문장 |
 |---|---|---|
 | README command | 실제 실행 절차와 일치 | `README start updated and rechecked` |
-| Evidence table | status 또는 화면 기준 있음 | `verification evidence added` |
+| 확인 기록 table | status 또는 화면 기준 있음 | `verification 확인 기록 added` |
 | Risk note | 위험과 제외가 분리됨 | `scope gap documented` |
 | Docker question | Week2 preview로 연결됨 | `question saved for Week2` |
 
@@ -92,7 +105,7 @@ flowchart TD
 | Type | 예시 | 연결 산출물 |
 |---|---|---|
 | Execution | 어디서 명령을 실행하나요? | README start |
-| Verification | 정상인지 어떻게 확인하나요? | evidence table |
+| Verification | 정상인지 어떻게 확인하나요? | 확인 기록 table |
 | Risk | API key를 써도 되나요? | risk/exclusion note |
 | Scope | 로그인 기능을 넣어도 되나요? | known gaps |
 | Next week | Docker가 왜 필요한가요? | Docker readiness note |
@@ -121,7 +134,7 @@ flowchart TD
 ### 흔한 오해
 | 오해 | 교정 |
 |---|---|
-| 산출물이 있으면 evidence는 나중에 채워도 된다. | evidence는 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
+| 산출물이 있으면 확인 기록은 나중에 채워도 된다. | 확인 기록은 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
 | Week1에서 모든 기술을 깊게 익혀야 한다. | Week1은 컴퓨팅 spine과 운영 증거를 만드는 주차이며, 깊은 hands-on은 각 기술 주차에서 진행한다. |
 | 막힌 내용을 숨기는 것이 좋다. | blocker를 증상, 시도한 일, 다음 조치로 기록하는 것이 현업식 진행 관리다. |
 
@@ -149,7 +162,7 @@ flowchart TD
 | 기준 | 충족 |
 |---|---|
 | 질문이 산출물 개선으로 이어졌다. | |
-| 수정 후 recheck evidence가 있다. | |
+| 수정 후 recheck 확인 기록이 있다. | |
 | 공통 누락을 개인 제출물에 반영했다. | |
 | Docker preview 질문이 준비되었다. | |
 
@@ -178,6 +191,6 @@ flowchart TD
 
 
 ### 공식/학술 근거 링크
-- Monash Constructive Alignment, https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment - feedback을 목표, 활동, 평가 evidence와 맞추는 기준이다.
+- Monash Constructive Alignment, https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment - feedback을 목표, 활동, 평가 확인 기록와 맞추는 기준이다.
 - Google SRE Book: Postmortem Culture, https://sre.google/sre-book/postmortem-culture/ - feedback을 개인 비판이 아니라 개선 가능한 artifact로 바꾸는 기준이다.
 - CMU Eberly Center: Bloom's Taxonomy, https://www.cmu.edu/teaching/designteach/design/bloomsTaxonomy.html - feedback을 이해/적용/평가 수준으로 구분하는 근거다.

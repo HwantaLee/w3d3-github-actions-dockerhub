@@ -1,58 +1,57 @@
-# Week 1 Day 4: 미니 앱 범위 설정, skeleton, 구현, 실행 증거, 위험 분류, 개인 면담
+# Week 1 Day 4: 공통 샘플앱 실행, 성공/실패/오류 관찰, runbook 작성
 
 ## Day Goal
-학생은 Week1 기준의 작은 정적 미니 앱을 범위 안에서 설계하고, skeleton 생성, data rendering 구현, 실행 증거 작성, 위험 분류, README/runbook 초안까지 완성한다. 7~8교시는 반드시 개인 면담과 보충 실습으로 운영하며 새 진도를 추가하지 않는다.
+Day4는 새 앱을 만드는 개발 수업이 아니다. 학생은 제공된 공통 샘플앱을 실행하고, 정상 상태와 실패 상태를 관찰하며, 브라우저와 `curl`, 서버 로그, console/Network를 사용해 확인 기록을 남긴다. 목표는 IT를 처음 접하는 챌린저도 "서버를 실행한다", "성공을 확인한다", "실패를 구분한다", "문서로 남긴다"를 체험하는 것이다.
 
 ## 운영 원칙
-- Week1 앱은 HTML/CSS/JS, dummy JSON, local static server, README evidence만 포함한다.
-- backend, database, paid API, authentication은 제외한다.
-- 기능 수보다 실행 가능성, 재현성, handoff 가능성을 우선한다.
-- DORA와 Well-Architected는 Week1 독립 수업으로 다루지 않는다. 필요한 경우 변경 증거, 재현성, 위험 인식이라는 현업 습관으로만 짧게 연결한다.
+- 공통 샘플앱은 `week1/day4/sample-app/`에 제공한다.
+- 학생은 앱을 새로 만들지 않는다. 아주 작은 값 수정과 의도적 오류 관찰만 한다.
+- backend, database, paid API, authentication, cloud deploy는 다루지 않는다.
+- HTML/CSS/JS 문법 설명은 필요한 만큼만 하고, 수업의 중심은 실행 조건과 관찰 기록이다.
+- 7~8교시는 새 진도 없이 최초 1:1 개인 면담과 기본 멘토링으로 운영한다.
+
+## 오늘 반드시 가져갈 것
+| 필수 개념 | 왜 필수인가 | 놓치면 생기는 문제 | 확인 기록 |
+|---|---|---|---|
+| 샘플앱 실행 조건 | 같은 앱을 모두가 같은 조건으로 실행해야 관찰을 비교할 수 있다. | 사람마다 다른 앱을 만들어 오류 원인을 비교하지 못한다. | 실행 경로, start command, URL |
+| 성공 상태 확인 | 정상 기준을 먼저 알아야 실패를 구분할 수 있다. | 200, 화면 표시, 로그를 연결하지 못한다. | 브라우저 화면, `curl -I`, 서버 로그 |
+| 실패/오류 관찰 | 404, 경로 오류, JSON 오류는 운영에서 흔한 첫 장애다. | 모든 실패를 "안 됨"으로만 표현한다. | 실패 URL, 상태 코드, console/Network |
+| README/runbook | 다음 사람이 실행하고 막혔을 때 확인할 순서를 제공한다. | 수업 후 혼자 다시 따라오지 못한다. | start/check/stop/troubleshoot |
+| 최초 1:1 면담 | IT 첫 경험자와 경험자의 출발점, 불안, 관심사가 다르므로 개인별 상태 확인이 필요하다. | 막힘을 기술 문제로만 보고 학습 지원 방향을 놓친다. | interview note, mentoring action |
 
 ## Lesson Index
 | 교시 | 주제 | 핵심 산출물 |
 |---|---|---|
-| 1교시 | 미니 앱 요구사항과 범위 경계 | scope note, include/exclude table |
-| 2교시 | 미니 앱 skeleton 생성 | file tree, minimal static app |
-| 3교시 | 구현 1 - HTML/CSS/JS/dummy JSON 연결 | data rendering evidence |
-| 4교시 | 구현 2 - 사용자 흐름과 error state | normal/empty/error state |
-| 5교시 | 실행 증거 작성 | command, path, port, URL, HTTP/browser evidence |
-| 6교시 | 운영 위험 분류와 README/runbook 기초 | risk table, runbook draft |
-| 7교시 | 개인 면담 및 환경 점검 | blocker classification, recovery action |
-| 8교시 | 개인 면담 및 보충 실습 | Day4 submission package, peer test note |
+| 1교시 | 공통 샘플앱 구조 읽기 | file role map |
+| 2교시 | 샘플앱 로컬 서버 실행 | start/check log |
+| 3교시 | 성공 상태 관찰 | success 확인 기록 table |
+| 4교시 | 실패 1: 잘못된 URL과 404 | 404 observation note |
+| 5교시 | 실패 2: data.json 경로/JSON 오류 | console/network error note |
+| 6교시 | README/runbook 작성 | start/check/stop/troubleshoot |
+| 7교시 | 최초 1:1 개인 면담 1 | interview note |
+| 8교시 | 최초 1:1 개인 면담 2 및 기본 멘토링 | mentoring note, Day5 carry-over |
 
 ## Required Deliverables
-| Deliverable | Minimum Evidence |
+| Deliverable | Minimum 확인 기록 |
 |---|---|
-| working static mini app | local server URL and visible page |
-| dummy JSON rendering | data value visible in browser |
-| execution evidence table | command, working directory, port, URL, status/result |
-| risk classification table | cost/security/reproducibility risks and responses |
-| README/runbook sections | start/check/stop/troubleshoot |
-| interview/blocker note | blocker type and next action |
+| sample app run | command, working directory, URL |
+| success check | browser result, `curl -I`, server log |
+| 404 observation | failing URL, status code, meaning |
+| data/JS error observation | console or Network note |
+| runbook | start/check/stop/troubleshoot |
+| interview/mentoring note | background, concern, blocker type, next action |
 
-## 50분 수업 공통 구조
-각 lesson은 다음 구조로 운영한다.
-1. 5분: 이전 산출물 확인과 목표 고정
-2. 10~15분: 핵심 개념과 예시 설명
-3. 20~25분: 개인 또는 짝 실습
-4. 5~10분: evidence 기록과 평가 체크
-5. 마지막 2~5분: 다음 교시 연결
-
-7~8교시는 이 구조를 강의가 아니라 면담/보충 실습에 적용한다.
-
-## 평가 기준 요약
-- 앱이 정적 서버에서 실행된다.
-- README만 보고 시작, 확인, 중지할 수 있다.
-- 사용자 흐름이 1개로 제한되어 있다.
-- dummy JSON, error state, 실행 evidence가 확인된다.
-- 비용, 보안, 재현성 위험이 명시되어 있다.
-- 개인 blocker와 보완 계획이 남아 있다.
+## 챌린저 복구 기준
+- 서버가 안 켜지면 `python3 --version`, 현재 경로, 포트 8000 충돌을 먼저 본다.
+- 브라우저가 안 열리면 서버 터미널이 살아 있는지와 URL이 `http://localhost:8000`인지 확인한다.
+- 화면은 열리지만 데이터가 안 보이면 console과 Network에서 `data.json` 요청을 확인한다.
+- 오류를 고치기 전에 실패 URL, 상태 코드, 오류 메시지를 먼저 적는다.
+- Day4 끝에는 새 기능보다 실행 확인 기록, README, 위험 표, 면담 이월 메모를 먼저 닫는다.
 
 ## 다음 주차 연결
-Day4 산출물은 Week2 Docker 실습의 입력이다. 앱 폴더는 build context가 되고, 실행 명령은 container command와 port mapping으로 바뀐다. README/runbook은 Docker runbook으로 확장된다.
+Day4 샘플앱은 Week2 Docker 실습의 공통 입력이 된다. Day4에서 확인한 실행 경로, start command, 포트, HTTP 확인, 오류 관찰 기록은 Week2에서 container command, port mapping, container logs, Docker runbook으로 확장된다.
 
 ## Visual Support
-![Local service evidence flow](../assets/week1-service-evidence-flow.png)
+![로컬 서비스 확인 기록 흐름](../assets/week1-service-evidence-flow.png)
 
-Day4에서는 이 evidence flow를 미니 앱 구현에 적용한다. 구현 자체보다 command, port, status, log, README evidence가 함께 남는지 확인한다.
+Day4에서는 이 확인 기록 흐름을 샘플앱에 적용한다. 구현 자체보다 command, port, status, log, console, README가 함께 남는지 확인한다.

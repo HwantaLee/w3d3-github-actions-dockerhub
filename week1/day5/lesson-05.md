@@ -1,4 +1,4 @@
-# 5교시: 통합 체크리스트, 평가 증거, 2~5주차 기술 매핑
+# 5교시: 통합 체크리스트, 평가 기준, 2~5주차 기술 매핑
 
 ## 수업 목표
 - Week1 최종 제출물을 평가 가능한 증거 기준으로 점검한다.
@@ -8,17 +8,30 @@
 ## 50분 운영
 | 시간 | 활동 | 학습 초점 | 학생 산출 |
 |---|---|---|---|
-| 0-10분 | 평가 증거 설명 | 점수 기준을 evidence와 연결한다. | 평가 기준 이해 |
+| 0-10분 | 평가 기준 설명 | 점수 기준을 확인 기록과 연결한다. | 평가 기준 이해 |
 | 10-25분 | 자기 체크 | 체크리스트 status를 채운다. | self assessment |
 | 25-35분 | 주차 매핑 | Week2~5 연결 문장을 작성한다. | technology map |
 | 35-45분 | 남은 위험 작성 | 제출 전 residual risk를 직접 적는다. | risk note |
-| 45-50분 | 발표 준비 연결 | 발표에서 보여줄 evidence를 고른다. | 발표 evidence |
+| 45-50분 | 발표 준비 연결 | 발표에서 보여줄 확인 기록을 고른다. | 발표 확인 기록 |
 
-## 0-10분 평가 증거 설명
+## 오늘 반드시 가져갈 것
+| 필수 개념 | 왜 필수인가 | 놓치면 생기는 문제 | 확인 기록 |
+|---|---|---|---|
+| 평가 기준 | Week1 산출물은 실행 가능한 기록으로 평가된다. | 앱 화면만 있고 실행 방법, 상태 코드, 위험이 빠진다. | 체크리스트 complete/partial/missing |
+| 5주 기술 매핑 | Week1 산출물이 이후 Docker, MSA, Kubernetes, AWS/Terraform으로 확장된다. | 이전 커리큘럼 흔적이 남아 학습 순서를 오해한다. | Week2~5 매핑 표 |
+| 남은 위험 | 제출 전 부족한 점을 숨기지 않고 다음 행동으로 바꾼다. | 막힌 부분이 발표와 다음 주차에서 다시 장애가 된다. | residual risk note |
+| 발표 확인 기록 | 발표는 기능 자랑이 아니라 실행과 검증을 보여주는 시간이다. | 무엇을 만들었는지보다 왜 동작한다고 판단하는지 설명하지 못한다. | 발표에 사용할 확인 기록 2개 |
 
-- 진행: 평가 증거 설명
+### 챌린저 복구 기준
+- 체크리스트가 비어 있으면 기능을 더 만들지 말고 실행 명령, URL, 상태 코드, README부터 채운다.
+- Week2~5 매핑은 도구 이름 암기가 아니라 "내 산출물의 어떤 한계를 다음 기술이 해결하는가"로 쓴다.
+- 남은 위험은 감점 회피용으로 숨기지 말고 `증상`, `현재 상태`, `다음 행동`으로 짧게 남긴다.
 
-- 초점: 점수 기준을 evidence와 연결한다.
+## 0-10분 평가 기준 설명
+
+- 진행: 평가 기준 설명
+
+- 초점: 점수 기준을 확인 기록과 연결한다.
 
 - 학생 산출: 평가 기준 이해
 
@@ -27,12 +40,12 @@
 
 
 ### 핵심 설명
-평가는 "열심히 했다"가 아니라 관찰 가능한 evidence로 판단한다. Week1의 evidence는 실행 명령, HTTP 확인, 화면 결과, 위험 분류, RCA, handoff 문서다.
+평가는 "열심히 했다"가 아니라 관찰 가능한 확인 기록으로 판단한다. Week1의 확인 기록은 실행 명령, HTTP 확인, 화면 결과, 위험 분류, RCA, handoff 문서다.
 
 
 
-### 시각 자료 1: Evidence Coverage Map
-![Week1 service evidence flow](../assets/week1-service-evidence-flow.png)
+### 시각 자료 1: 확인 기록 Coverage Map
+![Week1 service 확인 기록 flow](../assets/week1-service-evidence-flow.png)
 
 평가자는 앱 자체보다 "실행했다", "확인했다", "위험을 알고 있다"는 증거 묶음을 본다.
 
@@ -48,17 +61,17 @@
 
 
 
-### 평가 증거 체크리스트
-| Evidence | Required | Status |
+### 평가 기준 체크리스트
+| 확인 기록 | Required | Status |
 |---|---|---|
 | App runs locally | start command and URL | |
-| HTTP check | status code or browser evidence | |
+| HTTP check | status code or browser 확인 기록 | |
 | Data rendering | dummy JSON visible | |
 | Error handling | empty/error state note | |
 | README | start/check/stop/troubleshoot | |
 | Risk table | cost/security/reproducibility | |
 | RCA | one failure lifecycle | |
-| Spine map | file/process/port/data/evidence | |
+| Spine map | file/process/port/data/확인 기록 | |
 | Handoff | summary, risks, gaps, next step | |
 
 
@@ -67,14 +80,13 @@
 | Week | 기술 | Week1에서 이어지는 문제 |
 |---|---|---|
 | Week2 | Docker | 로컬 실행 조건을 컨테이너로 고정한다. |
-| Week3 | CI/CD | 실행 확인과 문서 검증을 자동화한다. |
-| Week4 | Cloud/hosting | localhost 밖에서 접근 가능한 서비스로 확장한다. |
-| Week5 | Observability/operations | log, status, failure evidence를 체계화한다. |
-| Week6 | Security/reliability review | secret, 접근, 위험 대응을 더 엄격히 평가한다. |
+| Week3 | MSA와 서비스 분리 | 하나의 정적 앱을 여러 서비스, API, DB, worker 관점으로 확장할 때 경계와 실행 순서를 다룬다. |
+| Week4 | Kubernetes | 컨테이너 실행 조건을 Pod, Deployment, Service, ConfigMap, Secret으로 표준화한다. |
+| Week5 | AWS/Terraform/FinOps/Observability | 로컬/클러스터 실행을 클라우드 서비스, 비용, 관찰 기록, IaC 변경 기록으로 확장한다. |
 
 
 
-### 시각 자료 2: Evidence 판정 흐름
+### 시각 자료 2: 확인 기록 판정 흐름
 ```mermaid
 flowchart LR
     A[Checklist item] --> B{관찰 가능한가?}
@@ -99,8 +111,8 @@ flowchart LR
 
 
 
-### 시각 자료 3: 발표 Evidence 선택표
-| Evidence 후보 | 보여주면 답하는 질문 | 발표 사용 여부 |
+### 시각 자료 3: 발표 확인 기록 선택표
+| 확인 기록 후보 | 보여주면 답하는 질문 | 발표 사용 여부 |
 |---|---|---|
 | README run/check section | 다음 사람이 실행할 수 있는가? | |
 | Browser result | 앱이 실제로 보이는가? | |
@@ -115,7 +127,7 @@ flowchart LR
 2. missing 항목은 보완 가능 여부와 이유를 적는다.
 3. Week2~5 기술 매핑을 자신의 앱 기준으로 다시 쓴다.
 4. 남은 위험을 숨기지 않고 제출 문서에 남긴다.
-5. 발표에서 보여줄 evidence 2개를 고른다.
+5. 발표에서 보여줄 확인 기록 2개를 고른다.
 
 ## 35-45분 남은 위험 작성
 
@@ -132,7 +144,7 @@ flowchart LR
 ### 흔한 오해
 | 오해 | 교정 |
 |---|---|
-| 산출물이 있으면 evidence는 나중에 채워도 된다. | evidence는 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
+| 산출물이 있으면 확인 기록은 나중에 채워도 된다. | 확인 기록은 산출물의 일부다. command, path, status, log, note가 함께 있어야 평가 가능하다. |
 | Week1에서 모든 기술을 깊게 익혀야 한다. | Week1은 컴퓨팅 spine과 운영 증거를 만드는 주차이며, 깊은 hands-on은 각 기술 주차에서 진행한다. |
 | 막힌 내용을 숨기는 것이 좋다. | blocker를 증상, 시도한 일, 다음 조치로 기록하는 것이 현업식 진행 관리다. |
 
@@ -140,9 +152,9 @@ flowchart LR
 
 - 진행: 발표 준비 연결
 
-- 초점: 발표에서 보여줄 evidence를 고른다.
+- 초점: 발표에서 보여줄 확인 기록을 고른다.
 
-- 학생 산출: 발표 evidence
+- 학생 산출: 발표 확인 기록
 
 - 완료 조건: 아래 자료를 사용해 이 시간 블록의 산출물을 만든다.
 
@@ -152,14 +164,14 @@ flowchart LR
 - final evaluation checklist
 - Week2~5 mapping
 - residual risk note
-- presentation evidence selection
+- presentation 확인 기록 selection
 
 
 
 ### 평가 기준
 | 기준 | 충족 |
 |---|---|
-| 평가 항목이 evidence 중심으로 채워졌다. | |
+| 평가 항목이 확인 기록 중심으로 채워졌다. | |
 | Week2~5 연결이 도구 이름 나열에 그치지 않는다. | |
 | 남은 위험이 구체적이다. | |
 | 발표에서 보여줄 증거가 선택되었다. | |
@@ -184,7 +196,7 @@ Week2 첫 과제는 이 체크리스트에서 `App runs locally`와 `How to run`
 
 
 ### 다음 연결
-다음 교시는 미니 발표로 산출물과 evidence를 설명한다.
+다음 교시는 Day3 챌린지와 Day4 운영 기록 발표로 산출물과 확인 기록을 설명한다.
 
 
 
