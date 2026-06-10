@@ -90,7 +90,7 @@
 - 5교시 : 실패 분석 라이프사이클 - reproduce, observe, hypothesize, fix, recheck, prevent
 - 6교시 : 관찰 가능성과 배포 preview - logs/status 확인 기록, build, artifact, release, deploy, rollback
 - 7교시 : AI Coding Tool 사용 원칙 - 공식 문서 확인, 실행 검증, secret/cost/API 위험 점검
-- 8교시 : 컴퓨팅 spine 매핑 노트 - Docker/Kubernetes/AWS/Terraform에서 같은 개념이 어떻게 이름을 바꾸는지 정리
+- 8교시 : Day 5 발표 챌린지 - AI로 작은 정적 웹사이트 초안을 만들고 실행 기록, 위험 제외, 컴퓨팅 spine 연결을 정리
 
 ## 4일차
 

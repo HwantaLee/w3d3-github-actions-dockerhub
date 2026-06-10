@@ -1,7 +1,7 @@
 # Week 1 Day 3 학술 근거와 교육 설계 기준
 
 ## Crosswalk
-| Standard | Observable action | Evidence |
+| Standard | Observable action | 확인 기록 |
 |---|---|---|
 | ABET-style problem analysis | 실패를 재현, 관찰, 원인 후보로 나눈다. | RCA record |
 | CS2023 software development | 실행 조건과 README를 작성한다. | reproducibility checklist |

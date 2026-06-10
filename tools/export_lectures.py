@@ -238,7 +238,7 @@ def main() -> int:
         default="lecture_mermaid_assets",
         help="Tracked output directory for rendered Mermaid PNGs when --link-mode=raw.",
     )
-    parser.add_argument("roots", nargs="*", default=["week1", "week2", "week3", "week4", "week5", "week6"])
+    parser.add_argument("roots", nargs="*", default=["week1", "week2", "week3", "week4", "week5"])
     args = parser.parse_args()
 
     repo_root = Path(git_value(["rev-parse", "--show-toplevel"], ".")).resolve()
