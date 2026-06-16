@@ -1,153 +1,73 @@
-# 7교시: logs/exec/inspect 기반 장애 분석
+# 7교시: tag/push/pull 흐름
 
 ## 수업 목표
-- runtime 장애를 port, env, network, volume, process/log 문제로 분류한다.
-- `docker logs`, `docker exec`, `docker inspect`를 목적별로 사용한다.
-- missing env, wrong port, stale volume을 RCA 형식으로 기록한다.
+- image/build/registry 개념을 실행 evidence로 확인한다.
+- 명령, 검증, cleanup을 분리해 기록한다.
+- 실패를 RCA 형식으로 정리한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | runtime failure taxonomy | 설명 15% | failure map |
-| 8-20분 | missing env failure | 실행 25% | error evidence |
-| 20-30분 | wrong port drill | 실행 20% | port RCA |
-| 30-40분 | inspect/logs/exec 분리 | 실행 20% | command map |
-| 40-50분 | RCA note 작성 | 실행 20% | failure note |
+## 강의 전개
+local tag와 push gate를 설명한다. push는 선택이며 secret gate 이후에만 수행한다.
 
-### Visual 1: Runtime troubleshooting
-![Runtime troubleshooting](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day3/assets/lesson-07-runtime-troubleshooting.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-환경변수, port, network, volume은 모두 runtime 조건이다. 장애 분석은 어떤 조건이 빠졌는지 evidence로 좁히는 과정이다.
-
-## 핵심 설명
-Day 3 장애는 대부분 image build 문제가 아니다. 같은 image라도 runtime 조건을 잘못 주면 container는 실패하거나, 실행되어도 기대한 방식으로 접근되지 않는다.
-
-장애를 보면 먼저 build-time 문제인지 runtime 문제인지 나눈다. Day 3에서는 runtime 문제 안에서 port, env, network, volume, process/log 중 하나로 분류한다.
-
-`docker logs`는 process가 출력한 메시지를 본다. `docker exec`는 실행 중 container 내부에서 명령을 실행한다. `docker inspect`는 Docker가 알고 있는 container metadata, mount, network, env, port mapping을 본다.
-
-## failure taxonomy
-| 분류 | 대표 증상 | 첫 명령 |
-|---|---|---|
-| Port | `curl localhost` 실패 | `docker ps` PORTS |
-| Env | DB 초기화 실패 | `docker logs` |
-| Network | service name 접근 실패 | network inspect, same network test |
-| Volume | 데이터가 남거나 초기화 안 됨 | `docker volume ls`, inspect |
-| Process | container가 바로 종료 | `docker ps -a`, logs |
-
-## Drill 1: missing env
+## 실습 명령
 ```bash
-docker run --name paperclip-day3-postgres-missing-env postgres:16-alpine
+docker tag paperclip-static-site:day3 paperclip-static-site:day3-reviewed
+docker images paperclip-static-site
 ```
 
-Linux 사전 테스트 결과:
-
-```text
-Error: Database is uninitialized and superuser password is not specified.
-You must specify POSTGRES_PASSWORD to a non-empty value for the superuser.
-```
-
-해석:
-- image pull/build 문제가 아니다.
-- PostgreSQL official image의 runtime contract가 충족되지 않았다.
-- `-e POSTGRES_PASSWORD=...`가 필요하다.
-
-정리:
-
+## 검증 명령
 ```bash
-docker rm paperclip-day3-postgres-missing-env
+docker image inspect paperclip-static-site:day3-reviewed --format "{{.Id}}"
 ```
 
-## Drill 2: wrong port
-정상 web container를 `-p 18083:80`으로 실행한 뒤 잘못된 port로 접근한다.
-
-```bash
-curl -I http://localhost:80
-curl -I http://localhost:18083
-docker ps --filter name=paperclip-day3-web
-```
-
-해석:
-- `localhost:80` 실패는 container 내부 80번이 닫혔다는 뜻이 아닐 수 있다.
-- `docker ps`에서 host port가 18083인지 확인한다.
-- browser/curl은 host port로 접근한다.
-
-## Drill 3: stale volume
-PostgreSQL container를 삭제하고 같은 volume을 다시 붙이면 기존 data directory가 유지된다.
-
-```bash
-docker rm -f paperclip-day3-postgres
-docker run -d \
-  --name paperclip-day3-postgres \
-  -e POSTGRES_PASSWORD=paperclip \
-  -e POSTGRES_DB=paperclip \
-  -v paperclip-day3-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
-```
-
-해석:
-- volume이 남아 있으면 DB 초기화가 새로 일어나지 않을 수 있다.
-- env 값을 바꿨는데 DB 이름이나 초기 상태가 달라지지 않으면 stale volume을 의심한다.
-- 새 실습을 원하면 새 volume name을 쓰거나 기존 volume을 삭제한다.
-
-## 명령별 역할
-| 명령 | 보는 것 | 적합한 질문 |
-|---|---|---|
-| `docker ps` | running container, ports | 떠 있는가, 어느 port인가 |
-| `docker ps -a` | 종료된 container 포함 | 바로 죽었는가 |
-| `docker logs` | process output | 왜 실패했는가 |
-| `docker exec` | 내부 명령 실행 | 파일/DB readiness가 어떤가 |
-| `docker inspect` | metadata | mount/network/env가 어떻게 붙었는가 |
-| `docker volume ls` | volume object | 데이터가 남아 있는가 |
-| `docker network inspect` | network membership | 같은 network인가 |
-
-## 좋은 RCA와 나쁜 RCA
-| 나쁜 기록 | 좋은 기록 |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| DB가 안 됨 | `POSTGRES_PASSWORD` 없이 실행해 초기화 실패 |
-| 포트가 이상함 | `-p 18083:80`인데 `localhost:80`으로 확인함 |
-| Docker 문제 | container는 Up이고 HTTP만 실패하므로 port mapping 확인 필요 |
-| 데이터가 이상함 | 기존 `paperclip-day3-pgdata` volume을 재사용함 |
-| 로그가 길다 | readiness 줄과 error 줄만 발췌 |
+| build 실패 | Dockerfile path, build context, COPY source를 확인한다. |
+| run 성공 후 접속 실패 | EXPOSE와 host -p mapping을 구분한다. |
+| push 요구 | credential과 public repository gate를 먼저 확인한다. |
 
-## 핵심 유의사항
-장애 분석은 명령을 많이 치는 것이 아니라 질문을 좁히는 과정이다. "어디가 문제인가"를 모르면 로그도 읽기 어렵다.
+## Cleanup
+```bash
+docker stop paperclip-day3-static || true
+docker rm paperclip-day3-static || true
+# 필요할 때만 실습 image 삭제
+# docker image rm paperclip-static-site:day3 paperclip-static-site:day3-reviewed
+```
 
-실패 로그는 과도하게 길게 붙이지 않는다. 핵심 error line, 실행한 명령, 정상 기준, 재확인 결과를 함께 기록한다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-`docker exec`는 내부를 고치는 도구로 쓰지 않는다. 초급 단계에서는 확인 도구로 사용한다. container 내부에서 수동 수정하면 image, volume, writable layer 경계가 흐려진다.
+## Evidence
+| 항목 | 제출 기준 |
+|---|---|
+| Command evidence | 실행한 build/run/inspect 명령 |
+| Verification | HTTP/history/inspect 결과 |
+| RCA | 실패 drill 원인과 재검증 |
 
-## RCA 템플릿
+## 강의자 설명 포인트
+Day 3의 중심은 "내가 실행한 것은 어떤 artifact인가"라는 질문이다. Day 1과 Day 2에서는 이미 존재하는 official image를 가져와 실행했다. Day 3에서는 source file과 Dockerfile을 image로 포장한다. 학생은 Dockerfile을 단순 설치 스크립트처럼 읽기 쉽지만, 실제로는 build context를 입력으로 받아 image layer를 만드는 build recipe다.
+
+`COPY` 한 줄은 작아 보이지만 운영적으로는 중요하다. 어떤 파일이 image 안에 들어가고 어떤 파일이 제외되는지에 따라 image size, secret risk, rebuild cache가 달라진다. `.dockerignore`는 예쁘게 정리하는 파일이 아니라 Docker daemon으로 보내는 build input boundary를 줄이는 장치다. 이 점을 반복해서 강조한다.
+
+## 운영 해석
+tag는 이름표고 digest는 content identity에 가깝다. `latest`는 편하지만 재현성에는 약하다. 같은 tag가 시간이 지나 다른 내용을 가리킬 수 있기 때문이다. 교육 단계에서는 tag를 쉽게 쓰되, 운영 판단에서는 명시적 version tag와 digest 확인이 왜 필요한지 연결한다.
+
+Docker Hub push는 학습자가 하고 싶어할 수 있지만 기본 요구로 두지 않는다. public repository에 secret이나 불필요한 파일이 들어간 image를 올리는 사고를 막아야 한다. push 전에 image 안에 무엇이 들어갔는지, tag가 무엇인지, 공개 범위가 무엇인지 확인하게 한다.
+
+## README 기록 예시
 ```markdown
-## Runtime Failure RCA
-- 증상:
-- 실행한 명령:
-- 정상 기준:
-- 분류: port/env/network/volume/process
-- 확인한 evidence:
-- 핵심 error line:
-- 조치:
-- 재검증 명령:
-- 재검증 결과:
+## Image Build Evidence
+- Dockerfile path:
+- Build command:
+- Image tag:
+- Base image:
+- Build context note:
+- .dockerignore excludes:
+- HTTP check:
+- history/inspect summary:
+- Failure drill:
 ```
 
-## 마무리 점검
-```text
-container가 바로 종료되면 먼저 ____를 본다.
-HTTP 실패는 먼저 ____에서 host port를 확인한다.
-DB 초기화 실패는 ____ 누락을 의심한다.
-데이터가 예상과 다르면 ____ 재사용 여부를 확인한다.
-```
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| 분류 | runtime failure를 한 축으로 분류했다 |
-| logs | 핵심 error line을 찾았다 |
-| inspect | port/mount/network 중 하나를 확인했다 |
-| RCA | 재검증 결과까지 기록했다 |
-
-### 공식 근거 링크
-- Docker logs: https://docs.docker.com/reference/cli/docker/container/logs/
-- Docker exec: https://docs.docker.com/reference/cli/docker/container/exec/
-- Docker inspect: https://docs.docker.com/reference/cli/docker/inspect/
+## 다음 연결
+Day 4는 이 image를 여러 runtime config와 failure 조건으로 실행해 관찰한다.

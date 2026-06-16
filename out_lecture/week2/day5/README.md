@@ -1,48 +1,53 @@
-# Week 2 Day 5: Docker 운영 관점 통합, 보안, 이미지 배포 흐름, 학습 정리 제출
+# Week 2 Day 5: Docker Compose와 다중 컨테이너 실행 표준화
 
 ## Overview
-Day 5는 Week 2 Docker 학습을 하나의 운영 가능한 handoff package로 통합한다. 학생은 Dockerfile, image, container, tag, Compose, README, 장애 기록을 따로따로 제출하지 않고, 다른 사람이 실행하고 확인하고 정리할 수 있는 형태로 묶는다.
+Day 5는 Week 2에서 길게 실행했던 Docker 명령을 `compose.yaml`로 표준화하고, 제공 코드로 여러 유명 로컬 아키텍처를 직접 실행한다. 단순히 YAML 문법을 설명하는 날이 아니라 Web+DB, DB 관리 UI, cache, reverse proxy, queue+worker 같은 패턴을 `docker compose config`, `up`, `ps`, `logs`, `curl`, `exec`, `down`으로 검증한다.
 
 오늘의 핵심 질문은 다음과 같다.
 
 ```text
-Docker로 실행 환경을 표준화했다면, 그 결과물을 운영 관점에서 안전하고 재현 가능하게 전달하려면 무엇을 확인해야 하는가?
+유명한 다중 컨테이너 아키텍처를 compose.yaml로 제공하면 실행, 확인, 장애 분석, 인수인계가 어떻게 쉬워지는가?
 ```
 
-Day 5는 새로운 도구를 많이 늘리는 날이 아니다. 컨테이너가 VM이 아니라는 점, stateless app과 persistent data의 차이, 좋은 Dockerfile, secret 제외, image tag와 registry 흐름, 학습 정리 evidence를 정리한다. Week 3의 MSA로 넘어가기 전에 단일 앱 Docker 실행 계약을 확실히 닫는다.
+Day 5는 Docker Compose 확정일이다. 강사는 각 아키텍처별 starter code와 `compose.yaml`을 제공하고, 학생은 명령을 실행해 진짜로 뜨는지 검증한다. 모든 실행 명령은 code block으로 제시하고, 각 architecture는 최소한 start, check, logs, cleanup evidence를 남긴다.
 
 ## Learning Goals
-- container와 VM의 차이를 운영 관점에서 설명한다.
-- stateless app, immutable image, persistent volume의 경계를 설명한다.
-- 좋은 Dockerfile의 기준을 작고 명확하며 secret을 포함하지 않는 image 관점으로 평가한다.
-- `.dockerignore`, base image tag, `CMD`, `EXPOSE`, healthcheck의 의미를 설명한다.
-- root 실행, image 출처, tag 고정, secret 노출, public push 위험을 분류한다.
-- build, tag, push, pull, run 흐름을 배포 파이프라인의 축소판으로 설명한다.
-- 표준 실습 앱을 Dockerfile과 Compose로 실행 가능하게 정리한다.
-- Week 2 학습 정리 제출물에서 실행 방법, evidence, 장애/RCA, 남은 위험, Week 3 연결 질문을 정리한다.
+- Compose가 필요한 이유를 긴 `docker run` 명령의 반복성과 인수인계 문제로 설명한다.
+- `compose.yaml`의 `services`, `image`, `ports`, `environment`, `volumes`, `networks`를 읽는다.
+- Web+PostgreSQL two-tier 구조에서 service name, internal port, host port, connection string을 구분한다.
+- Adminer/pgAdmin 같은 DB 관리 UI를 붙일 때 어떤 port를 host에 노출하는지 설명한다.
+- Redis cache를 붙이고 cache hit/miss 또는 log evidence를 확인한다.
+- Nginx reverse proxy가 여러 web service로 routing하는 구조를 설명한다.
+- queue+worker+database 구조에서 비동기 처리와 worker logs를 확인한다.
+- `docker compose up`, `ps`, `logs`, `exec`, `down`, `down -v`의 차이를 설명한다.
+- Compose volume cleanup이 database data 삭제로 이어질 수 있음을 설명한다.
+- missing env, wrong service name, wrong port, stale volume을 Compose 장애로 분류한다.
+- Week 2 evidence를 Compose README handoff로 정리한다.
 
 ## Lesson Index
 | 교시 | 주제 | 핵심 산출물 |
 |---|---|---|
-| 1교시 | Docker 운영 관점 정리 | container/VM/stateless/immutable map |
-| 2교시 | 좋은 Dockerfile 작성 원칙 | Dockerfile review checklist |
-| 3교시 | 컨테이너 보안 기초 | secret/image/root/tag risk note |
-| 4교시 | 이미지 배포 흐름 | build-tag-push-pull-run evidence map |
-| 5교시 | 2주차 통합 실습 | build/run/compose/README package |
-| 6교시 | 2주차 Docker 학습 정리 제출 | learning summary card |
-| 7교시 | 제출물 점검 및 live Q&A | improvement patch list |
-| 8교시 | 다음 주차 Overview | Week 3 MSA readiness checklist |
+| 1교시 | Compose 기본과 검증 루프 | config/up/ps/logs/down evidence |
+| 2교시 | Architecture 1: Web + PostgreSQL | two-tier app evidence |
+| 3교시 | Architecture 2: Web + PostgreSQL + Adminer/pgAdmin | DB UI evidence |
+| 4교시 | Architecture 3: Web + Redis cache | cache/log evidence |
+| 5교시 | Architecture 4: Nginx reverse proxy + multiple web services | routing evidence |
+| 6교시 | Architecture 5: Queue + worker + database | async worker evidence |
+| 7교시 | Compose 장애 분석과 cleanup | missing env/wrong service/down-v RCA |
+| 8교시 | 2주차 제출물과 Week 3 MSA 연결 | service boundary readiness |
 
 ## Practice Files And Assets
 | 자료 | 용도 |
 |---|---|
-| `labs/integration-app/Dockerfile` | 좋은 Dockerfile 기준 실습 |
-| `labs/integration-app/.dockerignore` | build context와 secret 제외 실습 |
-| `labs/integration-app/compose.yaml` | 통합 Compose 실행 |
-| `labs/integration-app/html/index.html` | HTTP body marker |
-| `labs/integration-app/README.md` | 실습 앱 run/check/cleanup |
-| `labs/integration-app/release-checklist.md` | 제출 전 이미지/보안/handoff 점검 |
-| `hands-on-lab.md` | Day 5 전체 실행 흐름 |
+| `assets/day5-compose-architecture-lab-overview.png` | Day 5 Compose architecture lab 전체 구조 인포그래픽 |
+| `labs/compose-architectures/01-web-postgres/` | Web + PostgreSQL two-tier app |
+| `labs/compose-architectures/02-web-postgres-admin/` | Web + DB + Adminer/pgAdmin |
+| `labs/compose-architectures/03-web-redis/` | Web + Redis cache |
+| `labs/compose-architectures/04-nginx-reverse-proxy/` | Nginx reverse proxy + multiple web services |
+| `labs/compose-architectures/05-queue-worker-db/` | Queue + worker + database |
+| 각 architecture의 `compose.yaml` | 실행 조건과 service 관계 |
+| 각 architecture의 `README.md` | 실행/check/logs/cleanup 명령 |
+| `hands-on-lab.md` | Day 5 전체 Compose 실행 흐름 |
 | `academic-foundations.md` | 학술/현업 기준 mapping |
 | `assets/lesson-01-docker-ops-model.png` | Docker 운영 모델 |
 | `assets/lesson-02-good-dockerfile.png` | 좋은 Dockerfile 기준 |
@@ -56,98 +61,106 @@ Day 5는 새로운 도구를 많이 늘리는 날이 아니다. 컨테이너가 
 ## Required Evidence
 | Evidence | 제출 기준 |
 |---|---|
-| Dockerfile evidence | base image, COPY 범위, CMD/EXPOSE/healthcheck 설명 |
-| Build evidence | local image tag와 build 성공 기록 |
-| Run evidence | `docker run`, `docker ps`, HTTP 200, body marker |
-| Compose evidence | `docker compose config`, `up`, `ps`, HTTP check |
-| Security evidence | secret 제외, `.dockerignore`, public push 주의 |
-| Tag evidence | local tag와 tag naming 근거 |
-| Failure evidence | build/run/port/secret/volume 중 하나 RCA |
-| Handoff evidence | README build/run/check/cleanup section |
-| Learning summary evidence | Docker 학습 정리 카드와 개선 기록 |
+| Compose config evidence | `docker compose config` 성공 또는 error summary |
+| Compose up evidence | `docker compose up -d`, `ps`, service status |
+| PostgreSQL evidence | `exec` 또는 client query result |
+| Volume evidence | Compose volume name, data persistence, cleanup decision |
+| Web evidence | web service가 있으면 HTTP 200/body marker |
+| Architecture evidence | 최소 2개 architecture의 실행/check/logs/cleanup |
+| Logs evidence | `docker compose logs` 핵심 줄 |
+| Failure evidence | missing env/wrong service name/wrong port/stale volume 중 하나 RCA |
+| Handoff evidence | README compose up/check/exec/down/down-v warning |
 | Week 3 readiness | service/network/dependency 질문 목록 |
+
+## Preflight Verification
+현재 저장소 기준으로 다음 Compose architecture는 로컬 Docker에서 사전 검증했다.
+
+| Architecture | 검증 명령 | 결과 |
+|---|---|---|
+| `01-web-postgres` | `docker compose up -d`, `curl -I http://localhost:18085`, `docker compose exec db psql ...`, `docker compose down` | HTTP 200, PostgreSQL `current_database = app`, cleanup 성공 |
+| `04-nginx-reverse-proxy` | `docker compose up -d`, `curl http://localhost:18089/a/`, `curl http://localhost:18089/b/`, `docker compose down` | Web A/Web B 응답, proxy logs, cleanup 성공 |
+
+`02`, `03`, `05`는 `docker compose config` 검증을 통과했다. 해당 예제는 `adminer:4`, `redis:7-alpine` image pull이 필요할 수 있으므로 수업 전 네트워크 상태에서 `docker compose pull`을 먼저 확인한다.
 
 ## Official References
 | Topic | Reference | 확인할 키워드 |
 |---|---|---|
-| Docker overview | https://docs.docker.com/engine/docker-overview/ | image, container, registry |
-| Dockerfile reference | https://docs.docker.com/reference/dockerfile/ | FROM, COPY, CMD, EXPOSE, HEALTHCHECK |
-| Build best practices | https://docs.docker.com/build/building/best-practices/ | small image, cache, context |
-| Docker Scout base image policy | https://docs.docker.com/scout/policy/ | image update, vulnerabilities |
-| Docker Hub repositories | https://docs.docker.com/docker-hub/repos/ | push, pull, tag |
-| Docker security | https://docs.docker.com/engine/security/ | daemon, containers, isolation |
-| Twelve-Factor App | https://12factor.net/ | config, backing services, build/release/run |
+| Docker Compose | https://docs.docker.com/compose/ | multi-container application |
+| Compose file services | https://docs.docker.com/reference/compose-file/services/ | image, build, ports, environment, volumes |
+| Compose networking | https://docs.docker.com/compose/how-tos/networking/ | service name, DNS |
+| Compose volumes | https://docs.docker.com/reference/compose-file/volumes/ | named volumes |
+| PostgreSQL official image | https://github.com/docker-library/docs/blob/master/postgres/README.md | env, data directory, tags |
+| Twelve-Factor App | https://12factor.net/ | config, backing services |
 
 ## Academic/Workforce Standards Alignment
 | 기준 | Day 5 적용 | 학생 evidence |
 |---|---|---|
-| ABET problem analysis | Docker 운영 위험을 분류 | risk table |
-| ABET communication | 실행 가능한 README와 학습 정리 | handoff package |
-| CS2023 Knowledge | image/container/tag/registry/security 개념 | concept map |
-| CS2023 Skill | build/run/compose/tag/check 수행 | command evidence |
-| CS2023 Disposition | secret 비노출과 cleanup 책임 | security note |
-| NIST NICE | credential hygiene, least privilege, image trust | security checklist |
-| Bloom Evaluate | Dockerfile과 image push 위험 평가 | review rubric |
+| ABET problem analysis | 여러 service 실행 조건과 장애를 분류 | compose RCA |
+| ABET communication | 실행 가능한 Compose README | handoff package |
+| CS2023 Knowledge | service, network, volume, config 개념 | concept map |
+| CS2023 Skill | compose config/up/ps/logs/exec/down 수행 | command evidence |
+| CS2023 Disposition | secret 비노출과 volume cleanup 책임 | security/data note |
+| Bloom Evaluate | `down -v`와 volume 삭제 위험 평가 | cleanup decision |
 | SRE practice | failure drill, RCA, evidence summary | RCA note |
 
 ## Risk Register
 | 위험 | 가능성 | 영향 | Severity | 완화 |
 |---|---:|---:|---|---|
-| secret을 image에 COPY | 중간 | 높음 | High | `.dockerignore`, review |
-| `latest`만 제출 | 높음 | 중간 | Medium | explicit tag 사용 |
-| public push 실수 | 낮음 | 높음 | High | push 전 checklist |
-| root/admin 과용 | 중간 | 중간 | Medium | 최소 권한 설명 |
-| cleanup 누락 | 높음 | 낮음 | Medium | container/image audit |
-| port 충돌 | 높음 | 낮음 | Medium | host port 변경 |
-| build context 과대 | 중간 | 중간 | Medium | `.dockerignore` |
+| `.env`/password 노출 | 중간 | 높음 | High | secret masking, `.env.example` |
+| `down -v`로 DB data 삭제 | 중간 | 높음 | High | cleanup warning |
+| wrong service name | 높음 | 중간 | Medium | Compose DNS 설명 |
+| wrong host/container port | 높음 | 중간 | Medium | port mapping table |
+| stale volume | 중간 | 중간 | Medium | volume inspect/cleanup decision |
+| cleanup 누락 | 높음 | 낮음 | Medium | compose down audit |
 
 ## End-Of-Day Checklist
-- [ ] Dockerfile을 읽고 각 instruction의 운영 의미를 설명했다.
-- [ ] `.dockerignore`로 secret과 불필요 파일을 제외했다.
-- [ ] local image를 build하고 tag를 확인했다.
-- [ ] `docker run`으로 HTTP 200과 body marker를 확인했다.
-- [ ] Compose로 같은 앱을 실행하고 확인했다.
-- [ ] image push 위험과 tag 기준을 설명했다.
-- [ ] 장애/RCA 기록 1개를 완성했다.
-- [ ] README에 build/run/check/cleanup을 기록했다.
-- [ ] 학습 정리 제출물에 evidence, 남은 위험, Week 3 질문을 기록했다.
+- [ ] Day 1~2의 긴 `docker run` 명령을 Compose service로 옮겼다.
+- [ ] `docker compose config`를 실행했다.
+- [ ] `docker compose up -d`와 `ps`로 service 상태를 확인했다.
+- [ ] 최소 2개 architecture를 실행하고 검증했다.
+- [ ] Web+DB architecture에서 DB query 또는 app response를 확인했다.
+- [ ] DB UI, cache, reverse proxy, queue+worker 중 하나 이상을 추가로 실행했다.
+- [ ] Compose volume이 data를 보존하는지 확인했다.
+- [ ] `docker compose down`과 `down -v`의 차이를 설명했다.
+- [ ] Compose 장애/RCA 기록 1개를 완성했다.
+- [ ] README에 compose up/check/exec/logs/down/cleanup warning을 기록했다.
 - [ ] Week 3 MSA readiness 질문을 작성했다.
 
 ## Completion Definition
 Day 5는 다음 문장을 evidence와 함께 말할 수 있을 때 완료된다.
 
 ```text
-이 표준 앱은 Dockerfile로 build할 수 있고, 명시적 tag로 식별할 수 있으며, docker run과 Compose 두 방식으로 HTTP evidence를 확인할 수 있다. README는 다음 사람이 실행, 확인, 정리, 장애 대응을 재현할 수 있게 한다.
+제공된 Compose architecture는 compose.yaml 하나로 실행할 수 있고, services/ports/env/volumes/networks 조건이 파일에 남아 있으며, README는 다음 사람이 실행, 확인, 정리, 장애 대응을 재현할 수 있게 한다.
 ```
 
 ## Next Connection
-Week 3는 MSA로 넘어간다. Day 5에서 정리한 단일 service의 build/run/check/handoff 기준은 Week 3에서 frontend, api, database, worker 등 여러 service의 topology, dependency, network, health check, failure propagation을 다루는 기준이 된다.
+Week 3는 MSA로 넘어간다. Day 5에서 정리한 Compose service, service name, network, volume, dependency 기준은 Week 3에서 frontend, api, database, worker 등 여러 service의 topology, dependency, health check, failure propagation을 다루는 기준이 된다.
 
 ## Final Submission Packet
 | Artifact | Required Evidence |
 |---|---|
-| Dockerfile | instruction review note |
-| `.dockerignore` | secret/context exclusion note |
-| local image | explicit tag and build output |
-| run evidence | `docker ps`, HTTP 200, body marker |
-| Compose evidence | config/up/ps/check |
-| security note | no secret, push decision |
+| compose.yaml | services/ports/env/volumes/networks |
+| architecture folder | 제공 코드와 README |
+| Compose evidence | config/up/ps/logs/exec/check |
+| DB evidence | query result |
+| volume evidence | persistence and cleanup decision |
+| web evidence | HTTP 200/body marker if web service exists |
 | RCA | symptom, fix, recheck, prevention |
-| README | build/run/check/cleanup |
+| README | compose up/check/logs/exec/down/down-v warning |
 | learning summary card | evidence-centered study summary |
 | Week 3 question | MSA readiness |
 
 ## Review Sequence
-1. 파일이 있는지 본다.
-2. 명령이 실행 가능한지 본다.
-3. expected output이 있는지 본다.
-4. 실패 기록이 있는지 본다.
-5. secret과 cleanup 위험이 문서화됐는지 본다.
+1. `compose.yaml`이 있는지 본다.
+2. `docker compose config`가 되는지 본다.
+3. `up`, `ps`, `logs`, `exec/check` evidence가 있는지 본다.
+4. volume과 cleanup 위험이 문서화됐는지 본다.
+5. 실패 기록이 있는지 본다.
 6. 다른 사람이 fresh clone 후 따라 할 수 있는지 본다.
 
 ## Day 5 Instructor Notes
-- 새 기능 추가보다 handoff와 evidence를 우선한다.
+- 새 기능 추가보다 Compose handoff와 evidence를 우선한다.
 - Docker Hub push는 기본 요구하지 않는다.
-- 학생이 public push를 원하면 secret/content gate를 먼저 확인한다.
-- 학습 정리는 UI 시연보다 build/run/check/RCA/security와 본인 인사이트 중심으로 유도한다.
+- `down -v`는 데이터 삭제 명령으로 반복 강조한다.
+- 학습 정리는 UI 시연보다 compose config/up/check/RCA/cleanup과 본인 인사이트 중심으로 유도한다.
 - Week 3 preview는 MSA를 정답처럼 말하지 않고 운영 trade-off로 소개한다.

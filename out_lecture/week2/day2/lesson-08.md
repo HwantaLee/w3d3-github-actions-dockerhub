@@ -1,166 +1,79 @@
-# 8교시: 디스크 연동 2 - named volume과 README evidence
+# 8교시: storage/network 통합 실험
 
 ## 수업 목표
-- bind mount와 named volume의 차이를 설명한다.
-- named volume에 쓴 데이터가 container 삭제 후에도 남는 흐름을 확인한다.
-- 디스크 연동 실습 결과를 README에 build/run/disk/check/cleanup/troubleshoot 구조로 기록한다.
+- volume과 network를 함께 쓰는 PostgreSQL 실습을 완성한다.
+- 데이터 보존과 DNS 접속을 한 번에 검증한다.
+- cleanup audit을 수행한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 학생 산출 |
-|---|---|---:|---|
-| 0-6분 | bind mount vs named volume 비교 | 설명 12% | 비교표 |
-| 6-20분 | named volume 생성과 write | 실행 28% | write evidence |
-| 20-32분 | 새 container에서 read 확인 | 실행 24% | persistence evidence |
-| 32-40분 | volume inspect/rm과 위험 설명 | 실행 16% | cleanup evidence |
-| 40-48분 | README disk evidence 작성 | 실행 16% | README draft |
-| 48-50분 | Day 3 연결 | 설명 4% | next note |
+## 강의 전개
+Day 2 마지막 교시는 전체를 합친다. PostgreSQL container는 named volume을 사용하고 custom network에 붙는다. client container는 host port 없이 network DNS로 접속한다. container를 교체해도 data가 살아있는지 확인한 뒤 무엇을 지우고 무엇을 남길지 결정한다.
 
-### Visual 1: named volume 데이터 보존
-![named volume 데이터 보존](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/assets/lesson-08-named-volume-readme-evidence.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 이미지는 Container A가 named volume에 데이터를 쓰고 삭제된 뒤, Container B가 같은 volume에서 데이터를 읽는 흐름을 보여준다. container lifecycle과 data lifecycle이 분리된다는 점이 핵심이다.
-
-## bind mount와 named volume 비교
-| 구분 | Bind mount | Named volume |
-|---|---|---|
-| Source | host path를 직접 지정 | Docker가 volume 이름으로 관리 |
-| 적합한 용도 | 개발 중 host 파일 즉시 반영 | DB/data처럼 container 삭제 후 보존 |
-| 위험 | host path 의존, OS별 path 차이 | volume 삭제 전까지 데이터가 남음 |
-| 삭제 | host 파일은 직접 관리 | `docker volume rm`으로 삭제 |
-
-## 데이터 lifecycle 설명
-container는 쉽게 만들고 지울 수 있어야 한다. 하지만 모든 데이터가 container와 함께 사라져도 되는 것은 아니다. database file, uploaded file, generated report처럼 보존이 필요한 데이터는 container lifecycle에서 분리해야 한다.
-
-named volume은 Docker가 관리하는 persistent storage다. host path를 직접 외우지 않아도 volume name으로 mount할 수 있고, container가 삭제되어도 volume은 남는다. 이 특성은 DB 실습에서 중요하지만, 동시에 cleanup 책임도 만든다. "컨테이너를 지웠는데 왜 디스크가 계속 차지되는가"라는 질문은 대부분 volume이나 image/cache 정리와 연결된다.
-
-## 학술/운영 관점
-운영체제 관점에서 persistence는 "프로세스가 종료된 뒤에도 데이터가 남는가"의 문제다. container는 process lifecycle을 빠르게 만들고 삭제하는 데 적합하지만, storage는 별도의 lifecycle을 가진다. 그래서 운영 설계에서는 compute lifecycle과 data lifecycle을 분리해서 문서화한다.
-
-| lifecycle | Docker 예시 | 확인 명령 |
-|---|---|---|
-| Process/container | `docker run`, `docker stop`, `docker rm` | `docker ps`, `docker logs` |
-| Image artifact | `docker build`, `docker images` | `docker history`, `docker inspect` |
-| Persistent data | `docker volume create`, mount | `docker volume ls`, `docker volume inspect` |
-| Host file source | bind mount source path | `pwd`, `ls`, `docker inspect` |
-
-## Hands-on 1: named volume 생성과 write
+## 실습 명령
+```bash
+docker run -d --name paperclip-day2-pg --network paperclip-day2-net -e POSTGRES_PASSWORD=postgres -v paperclip-pg16-data:/var/lib/postgresql/data postgres:16
+```
 
 ```bash
-docker volume create paperclip-day2-data
-
-docker run --rm \
-  -v paperclip-day2-data:/data \
-  alpine:3.20 \
-  sh -c "echo volume-note-v1 > /data/note.txt && cat /data/note.txt"
+docker run --rm --network paperclip-day2-net -e PGPASSWORD=postgres postgres:16 psql -h paperclip-day2-pg -U postgres -d paperclip -c "INSERT INTO notes(body) VALUES ('day2 integrated evidence'); SELECT * FROM notes;"
 ```
 
-### Linux 사전 테스트 결과
-
-```text
-paperclip-day2-data
-volume-note-v1
-```
-
-첫 번째 줄은 volume 생성 결과이고, 두 번째 줄은 container가 volume 안에 쓴 파일을 읽은 결과다.
-
-전체 named volume 실습은 [hands-on-lab.md](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/hands-on-lab.md)의 Phase G와 Phase H를 따른다. 이 교시에서는 volume을 만들고 읽는 것에서 끝내지 않고, inspect, cleanup, README evidence까지 완료한다.
-
-## Hands-on 2: 새 container에서 read 확인
-
+## 검증 명령
 ```bash
-docker run --rm \
-  -v paperclip-day2-data:/data \
-  alpine:3.20 \
-  cat /data/note.txt
+docker stop paperclip-day2-pg
+docker rm paperclip-day2-pg
+docker run -d --name paperclip-day2-pg-v2 --network paperclip-day2-net -e POSTGRES_PASSWORD=postgres -v paperclip-pg16-data:/var/lib/postgresql/data postgres:16
+docker run --rm --network paperclip-day2-net -e PGPASSWORD=postgres postgres:16 psql -h paperclip-day2-pg-v2 -U postgres -d paperclip -c "SELECT * FROM notes;"
 ```
 
-### Linux 사전 테스트 결과
-
-```text
-volume-note-v1
-```
-
-앞의 container는 `--rm`으로 삭제되었지만 named volume은 남아 있었기 때문에 새 container가 같은 데이터를 읽을 수 있다.
-
-## Hands-on 3: inspect와 cleanup
-
-```bash
-docker volume inspect paperclip-day2-data
-docker volume rm paperclip-day2-data
-docker volume ls --filter name=paperclip-day2-data
-```
-
-주의: `docker volume rm`은 volume 데이터를 삭제한다. DB 실습이나 실제 서비스 데이터에는 신중하게 사용해야 한다.
-
-### Linux 사전 테스트 cleanup 결과
-
-```text
-docker stop paperclip-day2-disk
-paperclip-day2-disk
-
-docker rm paperclip-day2-disk
-paperclip-day2-disk
-
-docker volume rm paperclip-day2-data
-paperclip-day2-data
-```
-
-정리 후 `docker ps --filter name=paperclip-day2-disk`와 `docker volume ls --filter name=paperclip-day2-data`는 헤더만 출력했다.
-
-## README disk evidence template
-
-```markdown
-## Disk Mount Evidence
-
-### Bind mount
-- Source:
-- Destination:
-- Mode:
-- v1 response:
-- v2 response:
-- Cleanup:
-
-### Named volume
-- Volume name:
-- Write command:
-- Read command:
-- Persistence result:
-- Cleanup command:
-
-### Troubleshoot
-| Symptom | Evidence | Action |
-|---|---|---|
-| bind source path not found | pwd/ls/docker run error | source path 수정 |
-| response not updated | curl/browser cache/docker inspect | mount path와 browser cache 확인 |
-| volume data missing | docker volume ls/inspect | volume name 오타 또는 rm 여부 확인 |
-```
-
-## 추가 실습: volume inspect 읽기
-```bash
-docker volume inspect paperclip-day2-data
-```
-
-확인할 것:
-- `Name`: `paperclip-day2-data`
-- `Driver`: 보통 `local`
-- `Mountpoint`: Docker가 관리하는 host-side 저장 위치
-
-주의:
-- `Mountpoint`는 Docker 내부 관리 경로다. 수업에서는 이 경로를 직접 수정하지 않는다.
-- 데이터 수정은 container를 통해 수행하고, 운영에서는 backup/restore 절차를 별도로 둔다.
-
-## 평가 기준
-| 기준 | 2점 evidence |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| 비교 | bind mount와 named volume 차이를 설명했다. |
-| persistence | container 삭제 후 새 container가 volume 데이터를 읽는 것을 확인했다. |
-| cleanup | volume 삭제 전 위험을 설명하고 정리했다. |
-| README | disk evidence와 troubleshoot를 README에 기록했다. |
+| SELECT가 실패 | table 생성 여부와 volume mount path를 확인한다. |
+| network DNS 실패 | client와 DB가 같은 network인지 inspect한다. |
+| cleanup 과잉 | volume rm은 Day 2 evidence를 지울 수 있다. |
 
-### 공식 근거 링크
-- Docker Docs: Volumes, https://docs.docker.com/engine/storage/volumes/
-- Docker Docs: Bind mounts, https://docs.docker.com/engine/storage/bind-mounts/
-- Docker Docs: Storage, https://docs.docker.com/engine/storage/
+## Cleanup
+```bash
+docker stop paperclip-day2-pg-v2 || true
+docker rm paperclip-day2-pg-v2 || true
+docker network rm paperclip-day2-net || true
+# volume은 Day 5 Compose에서 재사용할 수 있으므로 기본적으로 남긴다.
+# docker volume rm paperclip-pg16-data
+```
 
-### 다음 연결
-Day 3는 network, port, environment variable, volume을 더 넓게 다룬다. Day 2 후반의 디스크 연동 실습은 Day 3 volume/data persistence 수업의 선행 경험이다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
+
+## Evidence
+| 항목 | 제출 기준 |
+|---|---|
+| 통합 run | volume+network 사용 command |
+| Data 보존 | container 교체 후 SELECT 결과 |
+| Cleanup audit | container/network/volume 처리 결정 |
+
+## 강의자 설명 포인트
+이 실습의 핵심은 명령어 자체가 아니라 경계다. container는 실행 단위이고, volume은 data lifecycle이며, network는 통신 경계다. 학생이 `docker run` 한 줄을 볼 때 `-v`, `--network`, `-p`를 옵션 목록으로 외우면 뒤에서 Compose와 Kubernetes로 넘어갈 때 같은 혼란이 반복된다. 그래서 각 옵션을 "무엇을 container 밖으로 분리하는가"라는 질문으로 읽게 한다.
+
+강의 중에는 성공 출력보다 실패 출력의 의미를 더 오래 다룬다. port가 열리지 않은 것은 web server 문제가 아닐 수 있고, DB 접속 실패는 password 문제가 아니라 network boundary 문제일 수 있다. host terminal, container 내부, 같은 Docker network의 client container는 모두 서로 다른 관찰 위치다. 학생이 어디에서 명령을 실행하는지 말로 먼저 설명한 뒤 CLI를 실행하게 한다.
+
+## 운영 해석
+실무에서 database container를 다룰 때 가장 위험한 실수는 cleanup을 단순 정리로만 보는 것이다. container 삭제는 process와 container writable layer를 정리하는 것이고, volume 삭제는 data를 삭제하는 것이다. network 삭제는 통신 경로를 정리하는 것이다. 이 세 가지를 구분하지 않으면 실습은 성공해도 운영 사고를 배운 셈이 된다.
+
+README에는 "실행됐다" 대신 "어떤 data를 남기고 무엇을 삭제했는지"를 써야 한다. Day 2 evidence는 Day 5 Compose에서 `volumes`와 `networks`를 읽는 기준이 된다. Compose의 YAML 항목은 갑자기 생긴 문법이 아니라 Day 2에서 손으로 실행한 storage/network 결정을 파일로 옮긴 것이다.
+
+## README 기록 예시
+```markdown
+## Storage/Network Evidence
+- Container:
+- Volume name:
+- Volume target path:
+- Network name:
+- Host port published? yes/no
+- Container DNS check:
+- Data survived container replacement? yes/no
+- Cleanup decision:
+```
+
+## 다음 연결
+Day 3는 image와 Dockerfile로 넘어간다. Day 2는 실행된 container의 data와 network를 다뤘고, Day 3는 그 container의 출발점인 image를 직접 만든다.

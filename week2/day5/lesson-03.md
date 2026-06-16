@@ -1,204 +1,85 @@
-# 3교시: 컨테이너 보안 기초
+# 3교시: Architecture 2 - Web + PostgreSQL + DB UI
 
 ## 수업 목표
-- container 보안을 image, runtime, registry, secret 관점으로 분류한다.
-- root 실행, image 출처, tag 고정, secret 관리의 기본 위험을 설명한다.
-- public push 전 확인해야 할 gate를 작성한다.
+- Compose architecture를 실제 명령으로 실행한다.
+- config/up/ps/logs/curl/exec/down 검증 루프를 적용한다.
+- Week 3 MSA service boundary로 연결한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | 보안 범위 설정 | 설명 15% | security scope |
-| 8-20분 | image 출처와 tag 위험 | 설명 25% | trust note |
-| 20-32분 | secret과 build context | 실행 25% | secret checklist |
-| 32-42분 | runtime 권한과 root 주의 | 설명 20% | least privilege note |
-| 42-50분 | push 전 security gate | 실행 15% | push gate |
+## 강의 전개
+Adminer/pgAdmin 같은 DB UI를 붙이고 host port 노출을 판단한다. 강사는 starter code와 compose.yaml을 제공하고, 학생은 YAML을 읽은 뒤 실제로 실행해 서비스 관계를 확인한다. 유명 아키텍처를 말로만 설명하지 않고 container, network, volume, port, log evidence로 확인한다.
 
-### Visual 1: 컨테이너 보안 기초
-![Container security basics](./assets/lesson-03-container-security.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 visual은 image trust, secret, root, tag, registry push를 하나의 보안 점검판으로 보여준다.
-
-## 핵심 설명
-컨테이너 보안은 Kubernetes부터 시작되는 것이 아니다. Dockerfile을 작성하고 image를 build하는 순간부터 시작된다. image에 무엇이 들어갔는지, 어디서 온 base image인지, 어떤 tag를 쓰는지, 어떤 secret이 build context에 포함되는지 확인해야 한다.
-
-Day 5 수준의 보안 목표는 취약점 스캐너를 완벽히 쓰는 것이 아니라 "명백한 위험을 만들지 않는 것"이다.
-
-## 보안 범위
-| 범위 | Day 5에서 다루는 것 | 오늘 다루지 않는 것 |
-|---|---|---|
-| Image | base image, tag, copied files | full CVE remediation |
-| Secret | `.env`, token, key 제외 | secret manager 실습 |
-| Runtime | root/admin 과용 주의 | seccomp/AppArmor 심화 |
-| Registry | public push gate | private registry 운영 |
-| Host | Docker daemon 권한 인식 | host hardening |
-
-## image 출처와 tag
-공식 image라고 해도 tag와 update 정책은 확인해야 한다. `nginx:latest`는 수업 evidence로 부족하다. 시간이 지나면 같은 tag가 다른 digest를 가리킬 수 있고, 재현성이 약해진다.
-
-좋은 기록:
-
-```text
-base image: nginx:1.27-alpine
-reason: small static web server image, explicit version tag
+## 실습 명령
+```bash
+cd week2/day5/labs/compose-architectures/02-web-postgres-admin
+docker compose config
+docker compose up -d
 ```
 
-부족한 기록:
-
-```text
-nginx 씀
+## 검증 명령
+```bash
+cd week2/day5/labs/compose-architectures/02-web-postgres-admin
+docker compose ps
+docker compose logs --tail 80
 ```
-
-## secret 비노출
-secret은 image layer, README, screenshot, terminal history, public registry에 남을 수 있다. 실습 password도 반복적으로 공개하는 습관을 만들면 안 된다.
-
-확인할 파일:
 
 ```bash
-find . -maxdepth 2 -type f -print
-sed -n '1,120p' .dockerignore
+cd week2/day5/labs/compose-architectures/02-web-postgres-admin
+# web가 있는 architecture는 curl로 확인
+curl -I http://localhost:18085 || true
+# DB가 있는 architecture는 exec 또는 run client로 확인
+docker compose exec db psql -U postgres -d app -c 'SELECT 1;' || true
 ```
 
-위험한 파일 예:
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
+|---|---|
+| config 실패 | indentation, env 누락, compose file path를 확인한다. |
+| service unhealthy | logs와 dependency readiness를 확인한다. |
+| down -v 남용 | database volume 삭제 위험을 설명한다. |
 
-```text
-.env
-id_rsa
-aws-credentials
-dockerhub-token.txt
-prod-password.txt
+## Cleanup
+```bash
+cd week2/day5/labs/compose-architectures/02-web-postgres-admin
+docker compose down
+# 데이터를 초기화해도 되는 실습일 때만 실행
+# docker compose down -v
 ```
 
-## root 실행 주의
-많은 official image는 기본 user가 root일 수 있다. Day 5에서는 모든 image를 non-root로 고치는 심화까지 하지 않지만, root 실행이 기본값일 수 있다는 사실과 그 위험은 설명한다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-실무에서는 다음을 검토한다.
-
-| 질문 | 이유 |
+## Evidence
+| 항목 | 제출 기준 |
 |---|---|
-| container process user는 누구인가 | 권한 최소화 |
-| write 가능한 path는 어디인가 | 변조/손상 범위 |
-| host mount가 write 가능한가 | host file 손상 위험 |
-| Docker daemon 접근이 필요한가 | host 수준 권한 위험 |
+| Architecture | 실행한 architecture 이름 |
+| Compose evidence | config/up/ps/logs/check 결과 |
+| Cleanup | down/down-v 판단 |
+| MSA 연결 | service boundary와 장애 전파 해석 |
 
-## public push gate
-public registry에 push하기 전 최소 확인:
+## 강의자 설명 포인트
+Day 5는 Compose 문법 암기 시간이 아니라 architecture를 실행 가능한 파일로 제공하는 연습이다. Day 2의 volume/network, Day 3의 image, Day 4의 env/logs/cleanup이 Compose 한 파일 안에서 다시 만난다. 학생은 `services`, `ports`, `environment`, `volumes`, `networks`를 YAML 속성으로만 보지 말고 지난 실습의 `docker run` 옵션이 옮겨진 결과로 읽어야 한다.
 
-| Gate | 질문 |
-|---|---|
-| Content | image에 secret/private data가 없는가 |
-| Tag | 식별 가능한 tag인가 |
-| License | base/app content 공유 가능성 확인 |
-| README | 실행 방법과 위험이 문서화됐는가 |
-| Account | 개인 token/MFA가 노출되지 않았는가 |
+유명한 아키텍처 패턴을 다룰 때도 그림만 보여주지 않는다. Web+DB, DB UI, cache, reverse proxy, queue+worker는 모두 실제 container로 띄워야 한다. `docker compose config`는 문법 검증이고, `up`은 시작이며, `ps/logs/curl/exec`가 정상 검증이다. `down`과 `down -v`는 cleanup과 data reset의 경계다.
 
-Day 5 기본 실습은 push를 요구하지 않는다. push는 강사가 명시적으로 요청할 때만 한다.
+## 운영 해석
+Compose는 Kubernetes가 아니다. 하지만 Compose는 multi-service 사고를 배우기에 좋다. service name이 곧 내부 DNS가 되고, volume이 data lifecycle을 담당하며, ports가 host 공개 경계를 만든다. Week 3 MSA로 넘어갈 때 service boundary, dependency, failure propagation을 설명하는 첫 번째 실습 근거가 된다.
 
-## 학술 기준 연결
-NIST NICE 관점에서는 credential handling과 least privilege가 핵심이다. ABET의 전문적 책임 관점에서는 학생이 "실행됐다"보다 "안전하게 공유 가능한가"를 판단해야 한다.
+각 architecture는 반드시 실행 evidence를 남긴다. 학생이 두 개 이상의 architecture를 직접 실행하면 공통 패턴이 보이기 시작한다. 모든 architecture는 config, start, check, logs, cleanup이라는 같은 운영 루프를 가진다.
 
-## 실무 failure mode
-| Failure mode | 영향 | 예방 |
-|---|---|---|
-| `.env` COPY | credential leak | `.dockerignore` |
-| public push 실수 | data exposure | push gate |
-| latest tag만 기록 | rollback/reproduce 어려움 | explicit tag |
-| root 권한 과신 | 침해 영향 확대 | least privilege |
-| screenshot에 token 노출 | credential leak | masking |
-
-## 오해 점검
-| 오해 | 교정 |
-|---|---|
-| 로컬 실습 password는 공개해도 된다 | 습관이 중요하며 공개 repository에는 피한다 |
-| image build가 되면 안전하다 | build 성공과 보안은 다르다 |
-| official image는 무조건 안전하다 | 출처는 좋지만 tag/update/CVE는 별도 판단 |
-| Docker 보안은 운영팀만 본다 | 개발/빌드 단계부터 공동 책임이다 |
-
-## 기록 템플릿
+## README 기록 예시
 ```markdown
-## Container Security Note
-- Base image:
-- Tag:
-- Secret excluded:
-- `.dockerignore`:
-- Public push decision:
-- Root/user note:
-- Remaining risk:
+## Compose Architecture Evidence
+- Architecture folder:
+- Services:
+- Config result:
+- Up/ps result:
+- HTTP or DB check:
+- Logs summary:
+- Volume/data cleanup decision:
+- Failure drill:
+- Week 3 MSA connection:
 ```
 
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| secret | image/README/screenshot 노출 위험을 설명했다 |
-| image trust | 출처와 tag 기준을 설명했다 |
-| least privilege | root/admin 과용 위험을 언급했다 |
-| push gate | public push 전 확인표를 작성했다 |
-
-## 전이 과제
-Week 3 MSA에서는 service와 image 수가 늘어난다. 각 service image마다 같은 security gate가 필요하다. 학생은 "서비스가 4개면 secret 노출 경로가 몇 배로 늘어나는가"를 짧게 쓴다.
-
-### 공식 근거 링크
-- Docker security: https://docs.docker.com/engine/security/
-- Docker Scout policy: https://docs.docker.com/scout/policy/
-
-## 위험 분류표
-| 위험 | 가능성 | 영향 | Severity | 완화 |
-|---|---:|---:|---|---|
-| `.env` image 포함 | 중간 | 높음 | High | `.dockerignore`와 review |
-| public registry push | 낮음 | 높음 | High | push gate와 instructor approval |
-| unpinned base image | 높음 | 중간 | Medium | explicit version tag |
-| root default process | 중간 | 중간 | Medium | user 확인과 least privilege |
-| host socket mount | 낮음 | 높음 | High | 실습에서 사용 금지 |
-| token screenshot | 중간 | 높음 | High | masking과 crop |
-
-## Security Gate Worksheet
-```markdown
-## Security Gate
-- Public push requested:
-- `.env` present in build context:
-- `.dockerignore` excludes secrets:
-- README contains real credentials:
-- Screenshot contains token/MFA:
-- Base image source:
-- Tag:
-- Decision:
-```
-
-## least privilege 기초
-최소 권한은 "아무 권한도 쓰지 않는다"가 아니라 필요한 권한만 쓰는 것이다. Day 5에서는 다음을 최소 기준으로 삼는다.
-
-- Docker daemon 접근은 필요한 실습 명령에만 사용한다.
-- public push는 명시 요청 전 수행하지 않는다.
-- host directory mount는 필요한 경로만 사용한다.
-- read-only mount를 쓸 수 있으면 read-only를 우선한다.
-- secret 값은 image, README, screenshot에 남기지 않는다.
-
-## image trust checklist
-```markdown
-## Image Trust
-- Base image source:
-- Base image tag:
-- Why this image:
-- What is copied into it:
-- What is intentionally excluded:
-- Push decision:
-```
-
-## secret handling examples
-| 나쁜 예 | 좋은 예 |
-|---|---|
-| `ENV API_KEY=real-key` | runtime secret 주입 |
-| README에 password 기재 | placeholder와 변수명만 기록 |
-| `.env` commit | `.env.example` commit |
-| terminal screenshot에 token | token masking |
-| image에 credential file COPY | `.dockerignore`로 제외 |
-
-## incident scenario
-상황: 학생이 실수로 `.env`를 image에 복사한 뒤 public registry에 push했다.
-
-대응:
-1. registry image를 삭제하거나 private 처리한다.
-2. 노출된 credential을 폐기하고 재발급한다.
-3. Dockerfile과 `.dockerignore`를 수정한다.
-4. README에 secret handling rule을 추가한다.
-5. RCA에 timeline, impact, prevention을 기록한다.
+## 다음 연결
+다음 architecture 또는 Week 3 MSA에서 같은 service/network/dependency 관점을 재사용한다.

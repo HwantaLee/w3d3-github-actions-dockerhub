@@ -5,22 +5,17 @@
 - `version`, `pull`, `images`, `run`, `ps`, `logs`, `stop`, `rm`을 실행 목적과 evidence 기준으로 연결한다.
 - 실행 후 중지와 정리까지 포함한 하나의 hands-on cycle을 완성한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 학생 산출 |
-|---|---|---:|---|
-| 0-5분 | 실습 목표와 안전 기준 확인 | 설명 10% | command 목적 note |
-| 5-15분 | `docker version`, `docker pull`, `docker images` 실행 | 실행 20% | image 준비 evidence |
-| 15-30분 | `docker run`, `docker ps`로 container 상태 확인 | 실행 30% | running status evidence |
-| 30-40분 | `docker logs`, `docker stop`, `docker rm` 실행 | 실행 20% | log/cleanup evidence |
-| 40-47분 | Linux 테스트 결과와 자기 출력 비교 | 실행 10% | 차이 기록 |
-| 47-50분 | 정리와 다음 교시 연결 | 설명 10% | 질문 1개 |
+## 강의 전개
 
-실행 비중은 약 80%다. 설명은 명령의 목적과 실패 증상만 잡고, 나머지 시간은 학생이 직접 실행하고 결과를 기록하는 데 사용한다.
+이 교시는 Docker 명령어를 많이 소개하는 시간이 아니라, 하나의 container lifecycle을 끝까지 닫는 시간이다. 학생이 `docker run`만 성공시키고 넘어가면 이후 port 충돌, 이름 충돌, disk 누적을 스스로 만든다. 그래서 실행, 확인, 관찰, 중지, 삭제를 하나의 묶음으로 반복한다.
 
-### Visual 1: Docker 기본 명령 사이클
-![Docker 기본 명령 사이클](./assets/lesson-05-docker-command-cycle.png)
+실습 image는 `nginx:latest`를 사용한다. PostgreSQL을 바로 시작하지 않는 이유는 web server가 port publishing을 눈으로 확인하기 쉽고, DB password와 readiness 같은 변수를 잠시 미룰 수 있기 때문이다. 여기서 `18080:80` mapping을 이해하면 다음 교시의 `15432:5432`, `15433:5432` mapping을 더 자연스럽게 받아들인다.
 
-이 이미지는 `version -> pull -> images -> run -> ps -> logs -> stop -> rm` 흐름을 한 사이클로 보여준다. `run`에서 끝내지 않고 관찰과 정리까지 완료해야 하나의 실습이 끝난다.
+명령은 상태 질문과 함께 읽는다. `docker version`은 CLI와 daemon이 연결됐는지 묻는다. `docker pull`은 registry에서 image를 가져올 수 있는지 묻는다. `docker images`는 local disk에 어떤 실행 재료가 있는지 묻는다. `docker ps`는 현재 실행 중인 container와 port binding을 묻는다. `docker logs`는 process가 남긴 관찰 evidence를 묻는다. `docker stop`과 `docker rm`은 운영자가 lifecycle을 끝까지 책임졌는지 묻는다.
+
+출력 차이도 정상 범위로 설명한다. 처음 pull하는 학생은 layer download가 보이고, 이미 받은 학생은 up to date가 보일 수 있다. container ID는 장비마다 다르다. Docker version도 다를 수 있다. 수업에서 고정해야 하는 것은 전체 문자열이 아니라 image name, container name, port binding, status, log의 의미다.
+
+마지막에는 cleanup을 강하게 확인한다. container가 남아 있으면 다음 실습에서 이름 충돌이나 port 충돌이 난다. 특히 교육 환경에서는 "실습이 끝났다"의 기준을 browser 확인이 아니라 `stop`, `rm`, `ps` 재확인까지로 잡아야 한다.
 
 ## 실습 전 기준
 
@@ -164,4 +159,4 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 - Docker Docs: docker container logs, https://docs.docker.com/reference/cli/docker/container/logs/
 
 ### 다음 연결
-다음 교시는 같은 명령을 `hello-world`와 `nginx` 서비스 확인 흐름으로 확장한다. 핵심은 "container가 떠 있다"가 아니라 HTTP 응답과 log로 서비스 상태를 검증하는 것이다.
+다음 교시는 같은 명령 사이클을 PostgreSQL 공식 image에 적용한다. 핵심은 "container가 떠 있다"가 아니라 port, log, query result, cleanup으로 DB 실행 상태를 검증하는 것이다.

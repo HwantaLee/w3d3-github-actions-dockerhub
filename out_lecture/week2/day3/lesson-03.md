@@ -1,174 +1,73 @@
-# 3교시: environment variable과 runtime config
+# 3교시: build context와 .dockerignore
 
 ## 수업 목표
-- environment variable이 image build 결과가 아니라 runtime config임을 설명한다.
-- `docker run -e`로 설정을 주입하고 container 안에서 값을 확인한다.
-- 실습용 설정과 secret 관리 위험을 구분한다.
+- image/build/registry 개념을 실행 evidence로 확인한다.
+- 명령, 검증, cleanup을 분리해 기록한다.
+- 실패를 RCA 형식으로 정리한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | Dockerfile config와 runtime config 비교 | 설명 15% | 비교표 |
-| 8-18분 | `-e` 옵션 설명 | 설명 20% | env note |
-| 18-32분 | env-report 실습 | 실행 30% | env output |
-| 32-42분 | DB env 연결 | 실행 20% | `POSTGRES_PASSWORD` note |
-| 42-50분 | secret 유의사항과 README 기록 | 설명 15% | handoff 문장 |
+## 강의 전개
+build context에 무엇이 Docker daemon으로 전달되는지 확인하고 secret을 제외한다.
 
-### Visual 1: Runtime environment variables
-![Runtime environment variables](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day3/assets/lesson-03-runtime-env-vars.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 이미지는 image artifact와 runtime environment variable을 분리해서 보여준다. 같은 image라도 실행할 때 주입한 환경변수에 따라 설정이 달라질 수 있다.
-
-## 핵심 설명
-Dockerfile에 값을 굳히면 image를 다시 build해야 바꿀 수 있다. environment variable은 container 실행 시점에 주입되므로 같은 image를 여러 환경에서 다르게 실행할 수 있다.
-
-예를 들어 `APP_ENV=practice`, `DB_HOST=postgres`는 image 파일 자체가 아니라 실행 조건이다. Day 4 Compose에서는 이 값들이 `environment:` 항목으로 이동한다.
-
-환경변수는 설정 분리에 유용하지만 secret을 안전하게 보관하는 만능 도구는 아니다. `docker inspect`, shell history, logs, README에 값이 남을 수 있다. 실습에서는 값을 보여주기 위해 사용하지만 운영에서는 secret manager, 파일 권한, 접근 통제까지 함께 고려한다.
-
-## 실행 명령
+## 실습 명령
 ```bash
-cd week2/day3/labs/env-report
-
-docker run --rm \
-  -e APP_ENV=practice \
-  -e APP_PORT=8080 \
-  -e FEATURE_FLAG=on \
-  -e DB_HOST=postgres \
-  -e DB_PORT=5432 \
-  -v "$PWD/report.sh:/workspace/report.sh:ro" \
-  alpine:3.20 sh /workspace/report.sh
+printf ".git\n*.log\n.env\nnode_modules\n" > week2/day3/labs/static-site/.dockerignore
+printf "SECRET=do-not-copy" > week2/day3/labs/static-site/.env
 ```
 
-## Linux 사전 테스트 결과
-```text
-APP_ENV=practice
-APP_PORT=8080
-FEATURE_FLAG=on
-DB_HOST=postgres
-DB_PORT=5432
-```
-
-## env 읽는 법
-| 변수 | 의미 | 운영 질문 |
-|---|---|---|
-| `APP_ENV` | 실행 환경 이름 | dev/stage/prod를 구분하는가 |
-| `APP_PORT` | 앱이 사용할 port 설정 | 실제 listen port와 일치하는가 |
-| `FEATURE_FLAG` | 기능 on/off | 배포 없이 기능을 제어하는가 |
-| `DB_HOST` | DB 접근 hostname | Docker network name과 맞는가 |
-| `DB_PORT` | DB 접근 port | internal port와 host publish port를 혼동하지 않는가 |
-
-## 핵심 유의사항
-environment variable 이름은 문서화해야 한다. 값 자체가 secret이면 공개 README에 쓰지 않고, 어떤 이름이 필요하고 어디서 주입해야 하는지만 적는다.
-
-`-e KEY=value`는 container 실행 시점의 값이다. 이미 실행 중인 container의 environment를 바꾸고 싶다면 일반적으로 container를 새로 실행해야 한다. 실행 중 container 안에서 export를 해도 container 재생성에는 남지 않는다.
-
-`--rm`은 container 종료 후 자동 제거를 뜻한다. env-report처럼 결과만 출력하고 끝나는 실습에는 적합하지만, logs나 inspect evidence를 나중에 봐야 하는 실습에서는 `--rm`을 쓰지 않는 편이 낫다.
-
-## 자주 놓치는 지점
-| 놓치는 지점 | 증상 | 확인 |
-|---|---|---|
-| `-e KEY value`처럼 잘못 입력 | 값이 비어 있거나 command로 해석 | `-e KEY=value` |
-| env를 image 설정으로 착각 | rebuild가 필요하다고 생각 | run command 확인 |
-| secret을 README에 기록 | credential 노출 | 변수 이름만 기록 |
-| container 재사용 기대 | 새 값이 반영 안 됨 | container 재생성 |
-| host env와 container env 혼동 | host에는 값이 있는데 container에는 없음 | `docker exec env` |
-
-## PostgreSQL env 연결
-PostgreSQL official image는 초기화되지 않은 DB에 superuser password가 필요하다.
-
+## 검증 명령
 ```bash
-docker run --name paperclip-day3-postgres-missing-env postgres:16-alpine
+find week2/day3/labs/static-site -maxdepth 1 -type f -print
 ```
 
-Linux 사전 테스트 실패:
-
-```text
-Error: Database is uninitialized and superuser password is not specified.
-You must specify POSTGRES_PASSWORD to a non-empty value for the superuser.
-```
-
-이 실패는 image가 깨진 것이 아니다. runtime configuration이 빠진 것이다. 원인은 Dockerfile이 아니라 `docker run -e POSTGRES_PASSWORD=...` 누락이다.
-
-## 실무에서 챙기면 좋은 것
-| 항목 | 기준 |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| 변수 이름 | 대문자 snake case로 통일 |
-| 기본값 | 없어도 실행 가능한 값과 반드시 필요한 값을 구분 |
-| secret | README에는 값이 아니라 주입 방법만 기록 |
-| 로그 | env 값이 통째로 출력되지 않게 주의 |
-| 변경 | config 변경 시 container 재생성 필요 여부 기록 |
+| build 실패 | Dockerfile path, build context, COPY source를 확인한다. |
+| run 성공 후 접속 실패 | EXPOSE와 host -p mapping을 구분한다. |
+| push 요구 | credential과 public repository gate를 먼저 확인한다. |
 
-## 확장 실습: 값 누락과 기본값 비교
-`report.sh`는 값이 없으면 `missing`을 출력한다. 일부 변수를 빼고 실행하면 어떤 값이 빠졌는지 바로 확인할 수 있다.
-
+## Cleanup
 ```bash
-docker run --rm \
-  -e APP_ENV=practice \
-  -v "$PWD/report.sh:/workspace/report.sh:ro" \
-  alpine:3.20 sh /workspace/report.sh
+docker stop paperclip-day3-static || true
+docker rm paperclip-day3-static || true
+# 필요할 때만 실습 image 삭제
+# docker image rm paperclip-static-site:day3 paperclip-static-site:day3-reviewed
 ```
 
-기대 해석:
-- `APP_ENV`만 `practice`로 출력된다.
-- 나머지 값은 `missing`으로 출력된다.
-- 이것은 image 문제가 아니라 runtime config 누락이다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-## 운영 질문
-| 질문 | 확인 이유 |
+## Evidence
+| 항목 | 제출 기준 |
 |---|---|
-| 이 변수는 필수인가 선택인가 | 누락 시 container가 죽어야 하는지 판단 |
-| 값이 secret인가 | README와 logs에 남겨도 되는지 판단 |
-| 기본값이 안전한가 | 누락 시 위험한 기본 동작을 피함 |
-| 변경 시 재시작이 필요한가 | runtime handoff에 반영 |
-| Compose로 옮길 때 이름이 유지되는가 | Day 4 전환 준비 |
+| Command evidence | 실행한 build/run/inspect 명령 |
+| Verification | HTTP/history/inspect 결과 |
+| RCA | 실패 drill 원인과 재검증 |
 
-## README에 남길 방식
-좋은 예시는 값과 책임을 분리한다.
+## 강의자 설명 포인트
+Day 3의 중심은 "내가 실행한 것은 어떤 artifact인가"라는 질문이다. Day 1과 Day 2에서는 이미 존재하는 official image를 가져와 실행했다. Day 3에서는 source file과 Dockerfile을 image로 포장한다. 학생은 Dockerfile을 단순 설치 스크립트처럼 읽기 쉽지만, 실제로는 build context를 입력으로 받아 image layer를 만드는 build recipe다.
 
-```text
-Required env:
-- APP_ENV: practice/stage/prod 중 하나
-- DB_HOST: Docker network 안의 DB service name
-- POSTGRES_PASSWORD: local secret, README에 실제 값 기록 금지
-```
+`COPY` 한 줄은 작아 보이지만 운영적으로는 중요하다. 어떤 파일이 image 안에 들어가고 어떤 파일이 제외되는지에 따라 image size, secret risk, rebuild cache가 달라진다. `.dockerignore`는 예쁘게 정리하는 파일이 아니라 Docker daemon으로 보내는 build input boundary를 줄이는 장치다. 이 점을 반복해서 강조한다.
 
-나쁜 예시는 실제 secret 값을 그대로 남긴다.
+## 운영 해석
+tag는 이름표고 digest는 content identity에 가깝다. `latest`는 편하지만 재현성에는 약하다. 같은 tag가 시간이 지나 다른 내용을 가리킬 수 있기 때문이다. 교육 단계에서는 tag를 쉽게 쓰되, 운영 판단에서는 명시적 version tag와 digest 확인이 왜 필요한지 연결한다.
 
-```text
-POSTGRES_PASSWORD=paperclip
-```
+Docker Hub push는 학습자가 하고 싶어할 수 있지만 기본 요구로 두지 않는다. public repository에 secret이나 불필요한 파일이 들어간 image를 올리는 사고를 막아야 한다. push 전에 image 안에 무엇이 들어갔는지, tag가 무엇인지, 공개 범위가 무엇인지 확인하게 한다.
 
-## 기록 템플릿
+## README 기록 예시
 ```markdown
-## Lesson 3 Env Evidence
-- image:
-- command:
-- APP_ENV:
-- APP_PORT:
-- FEATURE_FLAG:
-- DB_HOST:
-- DB_PORT:
-- missing env failure:
-- secret으로 취급해야 할 값:
+## Image Build Evidence
+- Dockerfile path:
+- Build command:
+- Image tag:
+- Base image:
+- Build context note:
+- .dockerignore excludes:
+- HTTP check:
+- history/inspect summary:
+- Failure drill:
 ```
 
-## 마무리 점검
-```text
-environment variable은 image에 굳힌 값이 아니라 ____ config다.
-PostgreSQL 초기화에 필요한 env는 ____다.
-secret 값은 README에 ____ 않고, 필요한 변수 이름과 주입 방법만 적는다.
-```
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| env 주입 | `-e`로 값을 전달했다 |
-| 출력 | container 내부에서 값을 확인했다 |
-| 분류 | missing env를 runtime config 문제로 분류했다 |
-| 보안 | secret 기록 위험을 설명했다 |
-
-### 공식 근거 링크
-- Docker run reference: https://docs.docker.com/reference/cli/docker/container/run/
-- PostgreSQL Docker Official Image: https://hub.docker.com/_/postgres
-- Twelve-Factor App Config: https://12factor.net/config
+## 다음 연결
+Day 4는 이 image를 여러 runtime config와 failure 조건으로 실행해 관찰한다.

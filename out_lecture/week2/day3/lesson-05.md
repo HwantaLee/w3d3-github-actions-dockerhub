@@ -1,178 +1,74 @@
-# 5교시: named volume과 데이터 보존
+# 5교시: build cache와 layer 최적화
 
 ## 수업 목표
-- named volume이 Docker-managed persistent storage임을 설명한다.
-- container lifecycle과 data lifecycle을 분리한다.
-- PostgreSQL data directory를 named volume으로 보존하는 구조를 확인한다.
+- image/build/registry 개념을 실행 evidence로 확인한다.
+- 명령, 검증, cleanup을 분리해 기록한다.
+- 실패를 RCA 형식으로 정리한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | bind mount 복습 | 설명 15% | storage 비교 |
-| 8-18분 | named volume 개념 | 설명 20% | volume note |
-| 18-32분 | volume 생성과 DB mount | 실행 30% | volume evidence |
-| 32-42분 | inspect로 mount 확인 | 실행 20% | mount JSON |
-| 42-50분 | stale volume 위험 정리 | 설명 15% | cleanup note |
+## 강의 전개
+source 변경 전후 cache hit/miss와 image history를 비교한다.
 
-### Visual 1: Named volume storage lifecycle
-![Named volume storage lifecycle](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day3/assets/lesson-05-named-volume-lifecycle.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 교시에서는 runtime config와 함께 persistent storage를 연결한다. named volume은 container 삭제 후에도 남을 수 있는 별도 storage object다.
-
-## 핵심 설명
-container를 삭제하면 container writable layer는 사라진다. 하지만 named volume은 container와 별도로 남을 수 있다. 그래서 DB container를 지웠는데도 데이터가 남거나, 반대로 volume을 지워서 데이터가 사라지는 일이 생긴다.
-
-named volume은 Docker가 관리한다. host path를 직접 지정하지 않고 volume name을 사용한다. PostgreSQL official image는 data directory로 `/var/lib/postgresql/data`를 사용하므로 이 path에 volume을 mount한다.
-
-## 실행 명령
+## 실습 명령
 ```bash
-docker volume create paperclip-day3-pgdata
-
-docker run -d \
-  --name paperclip-day3-postgres \
-  -e POSTGRES_PASSWORD=paperclip \
-  -e POSTGRES_DB=paperclip \
-  -v paperclip-day3-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
-
-docker inspect paperclip-day3-postgres --format '{{json .Mounts}}'
-docker volume inspect paperclip-day3-pgdata
+cd week2/day3/labs/static-site && docker build -t paperclip-static-site:day3-cache .
+printf "<h1>day3 static app v2</h1>" > week2/day3/labs/static-site/index.html
+cd week2/day3/labs/static-site && docker build -t paperclip-static-site:day3-v2 .
 ```
 
-## Linux 사전 테스트 결과
-```text
-"Type":"volume"
-"Name":"paperclip-day3-pgdata"
-"Destination":"/var/lib/postgresql/data"
-"RW":true
-```
-
-## bind mount와 named volume 비교
-| 구분 | bind mount | named volume |
-|---|---|---|
-| 소유 | host path 직접 지정 | Docker가 관리 |
-| 이름 | path 중심 | volume name 중심 |
-| 개발 편의 | host file 즉시 수정에 좋음 | DB data 보존에 좋음 |
-| portability | host path 의존 큼 | Docker volume name으로 관리 |
-| cleanup | host file은 직접 관리 | `docker volume rm` 필요 |
-
-## 핵심 유의사항
-volume은 container 삭제 후에도 남을 수 있다. 실습이 끝났는데 disk 사용량이 계속 늘어나는 이유가 volume일 수 있다.
-
-DB image는 초기화 여부를 volume 내용으로 판단한다. 이미 초기화된 volume을 다시 붙이면 `POSTGRES_DB` 같은 초기화 환경변수가 기대처럼 다시 적용되지 않을 수 있다. 이것이 stale volume 문제다.
-
-운영에서는 volume 삭제가 위험한 작업이다. 실습에서는 cleanup을 위해 삭제하지만 실제 DB volume을 지우면 데이터가 사라진다. `docker volume rm` 전에는 어떤 volume인지 확인한다.
-
-## 자주 놓치는 지점
-| 놓치는 지점 | 증상 | 확인 |
-|---|---|---|
-| container 삭제 후 데이터도 사라진다고 생각 | 데이터가 남아 있음 | `docker volume ls` |
-| volume 삭제 위험을 가볍게 봄 | DB 데이터 손실 | volume name 확인 |
-| stale volume | env 변경이 반영 안 됨 | 새 volume 사용 |
-| destination path 오타 | DB 초기화 위치 불일치 | official image docs |
-| bind/volume 혼동 | Source 해석 오류 | `.Mounts.Type` |
-
-## volume evidence 명령
+## 검증 명령
 ```bash
-docker volume ls --filter name=paperclip-day3
-docker volume inspect paperclip-day3-pgdata
-docker inspect paperclip-day3-postgres --format '{{json .Mounts}}'
+docker history paperclip-static-site:day3-v2
 ```
 
-확인 항목:
-- volume name
-- mount destination
-- read/write 여부
-- container와 volume의 lifecycle 차이
-
-## stale volume drill
-DB container를 지우고 같은 volume으로 다시 실행하면 data directory는 유지된다.
-
-```bash
-docker rm -f paperclip-day3-postgres
-docker run -d \
-  --name paperclip-day3-postgres \
-  -e POSTGRES_PASSWORD=paperclip \
-  -e POSTGRES_DB=paperclip \
-  -v paperclip-day3-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
-```
-
-확인할 것:
-- volume이 남아 있으면 DB는 기존 data directory를 사용한다.
-- 새 DB 초기화를 기대한다면 새 volume name을 쓰거나 기존 volume을 삭제해야 한다.
-- volume 삭제는 데이터 삭제이므로 실습/운영 구분이 필요하다.
-
-## 운영 관점
-DB data는 image에 넣지 않는다. image는 실행 환경이고, DB data는 runtime storage다. 이 둘을 분리해야 image를 재배포해도 데이터 lifecycle을 별도로 관리할 수 있다.
-
-## 확장 실습: volume 존재 여부 확인
-container를 삭제한 뒤 volume이 남아 있는지 확인한다.
-
-```bash
-docker rm -f paperclip-day3-postgres
-docker volume ls --filter name=paperclip-day3-pgdata
-docker volume inspect paperclip-day3-pgdata
-```
-
-해석:
-- container가 없어도 volume은 남을 수 있다.
-- volume inspect가 성공하면 data lifecycle은 아직 끝나지 않았다.
-- 새 DB 초기화를 원하면 새 volume name을 쓰거나 volume을 삭제한다.
-
-## cleanup 의사결정
-| 상황 | volume 삭제 여부 |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| 실습을 완전히 끝냄 | 삭제 가능 |
-| DB data를 다음 실습에서 재사용 | 삭제하지 않음 |
-| env 변경을 새 초기화로 확인 | 새 volume 사용 또는 삭제 |
-| 운영 DB | 임의 삭제 금지 |
-| disk 사용량 조사 | `docker system df`, volume inspect |
+| build 실패 | Dockerfile path, build context, COPY source를 확인한다. |
+| run 성공 후 접속 실패 | EXPOSE와 host -p mapping을 구분한다. |
+| push 요구 | credential과 public repository gate를 먼저 확인한다. |
 
-## disk 사용량 관점
-volume은 container 목록에 보이지 않기 때문에 놓치기 쉽다. container가 모두 정리됐는데 disk가 줄지 않으면 image, build cache, volume을 따로 확인한다.
-
+## Cleanup
 ```bash
-docker system df
-docker volume ls
+docker stop paperclip-day3-static || true
+docker rm paperclip-day3-static || true
+# 필요할 때만 실습 image 삭제
+# docker image rm paperclip-static-site:day3 paperclip-static-site:day3-reviewed
 ```
 
-이 명령은 삭제 명령이 아니라 관찰 명령이다. 삭제는 어떤 object인지 확인한 뒤 수행한다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-## 기록 템플릿
+## Evidence
+| 항목 | 제출 기준 |
+|---|---|
+| Command evidence | 실행한 build/run/inspect 명령 |
+| Verification | HTTP/history/inspect 결과 |
+| RCA | 실패 drill 원인과 재검증 |
+
+## 강의자 설명 포인트
+Day 3의 중심은 "내가 실행한 것은 어떤 artifact인가"라는 질문이다. Day 1과 Day 2에서는 이미 존재하는 official image를 가져와 실행했다. Day 3에서는 source file과 Dockerfile을 image로 포장한다. 학생은 Dockerfile을 단순 설치 스크립트처럼 읽기 쉽지만, 실제로는 build context를 입력으로 받아 image layer를 만드는 build recipe다.
+
+`COPY` 한 줄은 작아 보이지만 운영적으로는 중요하다. 어떤 파일이 image 안에 들어가고 어떤 파일이 제외되는지에 따라 image size, secret risk, rebuild cache가 달라진다. `.dockerignore`는 예쁘게 정리하는 파일이 아니라 Docker daemon으로 보내는 build input boundary를 줄이는 장치다. 이 점을 반복해서 강조한다.
+
+## 운영 해석
+tag는 이름표고 digest는 content identity에 가깝다. `latest`는 편하지만 재현성에는 약하다. 같은 tag가 시간이 지나 다른 내용을 가리킬 수 있기 때문이다. 교육 단계에서는 tag를 쉽게 쓰되, 운영 판단에서는 명시적 version tag와 digest 확인이 왜 필요한지 연결한다.
+
+Docker Hub push는 학습자가 하고 싶어할 수 있지만 기본 요구로 두지 않는다. public repository에 secret이나 불필요한 파일이 들어간 image를 올리는 사고를 막아야 한다. push 전에 image 안에 무엇이 들어갔는지, tag가 무엇인지, 공개 범위가 무엇인지 확인하게 한다.
+
+## README 기록 예시
 ```markdown
-## Lesson 5 Volume Evidence
-- volume name:
-- container:
-- destination:
-- mount type:
-- RW:
-- container 삭제 후 volume 존재 여부:
-- stale volume 가능성:
-- cleanup 명령:
+## Image Build Evidence
+- Dockerfile path:
+- Build command:
+- Image tag:
+- Base image:
+- Build context note:
+- .dockerignore excludes:
+- HTTP check:
+- history/inspect summary:
+- Failure drill:
 ```
 
-## 마무리 점검
-```text
-named volume은 container를 삭제해도 ____ 수 있다.
-PostgreSQL data directory는 ____이다.
-stale volume은 ____가 기대처럼 다시 적용되지 않을 때 의심한다.
-```
-
-## cleanup
-```bash
-docker rm -f paperclip-day3-postgres
-docker volume rm paperclip-day3-pgdata
-```
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| volume | named volume을 생성했다 |
-| mount | destination과 RW를 확인했다 |
-| lifecycle | container와 data lifecycle을 구분했다 |
-| 위험 | volume 삭제 위험을 설명했다 |
-
-### 공식 근거 링크
-- Docker volumes: https://docs.docker.com/engine/storage/volumes/
-- PostgreSQL Docker Official Image: https://hub.docker.com/_/postgres
+## 다음 연결
+Day 4는 이 image를 여러 runtime config와 failure 조건으로 실행해 관찰한다.

@@ -1,0 +1,19 @@
+services:
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "18088:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+
+  redis-cli:
+    image: redis:7-alpine
+    profiles: ["tool"]
+    depends_on:
+      - redis
+    command: ["redis-cli", "-h", "redis", "PING"]

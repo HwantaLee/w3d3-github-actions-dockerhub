@@ -1,216 +1,85 @@
-# 5교시: 2주차 통합 실습
+# 5교시: Architecture 4 - Nginx reverse proxy + multiple web services
 
 ## 수업 목표
-- 표준 실습 앱을 Dockerfile과 Compose로 모두 실행 가능하게 정리한다.
-- build/run/check/compose/cleanup evidence를 하나의 handoff package로 묶는다.
-- Week 2 최종 산출물의 누락 항목을 보완한다.
+- Compose architecture를 실제 명령으로 실행한다.
+- config/up/ps/logs/curl/exec/down 검증 루프를 적용한다.
+- Week 3 MSA service boundary로 연결한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | 통합 실습 목표 고정 | 설명 10% | package 기준 |
-| 8-20분 | Dockerfile build/run | 실행 30% | build/run evidence |
-| 20-32분 | Compose config/up/check | 실행 25% | compose evidence |
-| 32-42분 | README handoff 작성 | 실행 20% | README section |
-| 42-50분 | gap list와 cleanup | 실행 15% | final checklist |
+## 강의 전개
+reverse proxy routing과 upstream failure를 확인한다. 강사는 starter code와 compose.yaml을 제공하고, 학생은 YAML을 읽은 뒤 실제로 실행해 서비스 관계를 확인한다. 유명 아키텍처를 말로만 설명하지 않고 container, network, volume, port, log evidence로 확인한다.
 
-### Visual 1: 통합 실습 evidence
-![Integration lab evidence](./assets/lesson-05-integration-lab.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 visual은 Dockerfile build, container run, Compose 실행, README handoff가 하나의 제출 패키지로 이어지는 흐름을 보여준다.
-
-## 핵심 설명
-통합 실습은 새 앱을 화려하게 만드는 시간이 아니다. Week 2에서 배운 Docker 기능을 하나의 재현 가능한 패키지로 닫는 시간이다.
-
-학생은 다음 주장을 evidence로 뒷받침해야 한다.
-
-```text
-이 앱은 Dockerfile로 image를 만들 수 있고, docker run과 Compose로 실행할 수 있으며, README만 보고 정상 확인과 cleanup을 할 수 있다.
-```
-
-## 실습 경로
+## 실습 명령
 ```bash
-cd week2/day5/labs/integration-app
-```
-
-## Build/run/check
-```bash
-docker build -t paperclip/week2-day5-integration:local .
-docker run -d --name paperclip-day5-web -p 18085:80 paperclip/week2-day5-integration:local
-docker ps --filter name=paperclip-day5-web
-curl -I http://localhost:18085
-curl -s http://localhost:18085 | grep week2-day5-integration-v1
-```
-
-## Compose check
-```bash
-docker rm -f paperclip-day5-web
+cd week2/day5/labs/compose-architectures/04-nginx-reverse-proxy
 docker compose config
 docker compose up -d
+```
+
+## 검증 명령
+```bash
+cd week2/day5/labs/compose-architectures/04-nginx-reverse-proxy
 docker compose ps
-curl -I http://localhost:18085
-curl -s http://localhost:18085 | grep week2-day5-integration-v1
+docker compose logs --tail 80
 ```
 
-## README handoff minimum
-```markdown
-## Docker
-- Build:
-- Run:
-- Check:
-- Compose:
-- Cleanup:
-- Failure drill:
-- Security note:
-```
-
-## integration inventory
-| 항목 | 상태 | Evidence |
-|---|---|---|
-| Dockerfile | complete/partial/missing | |
-| `.dockerignore` | complete/partial/missing | |
-| local image tag | complete/partial/missing | |
-| docker run HTTP | complete/partial/missing | |
-| Compose config/up | complete/partial/missing | |
-| README handoff | complete/partial/missing | |
-| RCA | complete/partial/missing | |
-| cleanup | complete/partial/missing | |
-
-## 실무 기준
-통합 패키지는 다음 사람이 fresh clone 후 따라 할 수 있어야 한다. "내 PC에서 됨"은 통합 evidence가 아니다. path, command, port, expected output, cleanup이 모두 있어야 한다.
-
-## 학술 기준 연결
-이 교시는 portfolio assessment에 해당한다. 여러 활동 산출물을 하나의 증거 묶음으로 평가한다. ABET 커뮤니케이션 outcome도 포함된다. 학생은 기술 결과를 다른 사람이 실행 가능한 문서로 전달해야 한다.
-
-## failure drill 선택
-| Drill | 명령 | 기록할 원인 |
-|---|---|---|
-| wrong port | `curl -I http://localhost:80` | host port 오해 |
-| missing image | 잘못된 tag로 run | tag mismatch |
-| compose conflict | 같은 port 중복 실행 | cleanup 누락 |
-| secret risk | `.dockerignore` 설명 | build context risk |
-
-## 오해 점검
-| 오해 | 교정 |
-|---|---|
-| Dockerfile만 제출하면 충분하다 | run/check/cleanup이 필요하다 |
-| Compose만 되면 docker run은 몰라도 된다 | 둘의 관계를 설명해야 한다 |
-| README는 마지막 장식이다 | README가 handoff의 핵심 artifact다 |
-| 실패 기록은 감점이다 | 좋은 RCA는 운영 역량 evidence다 |
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| build | 명시적 tag로 image build |
-| run | HTTP 200과 body marker |
-| compose | config/up/check 완료 |
-| handoff | README가 fresh run 가능 |
-| RCA | recheck/prevention 포함 |
-
-## cleanup
 ```bash
+cd week2/day5/labs/compose-architectures/04-nginx-reverse-proxy
+# web가 있는 architecture는 curl로 확인
+curl -I http://localhost:18085 || true
+# DB가 있는 architecture는 exec 또는 run client로 확인
+docker compose exec db psql -U postgres -d app -c 'SELECT 1;' || true
+```
+
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
+|---|---|
+| config 실패 | indentation, env 누락, compose file path를 확인한다. |
+| service unhealthy | logs와 dependency readiness를 확인한다. |
+| down -v 남용 | database volume 삭제 위험을 설명한다. |
+
+## Cleanup
+```bash
+cd week2/day5/labs/compose-architectures/04-nginx-reverse-proxy
 docker compose down
-docker rm -f paperclip-day5-web
+# 데이터를 초기화해도 되는 실습일 때만 실행
+# docker compose down -v
 ```
 
-선택:
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-```bash
-docker image rm paperclip/week2-day5-integration:local
-```
-
-## 전이 과제
-통합 앱이 Week 3에서 `frontend`, `api`, `db`로 나뉜다면 오늘의 README는 어떻게 바뀌어야 하는지 3줄로 적는다.
-
-### 공식 근거 링크
-- Docker build best practices: https://docs.docker.com/build/building/best-practices/
-- Docker Compose: https://docs.docker.com/compose/
-
-## 통합 패키지 품질 기준
-| 품질 | 설명 |
+## Evidence
+| 항목 | 제출 기준 |
 |---|---|
-| 실행 가능 | 명령을 따라 하면 container가 실행된다 |
-| 확인 가능 | HTTP/log/status evidence로 정상 판단 가능 |
-| 복구 가능 | failure drill과 RCA가 있다 |
-| 정리 가능 | container/image/volume cleanup이 문서화됨 |
-| 전달 가능 | README만으로 다른 학생이 재현 가능 |
+| Architecture | 실행한 architecture 이름 |
+| Compose evidence | config/up/ps/logs/check 결과 |
+| Cleanup | down/down-v 판단 |
+| MSA 연결 | service boundary와 장애 전파 해석 |
 
-## evidence packet 예시
+## 강의자 설명 포인트
+Day 5는 Compose 문법 암기 시간이 아니라 architecture를 실행 가능한 파일로 제공하는 연습이다. Day 2의 volume/network, Day 3의 image, Day 4의 env/logs/cleanup이 Compose 한 파일 안에서 다시 만난다. 학생은 `services`, `ports`, `environment`, `volumes`, `networks`를 YAML 속성으로만 보지 말고 지난 실습의 `docker run` 옵션이 옮겨진 결과로 읽어야 한다.
+
+유명한 아키텍처 패턴을 다룰 때도 그림만 보여주지 않는다. Web+DB, DB UI, cache, reverse proxy, queue+worker는 모두 실제 container로 띄워야 한다. `docker compose config`는 문법 검증이고, `up`은 시작이며, `ps/logs/curl/exec`가 정상 검증이다. `down`과 `down -v`는 cleanup과 data reset의 경계다.
+
+## 운영 해석
+Compose는 Kubernetes가 아니다. 하지만 Compose는 multi-service 사고를 배우기에 좋다. service name이 곧 내부 DNS가 되고, volume이 data lifecycle을 담당하며, ports가 host 공개 경계를 만든다. Week 3 MSA로 넘어갈 때 service boundary, dependency, failure propagation을 설명하는 첫 번째 실습 근거가 된다.
+
+각 architecture는 반드시 실행 evidence를 남긴다. 학생이 두 개 이상의 architecture를 직접 실행하면 공통 패턴이 보이기 시작한다. 모든 architecture는 config, start, check, logs, cleanup이라는 같은 운영 루프를 가진다.
+
+## README 기록 예시
 ```markdown
-## Evidence Packet
-- `docker build`: success
-- `docker images`: paperclip/week2-day5-integration:local
-- `docker ps`: 18085->80
-- `curl -I`: HTTP/1.1 200 OK
-- body: week2-day5-integration-v1
-- `docker compose config`: success
-- cleanup: compose down
+## Compose Architecture Evidence
+- Architecture folder:
+- Services:
+- Config result:
+- Up/ps result:
+- HTTP or DB check:
+- Logs summary:
+- Volume/data cleanup decision:
+- Failure drill:
+- Week 3 MSA connection:
 ```
 
-## 통합 실습 채점표
-| 항목 | 0 | 1 | 2 |
-|---|---|---|---|
-| Build | 없음 | 성공만 기록 | tag와 build output |
-| Run | 없음 | container running | HTTP 200과 body marker |
-| Compose | 없음 | config만 | up/check/cleanup |
-| Security | 없음 | 주의 문구 | `.dockerignore`와 push gate |
-| RCA | 없음 | 증상만 | fix/recheck/prevention |
-| Handoff | 없음 | 명령만 | expected output과 risk |
-
-## 제출 전 audit
-```bash
-docker ps --filter name=paperclip-day5
-docker images paperclip/week2-day5-integration
-find . -maxdepth 2 -type f -print
-```
-
-audit에서 확인할 것은 남은 resource, image tag, 위험 파일이다.
-
-## Lesson 5 Exit Ticket
-```markdown
-## Exit Ticket
-- 통합 패키지에서 complete인 항목:
-- partial인 항목:
-- missing인 항목:
-- Day 5 제출 전 반드시 고칠 항목:
-```
-
-## 통합 패키지 품질 기준
-| 품질 | 설명 |
-|---|---|
-| 실행 가능 | 명령을 따라 하면 container가 실행된다 |
-| 확인 가능 | HTTP/log/status evidence로 정상 판단 가능 |
-| 복구 가능 | failure drill과 RCA가 있다 |
-| 정리 가능 | container/image/volume cleanup이 문서화됨 |
-| 전달 가능 | README만으로 다른 학생이 재현 가능 |
-
-## fresh clone test 사고실험
-다른 사람이 이 폴더만 받았다고 가정한다. 그 사람은 다음 질문에 답할 수 있어야 한다.
-
-1. 어디로 이동해야 하는가?
-2. 어떤 image tag로 build해야 하는가?
-3. 어떤 port로 접속해야 하는가?
-4. 정상 결과는 어떤 문자열인가?
-5. Compose와 docker run 중 무엇을 먼저 실행할 수 있는가?
-6. 실습 후 무엇을 지워야 하는가?
-
-## evidence packet 예시
-```markdown
-## Evidence Packet
-- `docker build`: success
-- `docker images`: paperclip/week2-day5-integration:local
-- `docker ps`: 18085->80
-- `curl -I`: HTTP/1.1 200 OK
-- body: week2-day5-integration-v1
-- `docker compose config`: success
-- cleanup: compose down
-```
-
-## RCA 연결
-```markdown
-- Symptom: bind for 0.0.0.0:18085 failed
-- Hypothesis: another container already uses host port 18085
-- Fix: stop old container or change WEB_PORT
-- Recheck: curl returns HTTP 200
-- Prevention: cleanup audit before rerun
-```
+## 다음 연결
+다음 architecture 또는 Week 3 MSA에서 같은 service/network/dependency 관점을 재사용한다.

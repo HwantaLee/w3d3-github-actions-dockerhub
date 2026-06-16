@@ -1,40 +1,51 @@
-# Week 2 Day 3 Academic Foundations
+# Week 2 Day 3 Academic And Professional Foundations
 
-## 핵심 근거
-| 근거 | Day 3 연결 |
+Day 3는 image, Dockerfile, build context, cache, registry를 다룬다. Day 2가 실행 중 state와 연결 경계였다면, Day 3는 실행 가능한 artifact를 어떻게 만들고 식별하고 공유할지에 초점을 둔다.
+
+| 기준 | Day 3 연결 |
 |---|---|
-| Docker run reference | port, env, mount, network 실행 옵션의 공식 기준 |
-| Docker networking docs | bridge network, container DNS, port publishing 구분 |
-| Docker storage docs | bind mount와 volume의 lifecycle 차이 |
-| PostgreSQL official image docs | `POSTGRES_PASSWORD`, data directory, initialization behavior |
-| Twelve-Factor App config principle | 설정은 code/image에 굳히지 않고 environment로 분리 |
+| Docker image docs | image, layer, tag, digest, immutable artifact 개념 |
+| Dockerfile reference | `FROM`, `WORKDIR`, `COPY`, `RUN`, `CMD`의 공식 동작 |
+| Docker build docs | build context, cache, layer, `.dockerignore`의 영향 |
+| Docker image tag/history | tag와 layer history를 evidence로 확인 |
+| Docker Hub docs | registry push/pull 흐름과 credential 보호 |
+| OCI Image Specification | manifest, layer, digest를 content-addressed artifact로 이해 |
+| OWASP Secrets Management | secret을 build context/image/registry에 포함하지 않는 기준 |
 
-## 시스템 관점
-Container runtime은 image를 실행 가능한 instance로 바꾸는 단계다. image는 read-only filesystem layer와 metadata를 제공하지만, 외부에서 접근할 port, runtime config, persistent storage, network membership은 실행 시점에 결정된다.
+## Conceptual Rationale
 
-Port publishing은 namespace boundary를 넘는 작업이다. container 내부 process가 80번 port에서 listen하더라도 host가 자동으로 접근할 수 있는 것은 아니다. `-p 18083:80`은 host namespace의 18083번 port로 들어온 요청을 container namespace의 80번 port로 전달한다.
+Image는 container를 실행하기 위한 표준 패키지다. 학생은 "내 컴퓨터에서 되는 코드"를 Dockerfile과 build context로 고정하고, build 결과를 tag와 image ID로 식별한다. tag는 사람이 쓰기 쉬운 이름이고 digest는 content identity에 가깝다는 차이를 함께 설명한다.
 
-Environment variable은 build artifact가 아니라 runtime configuration으로 다룬다. 같은 image라도 `APP_ENV=practice`와 `APP_ENV=prod`로 실행하면 동작 조건이 달라질 수 있다. 단, secret을 environment variable로 주입하는 것은 실습에서는 편리하지만 운영에서는 노출 경로를 함께 고려해야 한다.
+Dockerfile 수업의 위험은 문법 나열로 끝나는 것이다. Day 3에서는 매 instruction이 cache와 layer에 어떤 영향을 주는지 확인하고, `.dockerignore`가 없으면 어떤 파일이 build context에 들어갈 수 있는지 보여준다. registry는 마지막에 다루되, public push는 credential과 secret 점검을 통과한 경우에만 선택 실습으로 둔다.
 
-Bind mount와 named volume은 모두 container filesystem 바깥에 데이터를 둔다. bind mount는 host path에 직접 의존하고, named volume은 Docker가 관리하는 storage object에 의존한다. 개발 중 file sync에는 bind mount가 직관적이고, DB data persistence에는 named volume이 더 표준적이다.
+## Official Links
 
-## 교육적 초점
-Day 3의 난이도는 명령어 자체보다 분류에 있다. 학생은 실패를 보면 먼저 "build 문제인가 runtime 문제인가"를 나누고, runtime 문제 안에서 port, network, env, volume, process/log 중 어디에 가까운지 분류한다.
+- What is an image?: https://docs.docker.com/get-started/docker-concepts/the-basics/what-is-an-image/
+- Dockerfile reference: https://docs.docker.com/reference/dockerfile/
+- Writing a Dockerfile: https://docs.docker.com/guides/docker-concepts/building-images/writing-a-dockerfile/
+- Docker build command: https://docs.docker.com/reference/cli/docker/buildx/build/
+- Build context: https://docs.docker.com/build/building/context/
+- Docker image tag: https://docs.docker.com/reference/cli/docker/image/tag/
+- Docker image history: https://docs.docker.com/reference/cli/docker/image/history/
+- Docker Hub: https://docs.docker.com/docker-hub/
+- OCI Image Specification: https://specs.opencontainers.org/image-spec/
+- OWASP Secrets Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
 
-## 평가 관점
-| 수준 | 기대 행동 |
+## Standards Crosswalk
+
+| 기준 | 학생 행동 |
 |---|---|
-| 기억 | `-p`, `-e`, `-v`, `--network` 옵션 이름을 말한다 |
-| 이해 | host port와 container port를 구분한다 |
-| 적용 | 같은 image를 다른 port/env/volume 조건으로 실행한다 |
-| 분석 | HTTP 실패, env 누락, DB readiness 실패를 evidence로 분류한다 |
-| 종합 | README에 실행 조건과 cleanup을 재현 가능하게 남긴다 |
+| Bloom apply/analyze | Dockerfile을 작성하고 build output에서 cache/layer/path 문제를 분석 |
+| ABET-style problem solving | build 실패를 context, path, instruction, permission 문제로 분류 |
+| Professional responsibility | secret과 불필요한 파일이 image나 registry에 들어가지 않게 확인 |
+| DevOps handoff | build/run/check/cleanup/troubleshoot를 README에 남김 |
 
-## 공식 링크
-- Docker run reference: https://docs.docker.com/reference/cli/docker/container/run/
-- Docker networking: https://docs.docker.com/engine/network/
-- Docker storage: https://docs.docker.com/engine/storage/
-- Docker volumes: https://docs.docker.com/engine/storage/volumes/
-- Docker bind mounts: https://docs.docker.com/engine/storage/bind-mounts/
-- PostgreSQL Docker Official Image: https://hub.docker.com/_/postgres
-- Twelve-Factor App Config: https://12factor.net/config
+## Completion Evidence
+
+학생은 Day 3 종료 시점에 다음을 제출할 수 있어야 한다.
+
+- `.dockerignore`가 포함된 build context
+- explicit tag가 붙은 image
+- `docker image history` 또는 build log로 확인한 layer/cache evidence
+- container 실행 후 HTTP 또는 command output으로 검증한 evidence
+- registry push/pull을 수행했다면 repository, tag, push 전 점검 기록

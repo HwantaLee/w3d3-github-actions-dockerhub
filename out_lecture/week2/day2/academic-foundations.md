@@ -1,39 +1,50 @@
 # Week 2 Day 2 Academic And Professional Foundations
 
+Day 2는 Docker container의 실행 상태가 어디에 남고, container들이 어떤 이름과 network boundary로 서로를 찾는지 다룬다. 핵심은 volume과 network를 옵션 암기가 아니라 운영 계약으로 읽는 것이다.
+
 | 기준 | Day 2 연결 |
 |---|---|
-| Dockerfile reference | Dockerfile instruction의 공식 의미를 확인한다. |
-| Docker build docs | build context, cache, layer, tag를 공식 명령과 연결한다. |
-| Docker image docs | image, tag, digest, immutable image 개념을 설명한다. |
-| Docker storage docs | image layer, container writable layer, bind mount, volume을 분리한다. |
-| Docker Hub docs | registry push/pull과 credential 보호를 다룬다. |
-| OCI Image Specification | image manifest, layer, digest가 content-addressed artifact로 다뤄지는 기준을 연결한다. |
-| Operating systems filesystem model | mount, path, file permission, persistence를 OS abstraction으로 설명한다. |
-| OWASP Secrets Management | secret을 image layer와 public registry에 포함하지 않는 기준이다. |
-| DevOps handoff practice | README build/run/check/cleanup/troubleshoot가 인수인계 evidence가 된다. |
+| Docker storage docs | container writable layer, named volume, bind mount의 lifecycle 구분 |
+| Docker volumes docs | database data persistence와 volume 재사용 실습 |
+| Docker bind mounts docs | host path 의존성과 개발 편의, 권한 위험 설명 |
+| Docker networking docs | bridge network, user-defined network, container DNS 구분 |
+| Docker run reference | `-v`, `--mount`, `--network`, `-p` 실행 옵션의 공식 기준 |
+| PostgreSQL official image | data directory, initialization, password env 기준 |
+| SRE/DevOps evidence culture | 데이터 생존 여부와 연결 경로를 query/log로 증명 |
 
 ## Conceptual Rationale
-Dockerfile은 단순 명령 모음이 아니라 build artifact를 만드는 source code에 가깝다. Dockerfile instruction의 순서, build context의 범위, cache 사용 여부, base image tag는 결과 image의 내용과 재현성에 영향을 준다. 학생은 `docker build` 성공 여부만 보지 않고, 어떤 파일이 context로 들어갔는지, 어떤 instruction이 layer를 만들었는지, image가 어떤 tag와 ID를 갖는지 확인해야 한다.
 
-Storage 실습은 image build와 분리해서 다룬다. image layer는 배포 artifact의 일부이고, container writable layer는 container lifecycle에 묶인 임시 실행 상태다. 반면 bind mount와 named volume은 container filesystem 외부에 데이터를 두는 방식이다. 이 차이를 모르면 "컨테이너를 삭제했는데 데이터가 왜 남았는가" 또는 "컨테이너를 삭제하니 수정한 파일이 왜 사라졌는가" 같은 운영 사고가 생긴다.
+Container는 지우고 다시 만들 수 있어야 하지만, 모든 데이터가 같이 사라져야 하는 것은 아니다. Day 2의 첫 실험은 volume 없이 PostgreSQL container를 띄우고 데이터를 넣은 뒤 container를 삭제했을 때 데이터가 사라지는지 확인한다. 이 실패를 먼저 보여주면 volume이 "편의 기능"이 아니라 stateful workload의 필수 경계라는 점이 명확해진다.
 
-## Standards Crosswalk
-| 기준 | 학생 행동 |
-|---|---|
-| Bloom apply/analyze | Dockerfile을 작성하고 build output에서 layer/cache/path 문제를 분석한다. |
-| ABET-style problem solving | 실패 메시지를 build context, path, cache, permission 문제로 분류한다. |
-| Professional responsibility | secret이 image layer, build context, public registry에 들어가지 않게 확인한다. |
-| SRE/DevOps evidence culture | build/run/check/logs/cleanup 결과를 README와 RCA note에 남긴다. |
+Network도 같은 방식으로 다룬다. host에서 `localhost:15432`로 붙는 것과 같은 Docker network 안의 container가 `postgres16:5432`로 붙는 것은 다른 경로다. 학생은 port publishing과 service discovery를 분리해서 설명해야 한다.
 
 ## Official Links
-- Dockerfile reference: https://docs.docker.com/reference/dockerfile/
-- Docker build command: https://docs.docker.com/reference/cli/docker/buildx/build/
-- Docker build context: https://docs.docker.com/build/building/context/
+
 - Docker storage: https://docs.docker.com/engine/storage/
-- Docker bind mounts: https://docs.docker.com/engine/storage/bind-mounts/
 - Docker volumes: https://docs.docker.com/engine/storage/volumes/
-- Docker image tag: https://docs.docker.com/reference/cli/docker/image/tag/
-- Docker image history: https://docs.docker.com/reference/cli/docker/image/history/
-- Docker Hub quickstart: https://docs.docker.com/docker-hub/
-- OCI Image Specification: https://specs.opencontainers.org/image-spec/
-- OWASP Secrets Management Cheat Sheet: https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html
+- Docker bind mounts: https://docs.docker.com/engine/storage/bind-mounts/
+- Docker networking: https://docs.docker.com/engine/network/
+- Docker bridge network driver: https://docs.docker.com/engine/network/drivers/bridge/
+- Docker run reference: https://docs.docker.com/reference/cli/docker/container/run/
+- Docker volume CLI: https://docs.docker.com/reference/cli/docker/volume/
+- Docker network CLI: https://docs.docker.com/reference/cli/docker/network/
+- PostgreSQL Docker Official Image: https://hub.docker.com/_/postgres
+
+## Standards Crosswalk
+
+| 기준 | 학생 행동 |
+|---|---|
+| Bloom apply/analyze | volume 없는 DB와 named volume DB의 데이터 생존 결과를 비교 |
+| ABET-style problem solving | 접속 실패를 port, network, DNS, container 상태로 분류 |
+| Professional responsibility | `docker volume rm`과 `down -v`류 삭제 위험을 설명 |
+| SRE/DevOps evidence | query 결과, `docker volume ls`, `docker network inspect`를 evidence로 남김 |
+
+## Completion Evidence
+
+학생은 Day 2 종료 시점에 다음을 제출할 수 있어야 한다.
+
+- volume 없는 PostgreSQL container에서 데이터가 사라진 증거
+- named volume을 붙인 PostgreSQL container에서 데이터가 유지된 증거
+- bind mount로 host file이 container에 보이는 증거
+- user-defined network에서 container name DNS로 DB에 접속한 증거
+- host port publish와 Docker internal network의 차이를 설명한 README

@@ -1,177 +1,74 @@
-# 6교시: PostgreSQL container 실행
+# 6교시: registry와 image provenance
 
 ## 수업 목표
-- DB container가 요구하는 environment, network, volume 조건을 구성한다.
-- `pg_isready`, `psql`, `docker logs`로 readiness evidence를 확보한다.
-- DB를 host에 publish하지 않고 internal network에서 확인하는 구조를 이해한다.
+- image/build/registry 개념을 실행 evidence로 확인한다.
+- 명령, 검증, cleanup을 분리해 기록한다.
+- 실패를 RCA 형식으로 정리한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | DB container 실행 조건 정리 | 설명 15% | run option map |
-| 8-20분 | network/volume/env 준비 | 실행 25% | setup evidence |
-| 20-32분 | PostgreSQL 실행 | 실행 25% | container evidence |
-| 32-42분 | readiness와 SQL 확인 | 실행 20% | DB evidence |
-| 42-50분 | logs와 운영 해석 | 설명 15% | log note |
+## 강의 전개
+official image, tag, digest, pull policy를 evidence로 읽는다.
 
-### Visual 1: DB runtime contract
-![DB runtime contract](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day3/assets/lesson-06-postgres-runtime-contract.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-PostgreSQL container는 network, environment, volume을 모두 요구하는 좋은 실습 대상이다. 이 이미지는 DB가 network 내부에서 service name으로 접근되는 흐름을 보여준다.
-
-## 핵심 설명
-DB container는 단순히 image를 실행하는 것만으로 충분하지 않다. 초기 password, database name, data directory, network membership을 함께 지정해야 한다.
-
-`postgres:16-alpine` image는 `POSTGRES_PASSWORD` 없이 초기화되지 않은 DB를 시작하면 실패한다. 이 실패는 Docker 자체 오류가 아니라 official image가 요구하는 runtime contract를 충족하지 않은 것이다.
-
-DB readiness는 container가 `Up`인 것만으로 판단하지 않는다. `docker ps`는 process lifecycle을 보여주고, `pg_isready`는 DB가 connection을 받을 준비가 되었는지 확인한다. SQL 실행은 실제 database access evidence다.
-
-## 실행 명령
+## 실습 명령
 ```bash
-docker network create paperclip-day3-net
-docker volume create paperclip-day3-pgdata
-
-docker run -d \
-  --name paperclip-day3-postgres \
-  --network paperclip-day3-net \
-  -e POSTGRES_PASSWORD=paperclip \
-  -e POSTGRES_DB=paperclip \
-  -v paperclip-day3-pgdata:/var/lib/postgresql/data \
-  postgres:16-alpine
+docker pull postgres:16
+docker image inspect postgres:16 --format "{{json .RepoDigests}}"
 ```
 
-## 확인 명령
+## 검증 명령
 ```bash
-docker ps --filter name=paperclip-day3-postgres
-docker logs paperclip-day3-postgres
-docker exec paperclip-day3-postgres pg_isready -U postgres
-docker exec paperclip-day3-postgres psql -U postgres -d paperclip -c "select current_database();"
-docker run --rm --network paperclip-day3-net postgres:16-alpine pg_isready -h paperclip-day3-postgres -U postgres
+docker images postgres
+docker image inspect postgres:16 --format "{{.Id}} {{.Created}}"
 ```
 
-## Linux 사전 테스트 결과
-`docker ps`:
-
-```text
-postgres:16-alpine
-Up
-5432/tcp
-```
-
-logs 핵심 줄:
-
-```text
-database system is ready to accept connections
-```
-
-readiness:
-
-```text
-/var/run/postgresql:5432 - accepting connections
-paperclip-day3-postgres:5432 - accepting connections
-```
-
-SQL:
-
-```text
-current_database
-paperclip
-```
-
-## 실행 옵션 해석
-| 옵션 | 역할 |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| `--network paperclip-day3-net` | 같은 network container가 name으로 접근 가능 |
-| `-e POSTGRES_PASSWORD=paperclip` | superuser password 초기화 |
-| `-e POSTGRES_DB=paperclip` | 초기 database 생성 |
-| `-v paperclip-day3-pgdata:/var/lib/postgresql/data` | DB data persistence |
-| image `postgres:16-alpine` | DB runtime base |
+| build 실패 | Dockerfile path, build context, COPY source를 확인한다. |
+| run 성공 후 접속 실패 | EXPOSE와 host -p mapping을 구분한다. |
+| push 요구 | credential과 public repository gate를 먼저 확인한다. |
 
-## 핵심 유의사항
-DB container의 `5432/tcp`가 보인다고 host에서 `localhost:5432`로 접속할 수 있다는 뜻은 아니다. host publish가 없으면 host에 port가 열리지 않는다. Day 3에서는 internal network 통신을 보기 위해 host publish를 생략한다.
-
-PostgreSQL 초기화 로그는 길다. 모든 줄을 읽을 필요는 없지만 `database system is ready to accept connections`는 readiness 판단에 중요하다.
-
-`pg_isready`가 성공해도 application query가 항상 성공한다는 뜻은 아니다. DB process readiness와 schema/application readiness는 다르다. 초급 단계에서는 process readiness와 SQL 한 줄을 분리해서 확인한다.
-
-## 자주 놓치는 지점
-| 놓치는 지점 | 증상 | 확인 |
-|---|---|---|
-| password env 누락 | init error | `POSTGRES_PASSWORD` |
-| volume 재사용 | DB 초기화 값이 달라지지 않음 | volume inspect |
-| readiness 전 SQL 실행 | connection refused | `pg_isready` |
-| host publish 기대 | localhost 접속 실패 | `docker ps` PORTS |
-| logs 전체를 놓침 | 준비 완료 줄을 못 찾음 | `docker logs | grep ready` |
-
-## 운영 관점
-DB는 "떠 있다"보다 "준비되었다"가 중요하다. container process가 살아 있어도 DB가 connection을 받을 준비가 안 됐을 수 있다. readiness check는 application startup 순서, health check, Compose dependency에서 중요한 개념으로 이어진다.
-
-## 확장 실습: host publish 없이 DB 확인
-Day 3 DB 실습은 `-p`를 쓰지 않는다. 그래도 같은 Docker network 안의 container에서는 DB에 접근할 수 있다.
-
+## Cleanup
 ```bash
-docker run --rm \
-  --network paperclip-day3-net \
-  postgres:16-alpine \
-  pg_isready -h paperclip-day3-postgres -U postgres
+docker stop paperclip-day3-static || true
+docker rm paperclip-day3-static || true
+# 필요할 때만 실습 image 삭제
+# docker image rm paperclip-static-site:day3 paperclip-static-site:day3-reviewed
 ```
 
-Linux 사전 테스트 결과:
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-```text
-paperclip-day3-postgres:5432 - accepting connections
-```
-
-해석:
-- DB가 host에 공개되지 않아도 internal network 통신은 가능하다.
-- web app container는 Day 4에서 `DB_HOST=postgres` 같은 service name으로 DB를 찾게 된다.
-- 보안상 외부 공개가 필요 없는 service는 host publish를 피하는 것이 좋다.
-
-## logs에서 볼 핵심 줄
-| 로그 조각 | 의미 |
+## Evidence
+| 항목 | 제출 기준 |
 |---|---|
-| `starting PostgreSQL 16.13` | DB process 시작 |
-| `listening on IPv4 address "0.0.0.0", port 5432` | container 내부 listen |
-| `database system is ready to accept connections` | readiness |
-| `CREATE DATABASE` | `POSTGRES_DB` 초기화 |
-| `superuser password is not specified` | 필수 env 누락 |
+| Command evidence | 실행한 build/run/inspect 명령 |
+| Verification | HTTP/history/inspect 결과 |
+| RCA | 실패 drill 원인과 재검증 |
 
-## 기록 템플릿
+## 강의자 설명 포인트
+Day 3의 중심은 "내가 실행한 것은 어떤 artifact인가"라는 질문이다. Day 1과 Day 2에서는 이미 존재하는 official image를 가져와 실행했다. Day 3에서는 source file과 Dockerfile을 image로 포장한다. 학생은 Dockerfile을 단순 설치 스크립트처럼 읽기 쉽지만, 실제로는 build context를 입력으로 받아 image layer를 만드는 build recipe다.
+
+`COPY` 한 줄은 작아 보이지만 운영적으로는 중요하다. 어떤 파일이 image 안에 들어가고 어떤 파일이 제외되는지에 따라 image size, secret risk, rebuild cache가 달라진다. `.dockerignore`는 예쁘게 정리하는 파일이 아니라 Docker daemon으로 보내는 build input boundary를 줄이는 장치다. 이 점을 반복해서 강조한다.
+
+## 운영 해석
+tag는 이름표고 digest는 content identity에 가깝다. `latest`는 편하지만 재현성에는 약하다. 같은 tag가 시간이 지나 다른 내용을 가리킬 수 있기 때문이다. 교육 단계에서는 tag를 쉽게 쓰되, 운영 판단에서는 명시적 version tag와 digest 확인이 왜 필요한지 연결한다.
+
+Docker Hub push는 학습자가 하고 싶어할 수 있지만 기본 요구로 두지 않는다. public repository에 secret이나 불필요한 파일이 들어간 image를 올리는 사고를 막아야 한다. push 전에 image 안에 무엇이 들어갔는지, tag가 무엇인지, 공개 범위가 무엇인지 확인하게 한다.
+
+## README 기록 예시
 ```markdown
-## Lesson 6 DB Evidence
-- network:
-- volume:
-- container:
-- env:
-- image:
-- readiness:
-- SQL result:
-- logs 핵심 줄:
-- host publish 여부:
+## Image Build Evidence
+- Dockerfile path:
+- Build command:
+- Image tag:
+- Base image:
+- Build context note:
+- .dockerignore excludes:
+- HTTP check:
+- history/inspect summary:
+- Failure drill:
 ```
 
-## 마무리 점검
-```text
-PostgreSQL 초기화에 필요한 password env는 ____이다.
-DB readiness는 `docker ps`만으로 판단하지 않고 ____로 확인한다.
-host publish가 없으면 host의 `localhost:5432` 접근은 ____ 수 있다.
-```
-
-## cleanup
-```bash
-docker rm -f paperclip-day3-postgres
-docker volume rm paperclip-day3-pgdata
-docker network rm paperclip-day3-net
-```
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| 실행 조건 | env/network/volume을 함께 지정했다 |
-| readiness | `pg_isready`를 확인했다 |
-| SQL | database query 결과를 확보했다 |
-| 해석 | host publish와 internal port를 구분했다 |
-
-### 공식 근거 링크
-- PostgreSQL Docker Official Image: https://hub.docker.com/_/postgres
-- Docker run reference: https://docs.docker.com/reference/cli/docker/container/run/
+## 다음 연결
+Day 4는 이 image를 여러 runtime config와 failure 조건으로 실행해 관찰한다.

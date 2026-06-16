@@ -1,171 +1,71 @@
-# 7교시: 디스크 연동 1 - bind mount로 host 파일 서빙
+# 7교시: port publish와 network 차이
 
 ## 수업 목표
-- host disk directory를 container path에 bind mount하는 구조를 이해한다.
-- nginx container가 image 안 파일이 아니라 host 파일을 읽어 응답하는 흐름을 확인한다.
-- host 파일 수정이 container 응답에 즉시 반영되는 것을 evidence로 기록한다.
+- host 접근과 container 간 접근을 분리한다.
+- wrong host/port failure를 재현한다.
+- PORTS 출력과 network DNS를 함께 해석한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 학생 산출 |
-|---|---|---:|---|
-| 0-5분 | bind mount 개념과 경로 기준 확인 | 설명 10% | source/destination note |
-| 5-15분 | 실습 파일과 host path 확인 | 실행 20% | path evidence |
-| 15-28분 | nginx에 bind mount 연결 | 실행 25% | run/ps evidence |
-| 28-38분 | host 파일 수정 후 응답 변경 확인 | 실행 25% | v1/v2 evidence |
-| 38-45분 | inspect로 mount 구조 확인 | 실행 10% | mount evidence |
-| 45-50분 | cleanup과 named volume 연결 | 설명 10% | 다음 질문 |
+## 강의 전개
+port publish는 host 사용자가 container service에 들어오는 문이다. Docker network는 container끼리 통신하는 길이다. 둘을 섞으면 DB 접속 문자열을 계속 틀리게 된다. 이 교시는 같은 PostgreSQL을 host에서는 localhost:15432로, container 내부에서는 paperclip-net-pg:5432로 접근하는 차이를 비교한다.
 
-### Visual 1: Docker bind mount와 host disk
-![Docker bind mount와 host disk](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/assets/lesson-07-disk-bind-mount-nginx.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 이미지는 host의 `labs/disk-mount/html` directory가 container의 `/usr/share/nginx/html`에 연결되고, nginx가 그 파일을 browser에 제공하는 흐름을 보여준다. `:ro`는 container가 mount된 파일을 읽기 전용으로 본다는 뜻이다.
-
-## 실습 파일
-시작 파일은 [labs/disk-mount/html/index.html](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/labs/disk-mount/html/index.html)에 있다.
-
-```html
-<h1>Disk mount lab - host file v1</h1>
-<p>이 파일은 host disk에 있고 nginx container가 bind mount로 읽는다.</p>
-```
-
-## storage model 설명
-Docker storage는 크게 세 가지를 구분해야 한다. 첫째, image layer는 build 결과이며 read-only로 취급한다. 둘째, container writable layer는 container가 실행되는 동안 생기는 임시 변경 공간이다. 셋째, bind mount와 volume은 container lifecycle 바깥에 데이터를 두는 방법이다.
-
-bind mount는 host filesystem의 특정 path를 container path에 연결한다. 개발 중 source code나 설정 파일을 container에 빠르게 반영하기 좋다. 하지만 host path에 강하게 의존하므로 다른 사람의 Mac, Windows, Linux에서 같은 경로가 아닐 수 있다. 그래서 배포용 artifact로는 Dockerfile build가 더 적합하고, 개발용 빠른 확인에는 bind mount가 유용하다.
-
-## mount overlay 주의
-Docker 공식 문서는 container 안에 기존 파일이 있는 directory 위로 bind mount를 걸면 기존 내용이 mount된 host directory에 가려질 수 있다고 설명한다. nginx image 안의 `/usr/share/nginx/html`에는 기본 index 파일이 있지만, 우리가 host directory를 그 위치에 mount하면 host directory 내용이 보인다. 이것은 오류가 아니라 mount의 동작 방식이다.
-
-## Hands-on 1: bind mount 실행
-
-repository root에서 실행한다.
-
+## 실습 명령
 ```bash
-docker run -d \
-  --name paperclip-day2-disk \
-  -p 18083:80 \
-  -v "$PWD/week2/day2/labs/disk-mount/html:/usr/share/nginx/html:ro" \
-  nginx:1.27-alpine
-
-docker ps --filter name=paperclip-day2-disk
-for i in 1 2 3 4 5; do
-  curl -s http://localhost:18083 && break
-  sleep 1
-done
-docker exec paperclip-day2-disk ls -l /usr/share/nginx/html
+docker run -d --name paperclip-net-pg --network paperclip-day2-net -e POSTGRES_PASSWORD=postgres -p 15432:5432 -v paperclip-pg16-data:/var/lib/postgresql/data postgres:16
 ```
 
-macOS/Linux shell에서는 위처럼 `$PWD`를 쓴다. 경로 오류가 나면 먼저 `pwd`가 repository root인지 확인한다.
-`403 Forbidden`이 나오면 nginx 자체는 실행 중이지만 mount된 directory에 `index.html`이 없거나 Docker가 source path를 제대로 mount하지 못한 상태일 수 있다.
-
-전체 디스크 연동 절차는 [hands-on-lab.md](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/hands-on-lab.md)의 Phase F를 따른다. 이 교시에서는 source path, destination path, mode, inspect evidence를 반드시 기록한다.
-
-## Linux 사전 테스트 결과: v1
-
-`curl -s http://localhost:18083` 핵심 출력:
-
-```text
-<h1>Disk mount lab - host file v1</h1>
-<p>이 파일은 host disk에 있고 nginx container가 bind mount로 읽는다.</p>
-```
-
-내부 파일 확인:
-
-```text
-total 0
--rwxrwxrwx    1 1000     1000           279 index.html
-```
-
-## Hands-on 2: host 파일 수정 후 응답 변경
-
-[labs/disk-mount/html/index.html](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day2/labs/disk-mount/html/index.html)을 다음처럼 바꾼다.
-
-```html
-<h1>Disk mount lab - host file v2</h1>
-<p>host disk 파일을 수정하자 container 응답이 바뀐다.</p>
-```
-
-다시 확인한다.
-
+## 검증 명령
 ```bash
-curl -s http://localhost:18083
+docker ps --filter name=paperclip-net-pg
+PGPASSWORD=postgres psql -h localhost -p 15432 -U postgres -d paperclip -c "SELECT 1;" || true
+docker run --rm --network paperclip-day2-net -e PGPASSWORD=postgres postgres:16 psql -h paperclip-net-pg -U postgres -d paperclip -c "SELECT 1;"
 ```
 
-### Linux 사전 테스트 결과: v2
-
-```text
-<h1>Disk mount lab - host file v2</h1>
-<p>host disk 파일을 수정하자 container 응답이 바뀐다.</p>
-```
-
-이 결과는 image rebuild 없이 host disk의 파일 변경이 container 응답에 반영되는 것을 보여준다. 개발 환경에서는 유용하지만, 배포용 image를 만들 때는 Dockerfile build로 파일을 image에 포함하는 기준이 필요하다.
-
-## Hands-on 3: mount 구조 확인
-
-```bash
-docker inspect paperclip-day2-disk
-```
-
-### Linux 사전 테스트 핵심 출력
-
-```text
-"Mounts": [
-  {
-    "Type": "bind",
-    "Source": "/mnt/d/paperclip/week2/day2/labs/disk-mount/html",
-    "Destination": "/usr/share/nginx/html",
-    "Mode": "ro",
-    "RW": false
-  }
-]
-```
-
-## cleanup
-```bash
-docker stop paperclip-day2-disk
-docker rm paperclip-day2-disk
-```
-
-## bind mount 판단표
-| 항목 | 의미 | 확인 질문 |
-|---|---|---|
-| Source | host disk path | 실제 존재하는 directory인가 |
-| Destination | container 안 path | app이 읽는 위치와 맞는가 |
-| `:ro` | read only mount | container에서 수정할 필요가 없는가 |
-| path error | mount source 없음/오타 | `pwd`, `ls`로 확인했는가 |
-| 운영 위험 | host와 container 경계가 섞임 | 배포용 image와 개발용 mount를 구분했는가 |
-
-## 장애 drill
-| 증상 | 가능한 원인 | 확인 |
-|---|---|---|
-| nginx 기본 화면이 계속 보임 | mount destination이 틀림 | `docker inspect`, `Mounts` 확인 |
-| `v2`가 안 보임 | browser cache 또는 파일 저장 안 됨 | `curl -s`, host file 저장 확인 |
-| container가 바로 종료 | mount path 문제보다는 nginx/process 문제 가능 | `docker logs` |
-| permission denied | host file permission 또는 Desktop file sharing | `ls -l`, Docker Desktop file sharing |
-
-## 추가 실습: read-only 확인
-`:ro`로 mount했기 때문에 container 안에서 파일을 수정하려 하면 실패해야 한다.
-
-```bash
-docker exec paperclip-day2-disk sh -c "echo should-fail > /usr/share/nginx/html/from-container.txt"
-```
-
-예상:
-- read-only file system 또는 permission 관련 error가 나온다.
-
-운영 의미:
-- 개발 중에도 container가 host source를 임의로 바꾸지 못하게 할 수 있다.
-- read/write가 필요한 mount와 read-only mount를 구분해야 한다.
-
-## 평가 기준
-| 기준 | 2점 evidence |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| bind mount 실행 | source/destination/port를 정확히 기록했다. |
-| v1/v2 확인 | host file 수정 전후 응답 차이를 확인했다. |
-| inspect | `Type: bind`, `Source`, `Destination`, `RW: false`를 찾았다. |
-| cleanup | container를 stop/rm으로 정리했다. |
+| host psql 없음 | docker run --rm postgres client 방식으로 대체한다. |
+| container에서 localhost 사용 | client container 자신을 가리키므로 실패한다. |
+| 15432와 5432 혼동 | host port는 외부용, container port는 내부 service port다. |
 
-### 공식 근거 링크
-- Docker Docs: Bind mounts, https://docs.docker.com/engine/storage/bind-mounts/
-- Docker Docs: docker inspect, https://docs.docker.com/reference/cli/docker/inspect/
-- Docker Docs: Storage, https://docs.docker.com/engine/storage/
+## Cleanup
+```bash
+docker stop paperclip-net-pg || true
+docker rm paperclip-net-pg || true
+```
+
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
+
+## Evidence
+| 항목 | 제출 기준 |
+|---|---|
+| Host 접근 | localhost:15432 결과 또는 대체 경로 |
+| Container 접근 | paperclip-net-pg:5432 결과 |
+| failure drill | wrong host/port RCA |
+
+## 강의자 설명 포인트
+이 실습의 핵심은 명령어 자체가 아니라 경계다. container는 실행 단위이고, volume은 data lifecycle이며, network는 통신 경계다. 학생이 `docker run` 한 줄을 볼 때 `-v`, `--network`, `-p`를 옵션 목록으로 외우면 뒤에서 Compose와 Kubernetes로 넘어갈 때 같은 혼란이 반복된다. 그래서 각 옵션을 "무엇을 container 밖으로 분리하는가"라는 질문으로 읽게 한다.
+
+강의 중에는 성공 출력보다 실패 출력의 의미를 더 오래 다룬다. port가 열리지 않은 것은 web server 문제가 아닐 수 있고, DB 접속 실패는 password 문제가 아니라 network boundary 문제일 수 있다. host terminal, container 내부, 같은 Docker network의 client container는 모두 서로 다른 관찰 위치다. 학생이 어디에서 명령을 실행하는지 말로 먼저 설명한 뒤 CLI를 실행하게 한다.
+
+## 운영 해석
+실무에서 database container를 다룰 때 가장 위험한 실수는 cleanup을 단순 정리로만 보는 것이다. container 삭제는 process와 container writable layer를 정리하는 것이고, volume 삭제는 data를 삭제하는 것이다. network 삭제는 통신 경로를 정리하는 것이다. 이 세 가지를 구분하지 않으면 실습은 성공해도 운영 사고를 배운 셈이 된다.
+
+README에는 "실행됐다" 대신 "어떤 data를 남기고 무엇을 삭제했는지"를 써야 한다. Day 2 evidence는 Day 5 Compose에서 `volumes`와 `networks`를 읽는 기준이 된다. Compose의 YAML 항목은 갑자기 생긴 문법이 아니라 Day 2에서 손으로 실행한 storage/network 결정을 파일로 옮긴 것이다.
+
+## README 기록 예시
+```markdown
+## Storage/Network Evidence
+- Container:
+- Volume name:
+- Volume target path:
+- Network name:
+- Host port published? yes/no
+- Container DNS check:
+- Data survived container replacement? yes/no
+- Cleanup decision:
+```
+
+## 다음 연결
+다음 교시는 storage와 network를 합쳐 Day 2 evidence를 닫는다.

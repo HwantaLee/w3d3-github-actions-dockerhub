@@ -1,149 +1,85 @@
-# 7교시: 제출물 점검 및 live Q&A
+# 7교시: Compose 장애 분석과 cleanup
 
 ## 수업 목표
-- Week 2 Docker 학습 정리 제출물의 evidence gap을 찾는다.
-- live Q&A를 통해 Docker 개념 오해를 정리한다.
-- 수정 가능한 항목은 README, Dockerfile, Compose, 학습 정리 카드에 작은 patch list로 남긴다.
+- Compose architecture를 실제 명령으로 실행한다.
+- config/up/ps/logs/curl/exec/down 검증 루프를 적용한다.
+- Week 3 MSA service boundary로 연결한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 산출 |
-|---|---|---:|---|
-| 0-8분 | 제출물 점검 기준 확인 | 상담 15% | review board |
-| 8-20분 | evidence gap 분류 | 설명 25% | triage table |
-| 20-35분 | README/Dockerfile/summary quick patch | 실행 30% | patch list |
-| 35-45분 | live Q&A | 설명 20% | Q&A note |
-| 45-50분 | 최종 제출 기준 확인 | 실행 10% | final readiness |
+## 강의 전개
+missing env, wrong service name, wrong port, stale volume, down-v 위험을 RCA로 정리한다. 강사는 starter code와 compose.yaml을 제공하고, 학생은 YAML을 읽은 뒤 실제로 실행해 서비스 관계를 확인한다. 유명 아키텍처를 말로만 설명하지 않고 container, network, volume, port, log evidence로 확인한다.
 
-### Visual 1: 제출물 점검과 수정 흐름
-![Feedback loop](./assets/lesson-07-feedback-loop.png)
+이 교시는 설명만 듣고 지나가지 않는다. 명령은 반드시 code block으로 실행하고, 바로 이어서 검증 명령을 실행한다. 정상 출력이 다를 수 있는 부분은 전체 문자열을 외우지 않고 성공 패턴을 기록한다. 실패도 수업 산출물이다. 실패한 명령, 에러 요약, 가설, 다시 확인한 명령을 함께 남긴다.
 
-이 visual은 제출물에서 빠진 evidence를 찾고, 분류하고, 수정하고, 재확인하는 흐름을 보여준다.
-
-## 핵심 설명
-점검은 감점 이벤트가 아니라 제출물을 실행 가능한 상태로 만드는 과정이다. Day 5의 7교시는 학습 정리에서 드러난 evidence gap을 실제 README, Dockerfile, Compose 또는 summary 문장 개선으로 연결한다.
-
-## evidence gap 분류
-| 분류 | 예 | 처리 |
-|---|---|---|
-| Critical | secret 노출, cleanup 위험 | 즉시 수정 |
-| High | 실행 명령 누락 | README 또는 summary 보완 |
-| Medium | expected output 부족 | evidence 추가 |
-| Low | 표현 모호 | 문장 수정 |
-| Future | Week 3 주제 | 다음 주 질문으로 이동 |
-
-## quick patch 대상
-| 파일/문서 | 수정 예 |
-|---|---|
-| README | build/run/check/cleanup 보강 |
-| Dockerfile | COPY 범위 확인 |
-| `.dockerignore` | secret/불필요 파일 제외 |
-| compose.yaml | port/env 설명 보완 |
-| RCA note | recheck/prevention 추가 |
-| learning summary | hands-on 발전 내역, 인사이트, Week3 질문 추가 |
-
-## live Q&A 핵심 질문
-| 질문 | 답 방향 |
-|---|---|
-| container와 VM 차이는? | process isolation vs guest OS |
-| EXPOSE와 ports 차이는? | metadata vs host publish |
-| image와 container 차이는? | artifact vs running instance |
-| tag는 왜 필요한가? | reproducibility와 handoff |
-| down -v는 왜 위험한가? | volume data 삭제 |
-| secret은 어디에 두는가? | image 밖, 공개 문서 밖 |
-| 좋은 인사이트는 무엇인가? | 실행 evidence에서 나온 구조/위험/개선 판단 |
-
-## 실무 insight
-현업 review에서 좋은 태도는 방어가 아니라 evidence 업데이트다. "제 PC에서는 됐습니다"보다 "README에 확인 명령과 expected output을 추가하겠습니다"가 더 좋다.
-
-## Q&A 기록 템플릿
-```markdown
-## Day 5 Q&A
-- Question:
-- Answer:
-- Related file:
-- Action:
-- Recheck:
+## 실습 명령
+```bash
+cd week2/day5/labs/compose-architectures/01-web-postgres
+docker compose config
+docker compose up -d
 ```
 
-## 학술 기준 연결
-형성평가는 점검과 revision action이 연결될 때 효과가 있다. 질문을 들었다는 사실보다, 그 질문이 어떤 문서 수정이나 재확인으로 이어졌는지가 중요하다.
-
-## 오해 점검
-| 오해 | 교정 |
-|---|---|
-| 점검은 점수 확인 시간이다 | 제출물 개선 입력이다 |
-| 질문은 모르는 티를 낸다 | 좋은 질문은 risk를 드러낸다 |
-| 모든 지적을 길게 반영해야 한다 | severity 기준으로 우선순위화한다 |
-| README 수정은 부가 작업이다 | handoff 품질 자체다 |
-| 인사이트는 거창해야 한다 | 작은 실패에서 나온 재현성/보안/구조 판단이면 충분하다 |
-
-## 평가 기준
-| 기준 | 2점 evidence |
-|---|---|
-| 분류 | evidence gap severity를 나눴다 |
-| 수정 | 하나 이상 patch action을 기록했다 |
-| Q&A | 질문과 답을 문서화했다 |
-| 재확인 | 수정 후 check 명령을 적었다 |
-| 인사이트 | hands-on 발전 또는 Week3 구조 질문을 구체화했다 |
-
-## 전이 과제
-Week 3 첫날에 가져갈 질문 하나를 다음 형식으로 작성한다.
-
-```markdown
-## Week 3 Question
-- Docker/Compose에서 헷갈린 점:
-- MSA에서 커질 것 같은 위험:
-- 확인하고 싶은 evidence:
+## 검증 명령
+```bash
+cd week2/day5/labs/compose-architectures/01-web-postgres
+docker compose ps
+docker compose logs --tail 80
 ```
 
-### 공식 근거 링크
-- GitHub Docs About READMEs: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes
-- Monash Constructive Alignment: https://www.monash.edu/learning-teaching/teachhq/Teaching-practices/learning-outcomes/how-to/constructive-alignment
-
-## live patch log
-```markdown
-## Live Patch Log
-- Gap:
-- Severity:
-- File:
-- Change:
-- Recheck command:
-- Result:
+```bash
+cd week2/day5/labs/compose-architectures/01-web-postgres
+# web가 있는 architecture는 curl로 확인
+curl -I http://localhost:18085 || true
+# DB가 있는 architecture는 exec 또는 run client로 확인
+docker compose exec db psql -U postgres -d app -c 'SELECT 1;' || true
 ```
 
-## Q&A를 산출물로 바꾸기
-| 질문 | 문서 action |
+## 실패 드릴과 오해 교정
+| 상황 | 해석 |
 |---|---|
-| 어떤 port로 접속하나요 | README Check section 보강 |
-| `down -v` 써도 되나요 | cleanup warning 추가 |
-| image push했나요 | push decision record 추가 |
-| secret은 어디 있나요 | security note 추가 |
-| Week 3와 연결은? | readiness question 추가 |
-| hands-on 발전 내역이 약해요 | 변경한 점, 이유, evidence를 한 줄씩 추가 |
+| config 실패 | indentation, env 누락, compose file path를 확인한다. |
+| service unhealthy | logs와 dependency readiness를 확인한다. |
+| down -v 남용 | database volume 삭제 위험을 설명한다. |
 
-## evidence gap 우선순위 원칙
-1. secret/security risk
-2. 실행 불가능한 명령
-3. 정상 확인 기준 누락
-4. cleanup/data risk
-5. 인사이트 또는 Week3 질문 부재
-6. 표현 개선
-
-## Lesson 7 Exit Ticket
-```markdown
-## Exit Ticket
-- 오늘 찾은 가장 중요한 evidence gap:
-- severity:
-- 수정한 파일:
-- 재확인 명령:
-- Week 3로 넘길 질문:
+## Cleanup
+```bash
+cd week2/day5/labs/compose-architectures/01-web-postgres
+docker compose down
+# 데이터를 초기화해도 되는 실습일 때만 실행
+# docker compose down -v
 ```
 
-## 제출물 점검 마감 기준
-점검은 기록만 하고 끝내지 않는다. 최소 하나는 문서나 명령으로 반영한다. 수정할 시간이 부족하면 "수정 예정"이 아니라 owner, 파일, recheck 명령을 남긴다.
+Cleanup은 비용과 데이터 안전을 동시에 다룬다. container를 지우는 명령과 volume/network/image를 지우는 명령은 의미가 다르다. 특히 volume 삭제는 database data 삭제일 수 있으므로 실습 volume인지 확인한 뒤 실행한다.
 
-마감 확인:
-- Critical/High gap이 방치되지 않았는가?
-- README 수정 후 명령을 다시 확인했는가?
-- Week 3 질문과 Day 5 수정 항목을 구분했는가?
-- 제출물에 본인이 실행한 evidence와 본인 판단이 함께 있는가?
+## Evidence
+| 항목 | 제출 기준 |
+|---|---|
+| Architecture | 실행한 architecture 이름 |
+| Compose evidence | config/up/ps/logs/check 결과 |
+| Cleanup | down/down-v 판단 |
+| MSA 연결 | service boundary와 장애 전파 해석 |
+
+## 강의자 설명 포인트
+Day 5는 Compose 문법 암기 시간이 아니라 architecture를 실행 가능한 파일로 제공하는 연습이다. Day 2의 volume/network, Day 3의 image, Day 4의 env/logs/cleanup이 Compose 한 파일 안에서 다시 만난다. 학생은 `services`, `ports`, `environment`, `volumes`, `networks`를 YAML 속성으로만 보지 말고 지난 실습의 `docker run` 옵션이 옮겨진 결과로 읽어야 한다.
+
+유명한 아키텍처 패턴을 다룰 때도 그림만 보여주지 않는다. Web+DB, DB UI, cache, reverse proxy, queue+worker는 모두 실제 container로 띄워야 한다. `docker compose config`는 문법 검증이고, `up`은 시작이며, `ps/logs/curl/exec`가 정상 검증이다. `down`과 `down -v`는 cleanup과 data reset의 경계다.
+
+## 운영 해석
+Compose는 Kubernetes가 아니다. 하지만 Compose는 multi-service 사고를 배우기에 좋다. service name이 곧 내부 DNS가 되고, volume이 data lifecycle을 담당하며, ports가 host 공개 경계를 만든다. Week 3 MSA로 넘어갈 때 service boundary, dependency, failure propagation을 설명하는 첫 번째 실습 근거가 된다.
+
+각 architecture는 반드시 실행 evidence를 남긴다. 학생이 두 개 이상의 architecture를 직접 실행하면 공통 패턴이 보이기 시작한다. 모든 architecture는 config, start, check, logs, cleanup이라는 같은 운영 루프를 가진다.
+
+## README 기록 예시
+```markdown
+## Compose Architecture Evidence
+- Architecture folder:
+- Services:
+- Config result:
+- Up/ps result:
+- HTTP or DB check:
+- Logs summary:
+- Volume/data cleanup decision:
+- Failure drill:
+- Week 3 MSA connection:
+```
+
+## 다음 연결
+다음 architecture 또는 Week 3 MSA에서 같은 service/network/dependency 관점을 재사용한다.

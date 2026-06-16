@@ -1,134 +1,135 @@
-# 8교시: 보충 실습 - 기본 명령 재실습과 Day 2 준비
+# 8교시: 포트 충돌, 정리, 증거 제출
 
 ## 수업 목표
-- Day 1 Docker 기본 cycle을 반복 실행해 명령 목적과 evidence 기록을 안정화한다.
-- 실행 중 container와 stopped container를 정리하고, 다음 실습에 영향을 주지 않는 상태로 마감한다.
-- Day 2 Dockerfile 학습을 위해 image, container, command, port, log의 의미를 readiness note로 정리한다.
+- 같은 host port를 두 PostgreSQL container가 동시에 사용할 수 없음을 실험으로 확인한다.
+- port mapping을 바꾸면 같은 container port `5432`를 가진 DB가 동시에 실행될 수 있음을 설명한다.
+- container와 volume 정리 기준을 구분하고 Day 2 준비 note를 작성한다.
 
-## 50분 흐름
-| 시간 | 활동 | 비중 | 학생 산출 |
-|---|---|---:|---|
-| 0-5분 | 보충 실습 목표 확인 | 설명 10% | 자기 목표 선택 |
-| 5-20분 | 기본 명령 cycle 반복 | 실행 30% | evidence table |
-| 20-35분 | nginx 재실행과 HTTP 확인 | 실행 30% | `200 OK` 기록 |
-| 35-42분 | HTML 수정 반영 또는 cleanup 확인 | 실행 15% | source edit / cleanup check |
-| 42-47분 | Day 2 Dockerfile readiness note | 실행 5% | readiness note |
-| 47-50분 | 질문 1개와 마감 | 설명 10% | next question |
+## 강의 전개
 
-### Visual 1: Docker Day 1 보충 실습 보드
-![Docker Day 1 보충 실습 보드](./assets/lesson-08-supplemental-practice-board.png)
+이 교시는 의도적으로 실패를 만든 뒤 그 실패를 evidence로 읽는 시간이다. 앞 교시에서 PostgreSQL 16과 18은 서로 다른 host port를 사용했기 때문에 동시에 실행됐다. 이제 같은 host port를 두 container에 publish하려고 하면 왜 실패하는지 직접 확인한다.
 
-이 이미지는 반복 실행, nginx 재실행, 정리 확인, Day 2 준비를 하나의 보드로 보여준다. 학생은 빈칸을 채우듯 command, 결과 요약, screenshot filename, blocker를 기록한다.
+핵심은 container 내부 port와 host port를 분리하는 것이다. container 내부에서는 PostgreSQL 16도 `5432`, PostgreSQL 18도 `5432`를 사용할 수 있다. 두 process가 서로 다른 container namespace 안에 있기 때문이다. 하지만 host machine의 `localhost:15432`는 하나의 network endpoint다. 이미 `paperclip-pg16`이 그 endpoint를 사용 중이면 두 번째 container가 같은 host port를 잡을 수 없다.
 
-## 반복 실습 A: 기본 명령 cycle
+실패 메시지는 수업의 정답 일부다. `port is already allocated`, `Bind for ... failed`, `address already in use` 같은 표현은 Docker version과 OS에 따라 조금씩 다를 수 있다. 학생은 문구를 그대로 외우는 대신 "같은 host IP/port 조합을 이미 사용 중이다"라는 원인을 적어야 한다.
 
-```bash
-docker version
-docker pull nginx:latest
-docker images
-```
+정리 단계에서는 container와 volume을 구분한다. container를 삭제하면 process와 container writable layer는 사라지지만 named volume은 남을 수 있다. 실습 DB 데이터를 유지하고 싶다면 volume을 남긴다. 완전히 초기화하고 싶다면 volume까지 삭제한다. 이 구분은 Day 2 이후 Dockerfile과 Compose를 배울 때도 계속 이어진다.
 
-기록할 것:
-- Client/Server가 모두 보이는가
-- `nginx:latest`가 pull 가능한가
-- image 목록에서 `nginx`와 `hello-world`를 구분할 수 있는가
+마지막 제출 evidence는 Day 1 전체를 닫는 운영 기록이다. Docker 설치 경로, version 확인, Docker 개념 요약, 로컬 PostgreSQL 처리 결정, PostgreSQL 16/18 port와 version 결과, 의도적 port conflict error, cleanup 결과가 모두 들어가야 한다. 이 기록이 있으면 Day 2에서 build와 Dockerfile로 넘어갈 때 남은 blocker를 빠르게 분리할 수 있다.
 
-## 반복 실습 B: nginx 재실행
+## Hands-on 1: 같은 host port 충돌 만들기
+
+먼저 `paperclip-pg16`이 `15432:5432`로 실행 중인지 확인한다.
 
 ```bash
-docker run -d --name paperclip-day1-nginx -p 18080:80 nginx:latest
-docker ps --filter name=paperclip-day1-nginx
-curl -I http://localhost:18080
-docker logs paperclip-day1-nginx
+docker ps --filter name=paperclip-pg16
 ```
 
-정상 기준:
-- `docker run -d`가 container ID를 출력한다.
-- `docker ps`에서 `Up` 상태와 `18080->80/tcp` port binding이 보인다.
-- `curl -I`에서 `HTTP/1.1 200 OK`가 보인다.
-- `docker logs`에서 nginx startup log가 보인다.
-
-## 반복 실습 C: HTML 수정 반영 확인
-
-6교시에서 시간이 부족했던 학생은 여기서 10분 안에 bind mount 실습을 반복한다.
+이제 PostgreSQL 18도 같은 host port `15432`를 쓰도록 일부러 실행해 본다.
 
 ```bash
 docker run -d \
-  --name paperclip-day1-nginx-edit \
-  -p 18081:80 \
-  -v "$PWD/week2/day1/labs/nginx-html:/usr/share/nginx/html:ro" \
-  nginx:latest
-
-curl -s http://localhost:18081
+  --name paperclip-pg18-conflict \
+  -e POSTGRES_PASSWORD=postgres \
+  -p 15432:5432 \
+  postgres:18
 ```
 
-[labs/nginx-html/index.html](./labs/nginx-html/index.html)의 `<h1>` 문구를 수정하고 다시 `curl -s http://localhost:18081`을 실행한다. 응답에 수정된 문구가 보이면 host file이 container nginx에 반영된 것이다.
+### 기대되는 실패
+정상적인 실패는 아래 유형이다.
 
-정리:
+```text
+Bind for 0.0.0.0:15432 failed: port is already allocated
+```
+
+문구는 Docker version과 OS에 따라 다를 수 있다. 핵심은 host port `15432`를 이미 다른 process/container가 사용 중이라 publish할 수 없다는 점이다.
+
+실패 container가 생성되어 남아 있으면 정리한다.
 
 ```bash
-docker stop paperclip-day1-nginx-edit
-docker rm paperclip-day1-nginx-edit
+docker rm paperclip-pg18-conflict
 ```
 
-## 반복 실습 D: 정리 확인
+## 충돌 원인 분석
+
+container 내부에서는 PostgreSQL 16과 18이 모두 `5432`를 써도 된다. 서로 다른 container namespace 안에서 각자 listen하기 때문이다. 하지만 host에서 외부 접속을 받을 port는 host machine의 network 자원이다. host의 같은 IP/port 조합은 한 process 또는 한 published port만 사용할 수 있다.
+
+| 구분 | PostgreSQL 16 | PostgreSQL 18 |
+|---|---|---|
+| container port | `5432` | `5432` |
+| 정상 host port | `15432` | `15433` |
+| 충돌 host port | `15432` | `15432` |
+| 결과 | 실행 가능 | 두 번째 container publish 실패 |
+
+## 정상 port mapping 재확인
+
+정상 상태를 다시 확인한다.
 
 ```bash
-docker stop paperclip-day1-nginx
-docker rm paperclip-day1-nginx
-docker ps --filter name=paperclip-day1-nginx
-docker ps -a --filter name=paperclip-day1-nginx
+docker ps --filter name=paperclip-pg
+docker exec paperclip-pg16 psql -U postgres -d paperclip -c "SELECT version();"
+docker exec paperclip-pg18 psql -U postgres -d paperclip -c "SELECT version();"
 ```
 
-정상 기준:
-- `stop`과 `rm`은 container 이름을 반환한다.
-- 정리 후 `docker ps`와 `docker ps -a`에서 해당 container가 보이지 않는다.
+host `psql` client가 있는 학생은 `localhost:15432`, `localhost:15433` 접속도 함께 기록한다.
 
-## Linux 사전 테스트 요약
-| 항목 | 테스트 결과 |
-|---|---|
-| OS | Ubuntu 24.04.3 LTS on Linux 6.6.87.2 WSL2 |
-| Docker | Client `29.0.2`, Server `29.3.1` |
-| hello-world | `Hello from Docker!` 출력 성공 |
-| nginx run | `paperclip-day1-nginx` 실행 성공 |
-| HTTP check | `HTTP/1.1 200 OK` |
-| bind mount source edit | v1 HTML 응답 확인 후 host file 수정, v2 응답 확인 |
-| logs | nginx `Configuration complete; ready for start up` 확인 |
-| cleanup | `stop`, `rm`, recheck 성공 |
+```bash
+PGPASSWORD=postgres psql -h localhost -p 15432 -U postgres -d paperclip -c "SELECT current_setting('server_version');"
+PGPASSWORD=postgres psql -h localhost -p 15433 -U postgres -d paperclip -c "SELECT current_setting('server_version');"
+```
 
-## Day 2 readiness note
+## container/volume cleanup
+
+실습 마감에는 두 가지 선택지가 있다.
+
+| 선택 | 명령 | 의미 |
+|---|---|---|
+| container만 정리 | `docker stop`, `docker rm` | DB process는 사라지지만 named volume data는 남을 수 있음 |
+| container와 실습 volume 정리 | `docker volume rm` 추가 | 오늘 실습 DB data까지 삭제 |
+
+오늘 실습 데이터가 필요 없다면 모두 정리한다.
+
+```bash
+docker stop paperclip-pg16 paperclip-pg18
+docker rm paperclip-pg16 paperclip-pg18
+docker volume rm paperclip-pg16-data paperclip-pg18-data
+docker ps -a --filter name=paperclip-pg
+docker volume ls | grep paperclip-pg
+```
+
+`docker volume rm`은 데이터를 삭제한다. 개인 DB나 다른 수업 산출물이 연결된 volume에는 사용하지 않는다.
+
+## Day 1 제출 정리
+
 ```markdown
-## Dockerfile Readiness
-- 오늘 실행한 image:
-- 오늘 실행한 container name:
-- container start command:
-- host source path:
-- host port -> container port:
-- 정상 확인 방법:
-- log 확인 방법:
-- 정리 방법:
-- Day 2 질문:
+## Week 2 Day 1 Final Evidence
+- Docker install path: macOS Desktop / Linux Desktop / Linux Engine / blocker
+- docker version summary:
+- docker compose version summary:
+- hello-world result:
+- Docker concept one-liner:
+- Local PostgreSQL cleanup decision:
+- pg16 host port and version:
+- pg18 host port and version:
+- port conflict error summary:
+- cleanup result:
+- remaining blocker:
 ```
-
-## 흔한 오해
-| 오해 | 바로잡기 |
-|---|---|
-| 보충 실습은 느린 학생만 한다. | 반복 실행은 명령 목적을 몸에 익히는 정상 학습이다. |
-| cleanup은 선택이다. | 다음 실습의 port 충돌을 막기 위해 필수다. |
-| Dockerfile은 완전히 새로운 내용이다. | Dockerfile은 오늘 실행한 image, command, port, file 조건을 build 문서로 옮기는 것이다. |
 
 ## 평가 기준
 | 기준 | 2점 evidence |
 |---|---|
-| 반복 실행 | 기본 cycle을 한 번 이상 재실행했다. |
-| HTTP 확인 | `curl -I` 또는 browser로 `200 OK`를 확인했다. |
-| cleanup | running/stopped container가 남지 않게 정리했다. |
-| readiness | Day 2 Dockerfile readiness note를 작성했다. |
-| 질문 | 다음 수업으로 가져갈 질문 1개를 남겼다. |
+| port 충돌 이해 | 같은 host port를 두 container가 동시에 사용할 수 없음을 error로 확인했다. |
+| 병렬 실행 이해 | `15432:5432`, `15433:5432` mapping을 설명했다. |
+| version 확인 | 16/18 query 결과를 분리해 기록했다. |
+| cleanup | container와 volume cleanup 범위를 구분했다. |
+| 안전 | 기존 로컬 PostgreSQL data 삭제 위험을 확인했다. |
 
 ### 공식 근거 링크
-- Docker Docs: Writing a Dockerfile, https://docs.docker.com/guides/docker-concepts/building-images/writing-a-dockerfile/
-- Docker Docs: Running containers, https://docs.docker.com/get-started/docker-concepts/running-containers/
+- Docker Docs: Publishing and exposing ports, https://docs.docker.com/get-started/docker-concepts/running-containers/publishing-ports/
+- Docker Docs: docker container rm, https://docs.docker.com/reference/cli/docker/container/rm/
+- Docker Docs: docker volume rm, https://docs.docker.com/reference/cli/docker/volume/rm/
+- PostgreSQL official image README: https://github.com/docker-library/docs/blob/master/postgres/README.md
 
 ### 다음 연결
-Day 2는 오늘의 실행 조건을 Dockerfile로 고정한다. `nginx` image를 실행해 본 경험을 바탕으로 `FROM`, `COPY`, `CMD`, `EXPOSE`가 어떤 실행 조건을 문서화하는지 배운다.
+Day 2는 오늘 실행한 container 개념을 Dockerfile과 image build로 확장한다. 오늘은 공식 image를 pull해서 실행했고, 내일부터는 실행 조건을 직접 Dockerfile로 고정한다.

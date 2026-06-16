@@ -1,0 +1,25 @@
+services:
+  queue:
+    image: redis:7-alpine
+
+  worker:
+    image: redis:7-alpine
+    depends_on:
+      - queue
+    command:
+      - sh
+      - -c
+      - |
+        echo "worker waiting for jobs"
+        while true; do redis-cli -h queue BRPOP jobs 0; done
+
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: jobs
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

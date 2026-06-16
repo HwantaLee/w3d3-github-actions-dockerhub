@@ -156,12 +156,19 @@
 - docker-compose
 
 ## 2주차 목표
-- Docker가 해결하려는 문제와 컨테이너 실행 모델을 이해한다.
-- 이미지와 컨테이너의 차이를 설명하고 기본 명령어로 컨테이너 생명주기를 다룬다.
-- Dockerfile을 작성해 간단한 웹 애플리케이션 이미지를 직접 빌드한다.
-- 포트 바인딩, 볼륨, 환경변수, 네트워크를 이용해 컨테이너 실행 방식을 제어한다.
-- Docker Compose로 웹 애플리케이션과 데이터베이스를 함께 실행한다.
-- 컨테이너 로그와 상태를 확인하고 기본적인 장애 원인을 분석한다.
+- Docker가 등장한 역사적 배경과 실행 환경 표준화 문제를 설명한다.
+- image와 container의 차이를 실행 패키지와 실행 중인 process 관점으로 구분한다.
+- Docker 설치/실행 상태를 공식 문서와 CLI evidence 기준으로 확인한다.
+- 기본 명령어로 container lifecycle을 실행, 확인, 관찰, 중지, 정리까지 다룬다.
+- nginx container로 Docker 실행 가능 여부를 빠르게 검증한다.
+- 로컬 PostgreSQL과 Docker PostgreSQL container의 port 충돌을 확인하고, OS별로 로컬 PostgreSQL 정리/삭제 절차를 기록한다.
+- PostgreSQL 16/18 container를 서로 다른 host port로 실행해 port binding과 version isolation을 검증한다.
+- container 안의 PostgreSQL에 user, database, table, row를 만들고 query로 정상 동작을 확인한다.
+- volume 없이 container를 재생성했을 때 데이터가 사라지는 이유를 확인하고, named volume으로 data lifecycle을 container lifecycle과 분리한다.
+- Dockerfile을 작성해 표준 실습 애플리케이션 이미지를 직접 빌드한다.
+- port binding, network, environment variable, bind mount, named volume을 이용해 runtime 실행 조건을 제어한다.
+- Docker Compose로 웹 애플리케이션과 데이터베이스를 함께 실행하고 service name, network, volume을 설명한다.
+- 컨테이너 로그와 상태를 확인하고 port/env/volume/network 장애 원인을 evidence 기반으로 분석한다.
 
 ## 2주차 운영 원칙
 - 강사가 제공하는 표준 실습 애플리케이션을 Docker 실습의 기본 재료로 사용한다.
@@ -169,75 +176,97 @@
 - 학생 개인의 1주차 미니 웹 애플리케이션은 추가 도전 과제 또는 보충 실습 재료로 활용한다.
 - Docker 명령어는 암기보다 "무엇을 확인하려는 명령인지"를 기준으로 가르친다.
 - 매 실습마다 실행, 확인, 중지, 정리까지 한 사이클로 진행한다.
+- CLI로 실행할 명령은 반드시 fenced code block으로 제시하고, 바로 아래에 성공/실패 판정 기준과 cleanup 명령을 둔다.
+- 강의에 넣는 Docker 실습 명령은 강사가 먼저 사전 실행해 실제로 되는지 검증하고, OS/Docker version 차이로 달라질 수 있는 출력은 expected pattern으로 기록한다.
+- 분 단위 진행표는 강사용 참고로만 두고, 강의 본문은 개념 전개, 실습 절차, evidence, 오해 교정, cleanup 기준으로 작성한다.
+- Day 1의 PostgreSQL 실습은 설치 검증, 로컬 PostgreSQL 충돌 확인, version별 port binding, SQL 기본 조작까지 다룬다.
+- Day 2는 Day 1 DB container의 데이터가 사라지는 현상을 출발점으로 삼아 storage와 network를 깊게 다룬다.
+- Day 3는 image, Dockerfile, layer/cache, tag/digest, registry를 깊게 다룬다.
+- Day 4는 environment/config, logs/inspect/exec/stats, failure drill, cleanup/security를 깊게 다룬다.
+- Day 5는 Docker Compose 섹션으로 확정하고, 강사가 제공하는 코드와 compose.yaml로 유명한 로컬 아키텍처 패턴을 직접 실행/검증한다.
 - 1주차 첫 멘토링은 Day6로 이동한다. 2주차 이후에는 주차 상황에 따라 1일차 또는 4일차 후반을 개인 면담, 환경 점검, 보충 실습, 진도 회복 시간으로 사용할 수 있다.
 
 ## 1일차
-- 1교시 : 1주차 복습 및 Docker 학습 목표 - 로컬 실행 문제, 배포 문제, 환경 차이 문제 정리
-- 2교시 : Docker Desktop 설치 및 계정 확인 - 공식 문서 기준 설치, Docker Hub 로그인, 권한/가상화 이슈 기록
-- 3교시 : Docker의 컨셉과 작동 방식 - image, container, registry, Docker Engine, Docker Desktop
-- 4교시 : Docker vs Local Computer - 좋아지는 점, 나빠지는 점, 언제 Docker를 쓰지 말아야 하는지
-- 5교시 : Docker 기본 명령어 1 - docker version, pull, images, run, ps, stop, rm
-- 6교시 : Hello World, nginx, 표준 실습 앱 첫 실행 - 컨테이너 실행, Docker Hub pull, 브라우저 접속, curl 확인
-- 7교시 : 개인 면담 및 환경 점검 - Docker Desktop 실행, WSL/가상화, 권한, 로그인 문제 해결
-- 8교시 : 보충 실습 - 기본 명령어 재실습, 막힌 학생 진도 회복
+- 1교시 : 짧은 Week 1 리뷰와 Docker 공식 컨셉 - Week 1 실행 조건을 Docker 공식 overview의 image, container, registry, client, daemon 개념으로 연결
+- 2교시 : Docker 설치와 nginx 실행 확인 - macOS Docker Desktop GUI 설치/실행, Linux Desktop/Engine 설치 확인, `docker version`, `hello-world`, nginx container 실행과 HTTP 확인
+- 3교시 : 로컬 PostgreSQL과 Docker PostgreSQL port 충돌 확인 - Week 1 로컬 PostgreSQL이 `5432`를 쓰는지 확인하고 Docker PostgreSQL을 같은 port로 띄울 때 충돌이 나는지 관찰
+- 4교시 : 로컬 PostgreSQL 삭제/중지 후 Docker PostgreSQL 재실행 - macOS/Linux별 로컬 PostgreSQL 중지/삭제/보류 절차, Docker PostgreSQL container 재실행과 접속 확인
+- 5교시 : PostgreSQL version별 container 병렬 실행 - macOS/Linux에서 `postgres:16`, `postgres:18`을 서로 다른 host port로 실행하고 일부러 같은 host port 충돌도 확인
+- 6교시 : SQL 기본 조작 검증 - 각 PostgreSQL container에 접속해 user, database, table을 만들고 row insert/query로 정상 동작 확인
+- 7교시 : 개인 면담 및 환경 점검 A - Docker 설치 blocker, PostgreSQL 정리 위험, 포트 충돌, SQL 접속 문제 확인
+- 8교시 : 개인 면담 및 환경 점검 B - Day 2 volume 실습 준비, 미완료 학생 보충 경로, evidence 제출 상태 확인
 
 ## 2일차
-- 1교시 : 이미지와 레이어의 이해 - base image, layer, cache, tag, digest의 기본 개념
-- 2교시 : Dockerfile 기본 문법 - FROM, WORKDIR, COPY, RUN, CMD, EXPOSE
-- 3교시 : 표준 실습 앱 소스코드 다운로드 - GitHub clone 또는 압축 파일 다운로드, 로컬 실행 구조 확인
-- 4교시 : 표준 실습 앱 이미지 만들기 - Dockerfile 작성, docker build, docker run
-- 5교시 : 이미지 빌드 문제 해결 - build context, .dockerignore, 캐시, 경로 오류, 권한 오류
-- 6교시 : 컨테이너 실행 검증 - 포트 접속, 로그 확인, 컨테이너 내부 파일 확인
-- 7교시 : 이미지 태그와 Docker Hub - tag, login, push, pull, 공개 이미지 사용 시 주의사항
-- 8교시 : 실습 정리 - README에 Docker build/run 명령 추가
+- 1교시 : Day 1 DB container 재생성과 데이터 소실 확인 - volume 없이 만든 PostgreSQL container를 다시 만들면 user/database/table/row가 사라지는 이유 확인
+- 2교시 : named volume과 database persistence - PostgreSQL volume을 만들고 container에 mount한 뒤 데이터 재입력, container 교체 후 보존 확인
+- 3교시 : Docker volume 명령과 cleanup 위험 - `volume ls`, `inspect`, `rm`, dangling volume, bind mount와 named volume 비교
+- 4교시 : bind mount와 host path 주의 - macOS/Linux path, read-only mount, host 파일 변경 반영 확인
+- 5교시 : Docker network 기본 - default bridge, custom bridge, network ls/inspect, container attach/detach
+- 6교시 : container name DNS와 DB client container - host port publish 없이 같은 network에서 PostgreSQL 접속
+- 7교시 : port publish와 network의 차이 - host 접근과 container 간 접근을 분리해 실험, wrong host/port failure drill
+- 8교시 : Day 2 storage/network 통합 실험 - volume+network PostgreSQL, 데이터 보존, DNS 접속, cleanup audit
 
 ## 3일차
-- 1교시 : 컨테이너 네트워크 기본 - bridge network, localhost 오해, container name, DNS
-- 2교시 : 포트 바인딩 실습 - host port와 container port, 포트 충돌, 여러 컨테이너 실행
-- 3교시 : 환경변수와 설정 주입 - -e 옵션, .env 파일, secret을 이미지에 넣으면 안 되는 이유
-- 4교시 : 볼륨과 데이터 보존 - bind mount, named volume, 컨테이너 삭제와 데이터의 관계
-- 5교시 : 데이터베이스 컨테이너 실행 - PostgreSQL 또는 MySQL 실행, 환경변수, 볼륨 연결
-- 6교시 : 웹 앱과 DB 연결 개념 - connection string, host, port, credential, 네트워크 확인
-- 7교시 : 장애 분석 실습 - 접속 실패, 포트 충돌, 환경변수 누락, 로그 기반 원인 분석
-- 8교시 : 장애 분석 기록 작성 - 재현, 관찰, 가설, 검증, 수정 내용을 README 또는 기록 파일에 정리
+- 1교시 : image와 layer, tag, digest - pull한 image를 `images`, `history`, `inspect`로 읽기
+- 2교시 : Dockerfile 기본 문법 - `FROM`, `WORKDIR`, `COPY`, `RUN`, `CMD`, `EXPOSE`
+- 3교시 : build context와 `.dockerignore` - source tree, secret 제외, context size 확인
+- 4교시 : 표준 앱 image build/run - 제공 코드로 image build, container run, HTTP 확인
+- 5교시 : build cache와 layer 최적화 - source 변경, cache hit/miss, image size 비교
+- 6교시 : registry와 image provenance - Docker Hub official image, tag 전략, digest pinning, pull policy
+- 7교시 : tag/push/pull 흐름 - local tag, Docker Hub push는 선택, credential/secret gate 필수
+- 8교시 : image build failure drill - missing file, wrong CMD, wrong port, bloated context RCA
 
 ## 4일차
-- 1교시 : Docker Compose가 필요한 이유 - 여러 컨테이너 실행 명령을 파일로 관리하는 방식
-- 2교시 : compose.yaml 기본 구조 - services, image, build, ports, environment, volumes, networks
-- 3교시 : 웹 애플리케이션 + DB Compose 실습 - compose up/down, logs, ps, exec
-- 4교시 : Compose 네트워크와 서비스 이름 - 컨테이너 간 통신, depends_on의 의미와 한계
-- 5교시 : 개발 환경용 Compose 구성 - bind mount, hot reload, env_file, local-only 설정
-- 6교시 : Compose 장애 분석 - DB 준비 전 앱 실행, 잘못된 포트, 잘못된 환경변수, 볼륨 초기화 이슈
-- 7교시 : 개인 면담 및 환경 점검 - Dockerfile, Compose, Docker Hub, 표준 실습 앱 실행 상태 확인
-- 8교시 : 보충 실습 - Compose 실습 진도 회복, 개인 프로젝트 Docker 실행 문제 해결
+- 1교시 : environment variable과 runtime config - `-e`, `--env-file`, `.env.example`, image 밖 config
+- 2교시 : secret 비노출과 설정 파일 위험 - README/screenshot/history에 password/token을 남기지 않는 기준
+- 3교시 : logs 기반 정상/장애 확인 - `docker logs`, app stdout/stderr, DB readiness log
+- 4교시 : inspect/exec 기반 내부 확인 - filesystem, env, network, mount, process 확인
+- 5교시 : stats/resource/restart policy - CPU/memory 관찰, restart 옵션, crash loop 맛보기
+- 6교시 : 통합 failure drill - missing env, wrong port, wrong network, stale volume, bad image tag
+- 7교시 : cleanup/security audit - container/image/network/volume 정리, 삭제하면 안 되는 data 구분
+- 8교시 : Compose 준비 handoff - Day 2~4 긴 명령을 compose.yaml로 옮길 mapping 작성
 
 ## 5일차
-- 1교시 : Docker 운영 관점 정리 - 컨테이너는 VM이 아니다, 상태 없는 앱, immutable image
-- 2교시 : 좋은 Dockerfile 작성 원칙 - 작은 이미지, 명확한 실행 명령, .dockerignore, secret 제외
-- 3교시 : 컨테이너 보안 기초 - root 실행 주의, 이미지 출처, 태그 고정, 취약 이미지, secret 관리
-- 4교시 : 이미지 배포 흐름 - build, tag, push, pull, run으로 보는 배포 파이프라인
-- 5교시 : 2주차 통합 실습 - 표준 실습 앱을 Dockerfile과 Compose로 실행 가능하게 정리
-- 6교시 : 2주차 발표 - Docker로 실행하는 방법, 겪은 장애, 해결 과정, 남은 문제 공유
-- 7교시 : 발표 피드백 및 라이브 Q&A - Dockerfile/Compose 개선점, 다음 주차 MSA 연결
-- 8교시 : 3주차 MSA Overview - Compose로 여러 서비스를 실행할 때 service boundary, API, DB, worker가 왜 중요해지는지 정리
+- 1교시 : Compose 기본과 검증 루프 - 제공 코드에서 `compose.yaml` 읽기, `config`, `up`, `ps`, `logs`, `down` 실행
+- 2교시 : Architecture 1 - Web + PostgreSQL two-tier app, service name과 internal port로 DB 연결
+- 3교시 : Architecture 2 - Web + PostgreSQL + Adminer/pgAdmin, DB 관리 UI와 host port 노출 기준
+- 4교시 : Architecture 3 - Web + Redis cache, cache hit/miss와 container logs 확인
+- 5교시 : Architecture 4 - Nginx reverse proxy + multiple web services, path/host routing과 upstream 장애 확인
+- 6교시 : Architecture 5 - Queue + worker + database, 비동기 처리와 worker logs 확인
+- 7교시 : Compose 장애 분석과 cleanup - missing env, wrong service name, wrong port, stale volume, `down` vs `down -v`
+- 8교시 : 2주차 제출물과 Week 3 MSA 연결 - 유명 아키텍처를 service boundary, API, DB, worker, 장애 전파로 해석
 
 ## 2주차 산출물
 - 표준 실습 애플리케이션용 Dockerfile
 - compose.yaml 1개
 - Docker build/run/compose 실행 명령이 포함된 README.md
 - Docker Hub에서 내려받아 실행한 표준 이미지 1개
-- 직접 빌드한 로컬 이미지 태그 1개
-- 포트, 로그, 환경변수, 볼륨 중 하나 이상을 포함한 장애 분석 기록 1개
+- 직접 빌드한 로컬 이미지 태그 1개 또는 Day 3~4 확정 전까지는 optional
+- PostgreSQL 16/18 port binding 실험 evidence 1개
+- SQL user/database/table/insert/query evidence 1개
+- storage/network evidence 각 1개 이상
+- image/Dockerfile/registry evidence 각 1개 이상
+- env/logs/inspect/exec failure drill evidence 1개 이상
+- Compose architecture 실행 evidence 2개 이상
+- 포트, 로그, 환경변수, 볼륨, 네트워크 중 하나 이상을 포함한 장애 분석 기록 1개
 - 3주차 학습 전 Docker 체크리스트
 
 ## 2주차 환경 준비 체크리스트
 - Docker Desktop 정상 실행
 - `docker version` 확인
 - `docker run hello-world` 성공
-- `docker run -p 8080:80 nginx` 실행 후 브라우저 접속 확인
+- Week 1 로컬 PostgreSQL 삭제/중지/보류 결정과 증거 기록
+- `postgres:16`, `postgres:18`을 서로 다른 host port로 실행하거나 실패 증상 기록
+- 같은 host port 충돌을 재현하고 port binding 관점으로 설명
+- PostgreSQL container에서 user/database/table/row 생성과 query 성공
+- volume 없는 container 재생성 후 데이터 소실 확인
+- named volume 연결 후 container 교체에도 데이터 보존 확인
+- custom network에서 container name으로 통신 확인
+- official image tag/digest 또는 image inspect 확인
+- env/config 주입과 secret 비노출 확인
 - Docker Hub 로그인 또는 표준 실습 앱 이미지 pull 가능 상태 확인
-- 표준 실습 앱 소스코드 다운로드 가능 상태 확인
-- Dockerfile build 성공
+- 표준 실습 앱 소스코드 확인과 build context 점검
+- Dockerfile build 성공 또는 Day 3~4 확정 후 보충
 - compose.yaml 실행 성공
 
 # 3주차
