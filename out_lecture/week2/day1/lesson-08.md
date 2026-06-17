@@ -103,7 +103,7 @@ docker volume ls | grep paperclip-pg
 
 ```markdown
 ## Week 2 Day 1 Final Evidence
-- Docker install path: macOS Desktop / Linux Desktop / Linux Engine / blocker
+- Docker install path: macOS Desktop / Linux Engine / Linux Desktop exception / blocker
 - docker version summary:
 - docker compose version summary:
 - hello-world result:

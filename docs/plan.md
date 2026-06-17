@@ -188,7 +188,7 @@
 
 ## 1일차
 - 1교시 : 짧은 Week 1 리뷰와 Docker 공식 컨셉 - Week 1 실행 조건을 Docker 공식 overview의 image, container, registry, client, daemon 개념으로 연결
-- 2교시 : Docker 설치와 nginx 실행 확인 - macOS Docker Desktop GUI 설치/실행, Linux Desktop/Engine 설치 확인, `docker version`, `hello-world`, nginx container 실행과 HTTP 확인
+- 2교시 : Docker 설치와 nginx 실행 확인 - macOS Docker Desktop GUI 설치/실행, Linux Docker Engine 설치 확인, `docker version`, `hello-world`, nginx container 실행과 HTTP 확인
 - 3교시 : 로컬 PostgreSQL과 Docker PostgreSQL port 충돌 확인 - Week 1 로컬 PostgreSQL이 `5432`를 쓰는지 확인하고 Docker PostgreSQL을 같은 port로 띄울 때 충돌이 나는지 관찰
 - 4교시 : 로컬 PostgreSQL 삭제/중지 후 Docker PostgreSQL 재실행 - macOS/Linux별 로컬 PostgreSQL 중지/삭제/보류 절차, Docker PostgreSQL container 재실행과 접속 확인
 - 5교시 : PostgreSQL version별 container 병렬 실행 - macOS/Linux에서 `postgres:16`, `postgres:18`을 서로 다른 host port로 실행하고 일부러 같은 host port 충돌도 확인

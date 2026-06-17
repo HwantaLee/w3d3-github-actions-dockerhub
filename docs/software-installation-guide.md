@@ -253,11 +253,7 @@ curl -I https://example.com
 
 ### 3.7 Docker 설치
 
-Linux에서는 Docker Desktop 또는 Docker Engine 중 하나를 선택한다. 초보자는 Docker Desktop이 GUI와 Compose를 함께 제공해 편하지만, 서버형 Linux나 교육장 VM에서는 Docker Engine이 더 일반적이다.
-
-Docker Desktop for Linux:
-
-- 공식 문서: https://docs.docker.com/desktop/setup/install/linux/
+Linux에서는 Docker Engine 설치를 기본 경로로 둔다. 서버형 Linux, 교육장 VM, WSL 기반 Ubuntu 모두 daemon/service와 CLI evidence를 확인하기 쉽기 때문이다. Docker Desktop for Linux는 이미 사용 중이거나 조직 정책상 필요한 경우의 예외 경로로만 기록한다.
 
 Docker Engine for Ubuntu:
 
@@ -270,6 +266,10 @@ Docker Engine for Debian:
 Docker Engine for Fedora:
 
 - 공식 문서: https://docs.docker.com/engine/install/fedora/
+
+Docker Desktop for Linux 예외 경로:
+
+- 공식 문서: https://docs.docker.com/desktop/setup/install/linux/
 
 Ubuntu 기준 Docker Engine 설치 후 확인:
 
@@ -368,7 +368,7 @@ code --version
 | GitHub account | https://docs.github.com/en/get-started/start-your-journey/creating-an-account-on-github |
 | GitHub PAT | https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens |
 | Docker Desktop Mac | https://docs.docker.com/desktop/setup/install/mac-install/ |
-| Docker Desktop Linux | https://docs.docker.com/desktop/setup/install/linux/ |
 | Docker Engine Ubuntu | https://docs.docker.com/engine/install/ubuntu/ |
 | Docker Engine Linux post-install | https://docs.docker.com/engine/install/linux-postinstall/ |
+| Docker Desktop Linux exception | https://docs.docker.com/desktop/setup/install/linux/ |
 | Docker Compose | https://docs.docker.com/compose/ |

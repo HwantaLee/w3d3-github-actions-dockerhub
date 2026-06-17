@@ -5,7 +5,7 @@
 | Term | 뜻 | 운영 관점 질문 |
 |---|---|---|
 | Docker | 애플리케이션 실행 환경을 image와 container로 표준화하는 도구와 생태계 | 같은 실행 조건을 다른 사람이 재현할 수 있는가 |
-| Docker Desktop | 로컬 장비에서 Docker를 쉽게 실행하고 관리하게 해주는 데스크톱 앱 | macOS/Linux에서 설치 방식, 권한, 실행 상태가 맞는가 |
+| Docker Desktop | 로컬 장비에서 Docker를 쉽게 실행하고 관리하게 해주는 데스크톱 앱 | macOS 기본 경로와 Linux 예외 경로를 구분했는가 |
 | Docker Engine | image build, container run, network, volume을 실제로 처리하는 Docker 실행 엔진 | CLI 명령이 어느 daemon에 전달되는가 |
 | Docker CLI | terminal에서 `docker ...` 명령을 실행하는 client | CLI는 있는데 daemon 연결이 안 되는 상태를 구분했는가 |
 | Docker daemon | Docker Engine의 background service | `docker version`에서 Server 정보가 보이는가 |
@@ -69,7 +69,7 @@
 ## 설치/권한 오류 용어
 | 증상/용어 | 뜻 | 먼저 볼 것 |
 |---|---|---|
-| `command not found: docker` | CLI가 설치되지 않았거나 PATH에서 찾지 못함 | Docker Desktop/Engine 설치, terminal 재시작 |
+| `command not found: docker` | CLI가 설치되지 않았거나 PATH에서 찾지 못함 | macOS Desktop 또는 Linux Engine 설치, terminal 재시작 |
 | `Cannot connect to the Docker daemon` | CLI는 있으나 daemon/Server에 연결 실패 | Docker Desktop running, `systemctl status docker` |
 | Permission denied | Linux 사용자가 Docker socket 접근 권한이 없을 수 있음 | `sudo docker ...` 성공 여부, docker group 정책 |
 | Port already allocated | host port를 이미 다른 process/container가 사용 중 | `docker ps`, 다른 port 사용 |

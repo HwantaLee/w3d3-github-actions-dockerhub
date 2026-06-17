@@ -126,7 +126,7 @@ stateDiagram-v2
 
 ## Environment
 - OS:
-- Docker Desktop status:
+- Docker runtime status:
 - Docker version command:
 - Result summary:
 
@@ -157,7 +157,7 @@ stateDiagram-v2
 
 ## 다음 교시 설치 준비
 
-다음 교시는 Docker 설치와 계정 상태 확인이다. macOS 학생은 Mac 설치 문서에서 Apple silicon/Intel 구분, system requirement, 권한 조건을 확인한다. Linux 학생은 Docker Desktop for Linux와 Docker Engine 설치 경로를 구분한다. Windows 장비를 쓰는 학생은 별도 예외 경로로 Windows 설치 문서의 WSL 2와 virtualization 조건을 확인한다.
+다음 교시는 Docker 설치와 계정 상태 확인이다. macOS 학생은 Mac 설치 문서에서 Apple silicon/Intel 구분, system requirement, 권한 조건을 확인한다. Linux 학생은 Docker Engine 설치 경로를 기본으로 확인하고, Docker Desktop for Linux는 이미 사용 중이거나 조직 정책상 필요한 경우의 예외 경로로만 기록한다. Windows 장비를 쓰는 학생은 별도 예외 경로로 Windows 설치 문서의 WSL 2와 virtualization 조건을 확인한다.
 
 ### 평가 기준
 | 기준 | 2점 evidence |
