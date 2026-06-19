@@ -1,5 +1,7 @@
 # 7교시: Cleanup과 security audit
 
+![Cleanup and security audit infographic](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day4/assets/lesson-07-cleanup-security-audit.png)
+
 ## 수업 목표
 - container, image, network, volume cleanup의 차이를 구분한다.
 - 삭제하면 안 되는 data와 지워도 되는 실습 자원을 나눈다.

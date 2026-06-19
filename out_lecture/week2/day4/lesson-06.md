@@ -1,5 +1,7 @@
 # 6교시: Failure drill - 출력으로 원인 좁히기
 
+![Runtime failure RCA infographic](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day4/assets/lesson-06-runtime-failure-rca.png)
+
 ## 수업 목표
 - missing env, wrong env file, wrong port, wrong network, stale volume, bad image tag를 출력으로 구분한다.
 - 실패를 config, network, image, service check 문제로 분류한다.

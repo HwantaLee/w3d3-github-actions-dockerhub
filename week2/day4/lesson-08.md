@@ -1,5 +1,7 @@
 # 8교시: Compose mapping handoff와 구름 EXP 배움일기
 
+![Runtime to platform mapping infographic](./assets/lesson-08-runtime-to-platform-mapping.png)
+
 ## 수업 목표
 - Day 4에서 사용한 긴 `docker run` option을 Compose 항목으로 매핑한다.
 - runtime config, 관찰 명령, cleanup 기준을 표로 정리한다.

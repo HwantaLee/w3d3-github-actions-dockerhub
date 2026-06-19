@@ -1,5 +1,7 @@
 # 4교시: Inspect와 exec로 내부 확인
 
+![Inspect and exec evidence infographic](./assets/lesson-04-inspect-exec-evidence.png)
+
 ## 수업 목표
 - `docker inspect`와 `docker exec`의 역할을 구분한다.
 - port, image, restart policy 같은 metadata를 선별해서 확인한다.

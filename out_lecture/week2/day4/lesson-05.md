@@ -1,5 +1,7 @@
 # 5교시: Stats, resource, restart policy
 
+![Stats restart crash loop infographic](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day4/assets/lesson-05-stats-restart-crash-loop.png)
+
 ## 수업 목표
 - `docker stats --no-stream`으로 resource 사용량을 확인한다.
 - restart policy가 무엇을 해주고 무엇을 해주지 못하는지 설명한다.

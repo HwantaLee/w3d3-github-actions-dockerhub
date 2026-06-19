@@ -1,5 +1,7 @@
 # 3교시: Logs와 HTTP 정상 확인
 
+![Logs and HTTP verification infographic](https://raw.githubusercontent.com/niceguy61/kdt_devops_lecture_2026_rev2/main/week2/day4/assets/lesson-03-logs-http-verification.png)
+
 ## 수업 목표
 - `docker ps`의 `Up`과 서비스 정상 응답을 구분한다.
 - `docker logs`에서 startup/access/error 신호를 확인한다.

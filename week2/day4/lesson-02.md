@@ -1,5 +1,7 @@
 # 2교시: `.env.example`과 secret 비노출
 
+![Env example and secret masking infographic](./assets/lesson-02-env-secret-masking.png)
+
 ## 수업 목표
 - `.env.example`과 실제 `.env`의 역할을 구분한다.
 - 문서에 남겨도 되는 정보와 남기면 안 되는 값을 분리한다.
