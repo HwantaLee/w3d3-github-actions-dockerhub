@@ -1,71 +1,66 @@
-# Week 3 Day 3: 데이터 의존성, Worker, 장애 전파
+# Week 3 Day 3: GitHub 협업 압축과 CI Gate
 
 ## Overview
-Day 3는 3주차 MSA 학습 흐름 중 `데이터 의존성, Worker, 장애 전파`를 다룬다. 오늘의 초점은 개발 코드 내부가 아니라 서비스를 실행하고 연결하고 관찰하고 복구하기 위해 인프라가 알아야 하는 정보다.
+Day 3는 GitHub를 하루에 압축한다. 목표는 모든 기능을 얕게 나열하는 것이 아니라 branch, PR, merge, rebase, revert, tag, Actions CI gate가 배포 사고를 줄이는 흐름을 하나로 이해하는 것이다.
 
 ## Learning Goals
-- 오늘 다루는 서비스 경계와 의존성을 운영 관점으로 설명한다.
-- Docker Compose 상태, 로그, health, HTTP 응답 중 하나 이상으로 정상/비정상을 판단한다.
-- 장애 증상을 숨기지 않고 재현 조건, 관찰 결과, 수정 또는 요청사항으로 기록한다.
-- Week 4 Kubernetes에서 필요한 리소스와 설정으로 연결한다.
+- GitHub Flow 중심의 branch, commit, push, pull request, review, merge 흐름을 설명한다.
+- merge, rebase, revert, tag를 이력 관리가 아니라 배포 사고 예방 도구로 해석한다.
+- GitHub Actions CI gate의 workflow, event, job, step, runner, secret 위치를 설명한다.
+- PR check 실패 로그를 읽고 merge 차단 이유를 evidence로 남긴다.
+- 실패 증상을 숨기지 않고 재현 조건, 관찰 결과, 수정 또는 요청사항으로 기록한다.
+- Week 4 Kubernetes 확장 수업으로 넘길 질문을 남긴다.
 
 ## Lesson Index
 | 교시 | 주제 | 핵심 산출물 |
 |---|---|---|
-| 1교시 | 서비스 분리와 데이터 의존성 | DB 공유의 위험, 서비스별 데이터 책임, 장애 영향 범위 evidence |
-| 2교시 | worker 서비스 운영 관점 | 비동기 처리, 배치 작업, 오래 걸리는 작업이 인프라에 주는 영향 evidence |
-| 3교시 | queue 또는 redis 운영 개념 | 동기 호출과 비동기 처리의 차이, 병목과 적체 관찰 evidence |
-| 4교시 | worker/queue 실습 | 요청 생성, 작업 처리, 로그와 상태로 처리 흐름 확인 evidence |
-| 5교시 | 장애 전파와 부분 장애 | api, DB, worker 장애가 사용자 경험과 운영 대응에 미치는 영향 evidence |
-| 6교시 | timeout과 retry 기본 | 무한 대기 방지, 재시도의 위험, 중복 처리 문제 evidence |
-| 7교시 | 로그 분산 문제 | 여러 서비스 로그 보기, correlation id/request id 필요성 evidence |
-| 8교시 | 관찰 가능성 기초 실습 | compose logs, 서비스별 로그 필터링, 요청 흐름 추적 evidence |
+| 1교시 | GitHub 협업 모델 | local branch, remote branch, origin, pull request 흐름 evidence |
+| 2교시 | branch 전략 압축 | GitHub Flow 중심, trunk-based/Git Flow 선택 기준 evidence |
+| 3교시 | PR 운영 기준 | 작은 PR, reviewer, status check, protected branch evidence |
+| 4교시 | merge/rebase/conflict | merge commit, squash, rebase merge 차이와 conflict 재검증 evidence |
+| 5교시 | revert와 rollback | git revert, PR revert, 배포 rollback 차이 evidence |
+| 6교시 | tag와 version 기준 | app version, Git tag, Docker image tag, latest 사용 기준 evidence |
+| 7교시 | GitHub Actions CI gate | pull_request event, checkout, lint/test/build, runner, secret evidence |
+| 8교시 | 구름 EXP 배움일기 | branch 전략, PR gate, merge/rebase/revert/tag, CI 실패 증거 정리 |
 
 ## Practice Files And Assets
 | 자료 | 용도 |
 |---|---|
-| `../day1/labs/msa-demo/compose.yaml` | 표준 MSA 실습 앱 실행 |
-| `../day1/labs/msa-demo/README.md` | run/check/failure/cleanup 기준 |
-| `hands-on-lab.md` | 오늘 실습 흐름이 있는 경우 실행 가이드 |
-| `academic-foundations.md` | 공식/학술/현업 기준 mapping |
-| `assets/` | 각 교시 보조 시각 자료 위치 |
+| `hands-on-lab.md` | 오늘 실습 흐름 실행 가이드 |
+| `academic-foundations.md` | 공식/현업 기준 mapping |
+| `assets/` | 이전 버전 보조 이미지 보관 위치. 새 수업에서는 필요할 때 선별 사용 |
 
 ## Session Visual Index
-| 교시 | 주제 | 세션별 이미지 |
+| 교시 | 주제 | 시각 자료 기준 |
 |---|---|---|
-| 1교시 | 서비스 분리와 데이터 의존성 | ![Day 3 Lesson 1](./assets/lesson-01-data-dependency.png) |
-| 2교시 | worker 서비스 운영 관점 | ![Day 3 Lesson 2](./assets/lesson-02-worker-operations.png) |
-| 3교시 | queue 또는 redis 운영 개념 | ![Day 3 Lesson 3](./assets/lesson-03-queue-redis-concept.png) |
-| 4교시 | worker/queue 실습 | ![Day 3 Lesson 4](./assets/lesson-04-worker-queue-lab.png) |
-| 5교시 | 장애 전파와 부분 장애 | ![Day 3 Lesson 5](./assets/lesson-05-failure-propagation.png) |
-| 6교시 | timeout과 retry 기본 | ![Day 3 Lesson 6](./assets/lesson-06-timeout-retry.png) |
-| 7교시 | 로그 분산 문제 | ![Day 3 Lesson 7](./assets/lesson-07-distributed-logs.png) |
-| 8교시 | 관찰 가능성 기초 실습 | ![Day 3 Lesson 8](./assets/lesson-08-observability-lab.png) |
+| 1교시 | GitHub 협업 모델 | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 2교시 | branch 전략 압축 | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 3교시 | PR 운영 기준 | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 4교시 | merge/rebase/conflict | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 5교시 | revert와 rollback | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 6교시 | tag와 version 기준 | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 7교시 | GitHub Actions CI gate | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
+| 8교시 | 구름 EXP 배움일기 | 교시 전용 보드/명령 결과 캡처 또는 수업 중 Mermaid 다이어그램 |
 
 ## Today Evidence
 | Evidence | 제출 기준 |
 |---|---|
-| topology note | 서비스별 역할과 의존성 설명 |
 | command evidence | 실행/확인/로그/정리 명령 |
 | failure note | 장애 재현, 관찰, 복구, 예방 |
-| handoff note | 개발팀 또는 다음 운영자에게 전달할 정보 |
+| handoff note | 다음 운영자 또는 Week 4로 넘길 정보 |
 
 ## Official References
 | Topic | Reference | 확인할 키워드 |
 |---|---|---|
-| Microservices on AWS | https://docs.aws.amazon.com/whitepapers/latest/microservices-on-aws/microservices.html | service, API, database, deployment |
-| AWS Microservices | https://aws.amazon.com/microservices/ | independent component, business capability |
-| Martin Fowler Microservices Guide | https://martinfowler.com/microservices/ | independently deployable, lightweight communication |
-| Docker Compose | https://docs.docker.com/compose/ | services, networks, depends_on, healthcheck |
-| Compose services reference | https://docs.docker.com/reference/compose-file/services/ | healthcheck, depends_on, environment |
-| Google SRE Cascading Failures | https://sre.google/sre-book/addressing-cascading-failures/ | failure propagation, overload, mitigation |
-| OpenTelemetry Concepts | https://opentelemetry.io/docs/concepts/ | traces, metrics, logs, observability |
-| Twelve-Factor App | https://12factor.net/ | config, backing services, logs |
+| GitHub Flow | https://docs.github.com/en/get-started/using-github/github-flow | branch, commit, PR, deploy |
+| GitHub Actions | https://docs.github.com/en/actions | workflow, event, job, runner |
+| GitHub protected branches | https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches | status check, review |
+| Kubernetes Concepts | https://kubernetes.io/docs/concepts/ | cluster, pod, deployment, service |
+| kubectl Cheat Sheet | https://kubernetes.io/docs/reference/kubectl/quick-reference/ | get, describe, logs, exec |
 
 
 ## End-Of-Day Checklist
-- [ ] 오늘 다룬 서비스와 의존성을 다이어그램으로 설명했다.
-- [ ] `docker compose ps`와 `docker compose logs`를 사용했다.
-- [ ] 정상 상태와 장애 상태를 증거로 구분했다.
-- [ ] 설정, health, logs, cleanup 기준을 문서에 남겼다.
-- [ ] Kubernetes로 넘어갈 때 필요한 리소스 후보를 적었다.
+- [ ] 오늘의 핵심 흐름을 한 문장으로 설명했다.
+- [ ] 명령 실행 결과를 evidence로 남겼다.
+- [ ] 실패 로그 또는 이벤트를 하나 이상 읽었다.
+- [ ] Week 4에서 더 깊게 다룰 질문을 적었다.

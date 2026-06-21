@@ -154,6 +154,15 @@ HTTP/1.1 200 OK
 
 해석: `Up`은 process 상태이고, `HTTP/1.1 200 OK`는 서비스 관점의 확인이다.
 
+포트가 이미 사용 중이면 다음처럼 점유 주체를 먼저 확인한다.
+
+```bash
+docker ps --format 'table {{.Names}}\t{{.Ports}}' | grep 18084 || true
+ss -ltnp | grep 18084 || true
+```
+
+다른 실습 container가 점유 중이면 정리하고, 다른 서비스가 점유 중이면 host port를 `18085:80`처럼 바꿔 실행한다.
+
 환경 설정을 로그로 남기는 경우에는 secret masking을 확인한다.
 
 ```bash
@@ -176,6 +185,7 @@ docker inspect paperclip-day4-nginx --format 'Ports={{json .NetworkSettings.Port
 docker inspect paperclip-day4-nginx --format 'Image={{.Config.Image}} Restart={{json .HostConfig.RestartPolicy}}'
 docker exec paperclip-day4-nginx ls -l /usr/share/nginx/html
 docker exec paperclip-day4-nginx sh -c 'ps | head'
+docker exec paperclip-day4-nginx sh -c 'cat /etc/nginx/conf.d/default.conf | sed -n "1,40p"'
 docker rm -f paperclip-day4-env-inspect || true
 docker run -d --name paperclip-day4-env-inspect --env-file week2/day4/labs/env-report/.env alpine:3.20 sleep 300
 docker inspect paperclip-day4-env-inspect --format '{{range .Config.Env}}{{println .}}{{end}}' \
@@ -192,12 +202,53 @@ Ports={"80/tcp":[{"HostIp":"0.0.0.0","HostPort":"18084"}]}
 Image=nginx:1.27-alpine
 index.html
 nginx
+server {
 APP_ENV=practice
 FEATURE_FLAG=on
 DB_PASSWORD=***masked***
 ```
 
 해석: inspect/exec는 env 값을 보여줄 수 있다. 실습 중 실제 값을 확인할 수는 있지만 제출물과 screenshot에는 masking된 출력만 남긴다.
+
+### exec shell read-only 확인
+여러 파일과 process를 이어서 볼 때는 shell로 들어갈 수 있다. 단, 이 shell은 상태 확인용이다. container 안에서 파일을 고치거나 package를 설치하지 않는다.
+
+```bash
+docker exec -it paperclip-day4-nginx sh
+```
+
+container 안에서 실행한다.
+
+```sh
+pwd
+whoami
+ls -al /usr/share/nginx/html
+cat /usr/share/nginx/html/index.html | head
+cat /etc/nginx/conf.d/default.conf | sed -n '1,40p'
+ps
+exit
+```
+
+Expected:
+
+```text
+/
+root
+index.html
+server {
+PID   USER
+```
+
+금지 예시는 다음과 같다.
+
+| 금지 명령/행동 | 이유 |
+|---|---|
+| `vi`, `nano`, `sed -i`로 설정 파일 수정 | image/Dockerfile/compose에 변경 근거가 남지 않음 |
+| `rm`, `mv`, `cp`로 내부 파일 변경 | 재시작/재생성 시 사라지거나 원인 추적이 어려움 |
+| `apk add`, `apt install`로 도구 설치 | container를 수동 snowflake 상태로 만듦 |
+| shell에서 hotfix 후 정상이라고 보고 | 같은 image로 재배포하면 문제가 되살아남 |
+
+수정이 필요하면 shell을 빠져나와 Dockerfile, env file, bind mount 원본 파일, `docker run` option 또는 Day 5의 compose.yaml에 반영한다.
 
 ## Phase F: stats와 restart policy
 ```bash
@@ -403,6 +454,7 @@ secret 값이 남은 출력/screenshot 여부:
 | logs | `docker logs ... --tail` | startup/access/error 중 무엇을 봤는지 적는다. |
 | inspect | port/env/restart/mount 중 선택 field | 전체 JSON이 아니라 필요한 field만 남겼다. |
 | exec | filesystem/process/env 중 하나 | container 내부 관찰 결과를 남겼다. |
+| exec shell safety | read-only 확인과 금지 행동 | shell에서 수정하지 않고 source로 돌아갈 기준을 적었다. |
 | restart | `RestartCount`, `ExitCode` | restart policy가 원인을 고치지 못한다는 것을 설명했다. |
 | failure RCA | 실패 출력 한 줄 | config/port/network/volume/image 중 하나로 분류했다. |
 | cleanup | 삭제/보존 목록 | volume 삭제가 data reset인지 판단했다. |

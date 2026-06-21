@@ -10,6 +10,7 @@ Day 4는 runtime configuration, observability, failure drill을 다룬다. Day 3
 | Docker exec | container 내부 process와 filesystem을 제한적으로 확인 |
 | Docker stats | resource usage 관찰 |
 | Twelve-Factor App config | config를 code/image와 분리 |
+| Public incident case | GitHub 자격증명 노출, cloud access key 관리 부실, hardcoded secret 위험 |
 | SRE incident practice | 실패 재현, fix, recheck, prevention 확인 |
 
 ## Conceptual Rationale
@@ -27,6 +28,9 @@ Observability는 Kubernetes부터 시작하는 주제가 아니다. 로컬 Docke
 - Docker stats: https://docs.docker.com/reference/cli/docker/container/stats/
 - Start containers automatically: https://docs.docker.com/engine/containers/start-containers-automatically/
 - Twelve-Factor App Config: https://12factor.net/config
+- AWS: Detect exposed security credentials: https://aws.amazon.com/ko/blogs/tech/detect-exposed-security-credential/
+- 보안뉴스: 티빙 사태, DB 유출보다 깃허브에 주목할 이유: https://m.boannews.com/html/detail.html?idx=144054
+- 이데일리: 티빙 해킹, 단순 정보유출 넘어 클라우드 계정 관리 논란으로 확산: https://v.daum.net/v/Y2xTjfMVDp
 
 ## Standards Crosswalk
 
@@ -36,6 +40,7 @@ Observability는 Kubernetes부터 시작하는 주제가 아니다. 로컬 Docke
 | ABET-style problem solving | 증상, 원인 후보, 수정, 재검증을 RCA note로 작성 |
 | Professional responsibility | secret 출력, root 실행, 불필요한 privileged option을 피함 |
 | SRE/DevOps 확인 지점 | logs, inspect, exec, stats, curl 결과를 함께 남김 |
+| Incident response | 노출된 credential은 masking만 하지 않고 revoke/rotate, 권한 축소, 사용 로그 확인을 수행 |
 
 ## 완료 전 주의할 점
 

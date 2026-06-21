@@ -160,6 +160,21 @@ APP_ENV=practice FEATURE_FLAG=on DB_PASSWORD=***masked***
 
 초보자는 `실습용이니까 괜찮다`고 생각하기 쉽다. 하지만 습관이 중요하다. 수업용 password라도 그대로 캡처해 공유하는 방식에 익숙해지면, 이후 Docker Hub token, AWS access key, database password도 같은 방식으로 노출될 수 있다.
 
+## 실제 사고 연결: TVING 자격증명 노출 논란
+2026년 6월 TVING 개인정보 유출 사고 보도에서는 단순 DB 유출을 넘어 GitHub 자격증명 노출, AWS access key 폐기, 클라우드 접근 권한 관리 부실이 쟁점으로 제기됐다. 일부 보도는 소스코드에 평문 자격증명을 적어두는 하드코딩 관행을 주요 원인 후보로 설명했다. 다만 공개 기사만으로는 실제 침입 경로와 최종 원인이 확정됐다고 단정할 수 없으므로, 수업에서는 "소스 저장소와 runtime secret 관리가 사고 대응의 핵심 쟁점이 된 사례"로 다룬다.
+
+이 사례가 Day 4의 `.env` 실습과 완전히 같은 유형은 아니다. TVING 보도에서 언급된 것은 GitHub, AWS access key, 내부 시스템 접근 권한 같은 더 큰 범위의 credential 관리 문제다. 하지만 원칙은 같다. secret이 source code, image layer, repository, terminal screenshot, log, issue에 남으면 공격자는 복잡한 취약점을 찾지 않고도 내부 시스템으로 들어갈 수 있다.
+
+| 사고 쟁점 | Day 4에서 연결할 원칙 |
+|---|---|
+| GitHub 자격증명 노출 가능성 | repository에는 실제 `.env`, access key, token을 올리지 않는다. |
+| AWS access key 폐기/교체 | 노출이 의심되면 값을 숨기는 것이 아니라 즉시 revoke/rotate한다. |
+| 소스코드 하드코딩 우려 | credential은 코드 상수가 아니라 env, secret manager, CI/CD secret으로 주입한다. |
+| 내부 시스템 직접 접근 정황 | credential 하나가 DB, storage, admin API 등 넓은 권한으로 이어지지 않게 least privilege를 적용한다. |
+| 사고 후 원인 추적 어려움 | 누가 어떤 secret을 어디서 사용했는지 audit log와 runbook으로 남긴다. |
+
+수업에서는 AWS key를 만들지 않는다. 대신 `DB_PASSWORD` 예시를 통해 같은 습관을 훈련한다. 실습 값이라도 공개 출력에 그대로 남기지 않고, 실제 운영 secret이라면 애초에 repository와 image에 들어가지 않게 설계한다.
+
 공유할 수 있는 파일은 보통 값이 비어 있거나 placeholder만 있는 예시 파일이다.
 
 ```dotenv
@@ -229,6 +244,12 @@ DB_PASSWORD=***masked***
 | env file은 공유 가능한가 | `.env.example`과 `.env` 구분 | example만 공유, 실제 값은 local |
 | env file 수정이 언제 반영되는가 | container 재생성 후 확인 | 기존 container에는 자동 반영되지 않음 |
 | image와 runtime config를 구분하는가 | 같은 image를 다른 env로 실행 | image는 같고 실행 조건만 달라짐 |
+| credential 사고가 나면 무엇을 하는가 | key 위치, 노출 범위, 사용 로그 확인 | masking이 아니라 revoke/rotate와 권한 축소가 필요함 |
+
+## 참고 사례 링크
+- 보안뉴스, "티빙 사태, DB 유출보다 깃허브에 주목할 이유": https://m.boannews.com/html/detail.html?idx=144054
+- 이데일리, "티빙 해킹, 단순 정보유출 넘어 클라우드 계정 관리 논란으로 확산": https://v.daum.net/v/Y2xTjfMVDp
+- AWS 기술 블로그, "인터넷에 노출된 자격증명 탐지하기": https://aws.amazon.com/ko/blogs/tech/detect-exposed-security-credential/
 
 ## 다음 연결
 다음 교시는 container를 실행하고 logs와 HTTP 응답을 분리해 정상 여부를 판단한다.

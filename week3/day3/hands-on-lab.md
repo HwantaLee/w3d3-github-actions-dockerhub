@@ -1,65 +1,79 @@
-# Week 3 Day 3 Hands-on Lab: MSA 운영 Evidence
-
-## 목적
-이 문서는 Day 3 교시별 실습을 하나의 실행 흐름으로 묶는다. 표준 실습 앱은 `week3/day1/labs/msa-demo`에 있으며, 모든 실습은 실행, 확인, 장애 재현, 복구, cleanup 기준을 남기는 방식으로 진행한다.
+# Week 3 Day 3 Hands-on Lab: GitHub Flow와 PR CI Gate
 
 ## 공통 준비
 ```bash
-cd week3/day1/labs/msa-demo
-docker compose version
-docker compose config
+git status
+git switch -c feature/week3-ci-gate
 ```
 
-## 실행
+## branch와 PR 흐름
 ```bash
-docker compose up --build -d
-docker compose ps
-curl -s http://localhost:18083/api/status
+git add week3/README.md
+git commit -m "docs: update week3 operating flow"
+git push -u origin feature/week3-ci-gate
 ```
 
-## 로그 확인
+GitHub에서 PR을 만들고 reviewer, status check, merge 방식이 어디에 표시되는지 확인한다.
+
+## merge/rebase/revert 실습 기준
+| 작업 | 확인할 것 |
+|---|---|
+| merge commit | 이력이 분기와 합류를 그대로 보여주는지 |
+| squash merge | 여러 commit이 하나로 정리되는지 |
+| rebase | 내 branch의 base가 최신 main으로 이동하는지 |
+| revert | 공유된 commit을 새 commit으로 되돌리는지 |
+
+## GitHub Actions CI gate 예시
+샘플 workflow는 `week3/day3/labs/github-actions/ci.yml`에 있다. 실제 repository에서 테스트할 때는 아래처럼 복사한다.
+
 ```bash
-docker compose logs --tail=60 frontend
-docker compose logs --tail=60 api
-docker compose logs --tail=60 worker
-docker compose logs --tail=60 db
+mkdir -p .github/workflows
+cp week3/day3/labs/github-actions/ci.yml .github/workflows/week3-ci.yml
+git add .github/workflows/week3-ci.yml
+git commit -m "ci: add week3 pull request gate"
+git push
 ```
 
-## 장애 Drill
-| Drill | 명령 또는 변경 | 관찰할 것 | 복구 |
-|---|---|---|---|
-| API 중지 | `docker compose stop api` | frontend의 API 오류, worker 실패 로그 | `docker compose start api` |
-| DB host 오류 | `.env`의 DB_HOST를 틀린 값으로 변경 후 재실행 | api health degraded | 값 복구 후 `docker compose up -d --build api` |
-| worker 중지 | `docker compose stop worker` | 사용자 화면은 유지되지만 background 처리 로그 중단 | `docker compose start worker` |
-| frontend port 충돌 | 다른 프로세스가 18083 사용 | compose up 실패 | host port 변경 또는 기존 프로세스 정리 |
+workflow 구조는 다음 형태를 기준으로 읽는다.
 
-## Cleanup
-```bash
-docker compose down
-docker compose down -v
+```yaml
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show repository
+        run: pwd && ls
+      - name: Validate Week 3 markdown exists
+        run: |
+          test -f week3/README.md
+          test -f week3/day3/hands-on-lab.md
 ```
 
-`down -v`는 실습 데이터 volume까지 지운다. 실제 운영 데이터에는 신중하게 사용한다.
+## 실패 로그 만들기
+CI gate의 의미는 실패했을 때 더 잘 보인다. `test -f week3/not-exists.md`처럼 존재하지 않는 파일을 잠깐 넣어 실패시키고, Actions log에서 어느 step이 실패했는지 확인한다. 확인 후 정상 조건으로 되돌린다.
 
 ## 제출 Evidence
 ```markdown
-# Day 3 MSA Lab Evidence
+# Day 3 GitHub Evidence
 
-## Run
-- command:
-- service status:
-- URL checked:
+## Branch strategy
+- Selected strategy:
+- Why:
 
-## Failure drill
-- symptom:
-- command/change:
-- logs observed:
-- recovery:
-- prevention note:
+## PR gate
+- PR URL:
+- Status check result:
+- Failed log, if any:
 
-## Kubernetes readiness
-- Which service becomes Deployment?
-- Which config becomes ConfigMap?
-- Which sensitive value becomes Secret?
-- Which entrypoint becomes Service or Ingress?
+## History operation
+- merge/rebase/revert/tag command:
+- Before:
+- After:
+- Risk note:
 ```
