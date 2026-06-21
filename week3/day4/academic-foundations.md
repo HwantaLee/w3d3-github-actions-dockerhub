@@ -1,21 +1,17 @@
-# Week 3 Day 4: Academic And Official Foundations
+# Week 3 Day4 Academic Foundations
 
-이 문서는 Day 4 수업 내용을 공식 문서와 현업 기준에 연결한다. 수업 중에는 링크 자체보다 어떤 판단 기준을 가져오는지가 중요하다.
+## 수업 기준
+Day 4는 바로 YAML부터 치지 않는다. Kubernetes가 왜 등장했고, 현업에서 왜 많이 쓰이며, kind를 왜 실습 도구로 선택하는지 설명한 뒤 WSL/macOS 설치와 cluster 생성을 진행한다.
 
-## Official References
-| Topic | Reference | 확인할 키워드 |
+## 공식/현업 참고 자료
+| 자료 | URL | 연결 포인트 |
 |---|---|---|
-| Kubernetes Concepts | https://kubernetes.io/docs/concepts/ | cluster, node, control plane, workload |
-| Kubernetes Components | https://kubernetes.io/docs/concepts/overview/components/ | kube-apiserver, kubelet, container runtime |
-| kubectl Cheat Sheet | https://kubernetes.io/docs/reference/kubectl/quick-reference/ | get, describe, logs, exec |
-| kind Quick Start | https://kind.sigs.k8s.io/docs/user/quick-start/ | Docker, create cluster, node |
-| k3s Docs | https://docs.k3s.io/ | lightweight Kubernetes, edge, server |
+| Kubernetes Concepts | https://kubernetes.io/docs/concepts/ | 수업에서 확인할 키워드 |
+| kind Quick Start | https://kind.sigs.k8s.io/docs/user/quick-start/ | 수업에서 확인할 키워드 |
+| k3s Docs | https://docs.k3s.io/ | 수업에서 확인할 키워드 |
 
-
-## 수업 적용 기준
-| 기준 | 수업에서의 사용 |
-|---|---|
-| Evidence first | 명령을 실행한 뒤 상태, 로그, 이벤트, PR check 결과를 근거로 판단한다. |
-| Small reversible change | cluster, namespace, manifest를 작고 되돌릴 수 있는 단위로 다룬다. |
-| Shared contract | Kubernetes manifest와 kubectl evidence는 팀이 공유하는 운영 계약이다. |
-| Failure readable | 실패는 숨길 대상이 아니라 다음 행동을 결정하는 신호다. |
+## 수업 적용 원칙
+- 공식 문서를 명령 암기 자료로 쓰지 않고, 어떤 상태를 확인하는 기준인지 읽는다.
+- 정상/비정상 판단은 화면 인상보다 command output, log, event, health response로 남긴다.
+- 보안 값과 token은 evidence에 그대로 남기지 않는다.
+- 8교시 배움일기에는 그날 확인한 증거와 다음 수업 질문을 남긴다.

@@ -1,79 +1,45 @@
-# Week 3 Day 3 Hands-on Lab: GitHub Flow와 PR CI Gate
+# Week 3 Day 3 Hands-on Lab: GitHub 협업과 CI Gate
 
-## 공통 준비
+## Phase 1. Branch 시작
 ```bash
 git status
-git switch -c feature/week3-ci-gate
+git switch -c practice/github-ci-gate
 ```
 
-## branch와 PR 흐름
+## Phase 2. 작은 변경 만들기
 ```bash
-git add week3/README.md
-git commit -m "docs: update week3 operating flow"
-git push -u origin feature/week3-ci-gate
+mkdir -p practice/week3-ci
+printf 'console.log("ci gate ok")\n' > practice/week3-ci/app.js
+printf '{"scripts":{"test":"node practice/week3-ci/app.js"}}\n' > package.practice.json
 ```
 
-GitHub에서 PR을 만들고 reviewer, status check, merge 방식이 어디에 표시되는지 확인한다.
-
-## merge/rebase/revert 실습 기준
-| 작업 | 확인할 것 |
-|---|---|
-| merge commit | 이력이 분기와 합류를 그대로 보여주는지 |
-| squash merge | 여러 commit이 하나로 정리되는지 |
-| rebase | 내 branch의 base가 최신 main으로 이동하는지 |
-| revert | 공유된 commit을 새 commit으로 되돌리는지 |
-
-## GitHub Actions CI gate 예시
-샘플 workflow는 `week3/day3/labs/github-actions/ci.yml`에 있다. 실제 repository에서 테스트할 때는 아래처럼 복사한다.
-
+## Phase 3. Workflow 읽기
 ```bash
-mkdir -p .github/workflows
-cp week3/day3/labs/github-actions/ci.yml .github/workflows/week3-ci.yml
-git add .github/workflows/week3-ci.yml
-git commit -m "ci: add week3 pull request gate"
-git push
+cat week3/day3/labs/github-actions/ci.yml
 ```
 
-workflow 구조는 다음 형태를 기준으로 읽는다.
+확인할 것: `on`, `jobs`, `runs-on`, `steps`, `checkout`, test/build command.
 
-```yaml
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [ main ]
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Show repository
-        run: pwd && ls
-      - name: Validate Week 3 markdown exists
-        run: |
-          test -f week3/README.md
-          test -f week3/day3/hands-on-lab.md
+## Phase 4. Git evidence
+```bash
+git status
+git add practice/week3-ci package.practice.json
+git commit -m "practice ci gate"
+git log --oneline -3
 ```
 
-## 실패 로그 만들기
-CI gate의 의미는 실패했을 때 더 잘 보인다. `test -f week3/not-exists.md`처럼 존재하지 않는 파일을 잠깐 넣어 실패시키고, Actions log에서 어느 step이 실패했는지 확인한다. 확인 후 정상 조건으로 되돌린다.
-
-## 제출 Evidence
-```markdown
-# Day 3 GitHub Evidence
-
-## Branch strategy
-- Selected strategy:
-- Why:
-
-## PR gate
-- PR URL:
-- Status check result:
-- Failed log, if any:
-
-## History operation
-- merge/rebase/revert/tag command:
-- Before:
-- After:
-- Risk note:
+## Phase 5. Rebase/Revert 개념 확인
+```bash
+git branch --show-current
+git log --oneline --graph --decorate -5
 ```
+
+실제 공유 branch에서 `reset --hard`를 사용하지 않는다. 되돌리기는 `git revert`를 기준으로 설명한다.
+
+## Phase 6. Tag 기준 정리
+```bash
+git tag --list
+# 예시만 설명: git tag v0.1.0
+```
+
+App version, Git tag, Docker image tag가 언제 같은 값이어야 하는지 메모한다.

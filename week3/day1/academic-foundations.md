@@ -1,26 +1,17 @@
-# Week 3 Day 1 Academic And Workforce Foundations
+# Week 3 Day1 Academic Foundations
 
-## 기준 연결
-| 기준 | Day 1 적용 | 학생 evidence |
+## 수업 기준
+Day 1은 Week 2 Compose 경험을 MSA 운영 토폴로지로 확장한다. 표준 `msa-demo` 앱을 기준으로 frontend, api, worker, db의 역할과 요청 흐름을 읽고 실제로 실행한다.
+
+## 공식/현업 참고 자료
+| 자료 | URL | 연결 포인트 |
 |---|---|---|
-| ABET problem analysis | 서비스 의존성과 장애 원인 분류 | topology/failure table |
-| ABET communication | 개발팀과 운영팀이 공유할 장애 리포트 작성 | handoff note |
-| CS2023 Knowledge | distributed systems, networking, reliability 개념 | service map |
-| CS2023 Skill | Compose 실행, 로그 확인, 설정 변경 | command evidence |
-| NIST NICE | credential hygiene, least privilege, operational monitoring | config/security note |
-| SRE practice | cascading failure, postmortem, health check | RCA note |
+| Microservices on AWS | https://docs.aws.amazon.com/whitepapers/latest/microservices-on-aws/microservices.html | 수업에서 확인할 키워드 |
+| Docker Compose services | https://docs.docker.com/reference/compose-file/services/ | 수업에서 확인할 키워드 |
+| Twelve-Factor App | https://12factor.net/ | 수업에서 확인할 키워드 |
 
-## 핵심 판단
-MSA 학습의 핵심은 서비스를 많이 쪼개는 것이 아니라, 쪼갠 서비스의 실행 조건과 장애 영향을 설명할 수 있는가이다. 배포 단위가 늘면 팀 독립성과 확장성의 가능성이 생기지만, 네트워크 실패와 로그 분산, 설정 관리 비용도 늘어난다.
-
-## Official References
-| Topic | Reference | 확인할 키워드 |
-|---|---|---|
-| Microservices on AWS | https://docs.aws.amazon.com/whitepapers/latest/microservices-on-aws/microservices.html | service, API, database, deployment |
-| AWS Microservices | https://aws.amazon.com/microservices/ | independent component, business capability |
-| Martin Fowler Microservices Guide | https://martinfowler.com/microservices/ | independently deployable, lightweight communication |
-| Docker Compose | https://docs.docker.com/compose/ | services, networks, depends_on, healthcheck |
-| Compose services reference | https://docs.docker.com/reference/compose-file/services/ | healthcheck, depends_on, environment |
-| Google SRE Cascading Failures | https://sre.google/sre-book/addressing-cascading-failures/ | failure propagation, overload, mitigation |
-| OpenTelemetry Concepts | https://opentelemetry.io/docs/concepts/ | traces, metrics, logs, observability |
-| Twelve-Factor App | https://12factor.net/ | config, backing services, logs |
+## 수업 적용 원칙
+- 공식 문서를 명령 암기 자료로 쓰지 않고, 어떤 상태를 확인하는 기준인지 읽는다.
+- 정상/비정상 판단은 화면 인상보다 command output, log, event, health response로 남긴다.
+- 보안 값과 token은 evidence에 그대로 남기지 않는다.
+- 8교시 배움일기에는 그날 확인한 증거와 다음 수업 질문을 남긴다.
