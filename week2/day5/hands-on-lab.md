@@ -11,6 +11,16 @@ docker compose up -d
 docker compose ps
 ```
 
+`docker compose config`에서 `networks`를 먼저 확인한다. Day 5 template은 default network 하나로 뭉치지 않고, 역할에 따라 다음 영역을 나눈다.
+
+| Network 이름 | 의미 | 대표 service |
+|---|---|---|
+| `public_net` | browser/curl이 들어오는 외부 진입 영역 | `frontend`, `gateway`, `proxy`, `api` |
+| `app_net` | gateway/frontend 뒤의 application 통신 영역 | `catalog-api`, `identity-api`, `payment-api` |
+| `cache_net` | Redis cache 접근 영역 | `redis`, `cache-writer` |
+| `queue_net` | producer/queue/worker 통신 영역 | `message-api`, `queue`, `worker` |
+| `data_net` | DB와 volume이 있는 stateful 영역 | `db`, `db-checker` |
+
 확인 후 정리한다.
 
 ```bash

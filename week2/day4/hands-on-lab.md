@@ -179,6 +179,75 @@ FEATURE_FLAG=on
 DB_PASSWORD=***masked***
 ```
 
+## Phase D2: HTTP 200과 JSON contract 분리
+이번 phase는 backend가 `200 OK`를 반환해도 frontend 기능이 실패할 수 있음을 확인한다.
+
+```bash
+docker rm -f paperclip-day4-api paperclip-day4-frontend || true
+docker run -d --name paperclip-day4-api \
+  -p 18088:8080 \
+  -e RESPONSE_MODE=text \
+  -v "$PWD/week2/day4/labs/http-json-state/backend:/app:ro" \
+  -w /app \
+  python:3.12-alpine python app.py
+
+docker run -d --name paperclip-day4-frontend \
+  -p 18087:80 \
+  -v "$PWD/week2/day4/labs/http-json-state/frontend:/usr/share/nginx/html:ro" \
+  nginx:1.27-alpine
+```
+
+```bash
+curl -i http://localhost:18088/health
+curl -i http://localhost:18088/api/items
+docker logs paperclip-day4-api --tail 20
+```
+
+Expected:
+
+```text
+HTTP/1.0 200 OK
+OK
+HTTP/1.0 200 OK
+OK
+path=/api/items mode=text
+```
+
+브라우저에서 확인한다.
+
+```text
+http://localhost:18087/ok.html
+http://localhost:18087/items.html
+```
+
+`ok.html`은 정상처럼 보이고, `items.html`은 JSON parse failed를 보여준다. backend log에 error가 없어도 frontend 기능은 실패한 상태다.
+
+복구한다.
+
+```bash
+docker rm -f paperclip-day4-api
+docker run -d --name paperclip-day4-api \
+  -p 18088:8080 \
+  -e RESPONSE_MODE=json \
+  -v "$PWD/week2/day4/labs/http-json-state/backend:/app:ro" \
+  -w /app \
+  python:3.12-alpine python app.py
+
+curl -i http://localhost:18088/api/items
+docker logs paperclip-day4-api --tail 20
+```
+
+Expected:
+
+```text
+HTTP/1.0 200 OK
+Content-Type: application/json
+{"items": ...}
+path=/api/items mode=json
+```
+
+`items.html`을 새로고침해서 list가 렌더링되는지 확인한다.
+
 ## Phase E: inspect와 exec
 ```bash
 docker inspect paperclip-day4-nginx --format 'Ports={{json .NetworkSettings.Ports}}'
@@ -416,7 +485,7 @@ docker system df
 Cleanup:
 
 ```bash
-docker rm -f paperclip-day4-nginx paperclip-day4-log-env paperclip-day4-env-inspect paperclip-day4-pg-ok paperclip-day4-pg-missing-env paperclip-day4-net-web paperclip-day4-restart-missing-env paperclip-day4-pg-volume || true
+docker rm -f paperclip-day4-nginx paperclip-day4-log-env paperclip-day4-env-inspect paperclip-day4-api paperclip-day4-frontend paperclip-day4-pg-ok paperclip-day4-pg-missing-env paperclip-day4-net-web paperclip-day4-restart-missing-env paperclip-day4-pg-volume || true
 docker network rm paperclip-day4-net-a paperclip-day4-net-b || true
 rm -f week2/day4/labs/env-report/.env week2/day4/labs/env-report/.env.dev week2/day4/labs/env-report/.env.staging week2/day4/labs/env-report/.env.prod
 # data reset이 필요할 때만 실행
@@ -451,6 +520,7 @@ secret 값이 남은 출력/screenshot 여부:
 | env 주입 | `-e` 또는 `--env-file` 실행 결과 | image rebuild 없이 runtime config가 바뀌었다. |
 | secret masking | `DB_PASSWORD=***masked***` 출력 | 실제 secret 값을 기록하지 않았다. |
 | HTTP 확인 | `curl -I http://localhost:18084` | `Up`과 서비스 정상 응답을 구분했다. |
+| JSON contract | `/api/items`와 frontend list | 200 OK와 frontend 정상 렌더링을 구분했다. |
 | logs | `docker logs ... --tail` | startup/access/error 중 무엇을 봤는지 적는다. |
 | inspect | port/env/restart/mount 중 선택 field | 전체 JSON이 아니라 필요한 field만 남겼다. |
 | exec | filesystem/process/env 중 하나 | container 내부 관찰 결과를 남겼다. |

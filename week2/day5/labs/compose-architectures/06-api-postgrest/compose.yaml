@@ -10,6 +10,9 @@ services:
       PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:18090
     depends_on:
       - db
+    networks:
+      - public_net
+      - data_net
 
   db:
     image: postgres:16
@@ -19,6 +22,8 @@ services:
     volumes:
       - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
 
   db-checker:
     image: postgres:16
@@ -31,6 +36,12 @@ services:
         until pg_isready -h db -U postgres -d app; do sleep 1; done
         psql postgresql://postgres:postgres@db:5432/app -c "SELECT id, title, status FROM api.tasks ORDER BY id;"
         tail -f /dev/null
+    networks:
+      - data_net
 
 volumes:
   pgdata:
+
+networks:
+  public_net:
+  data_net:

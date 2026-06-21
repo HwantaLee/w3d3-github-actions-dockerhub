@@ -31,6 +31,53 @@ docker compose ps
 docker compose logs --tail 80
 ```
 
+`docker compose config`는 실행 전에 Compose 파일을 정규화해서 보여준다. 강의에서는 이 결과를 먼저 보고 “이 서비스가 어떤 image로 뜨는지, 어떤 port를 host에 공개하는지, 어떤 volume을 붙이는지”를 확인한다.
+
+```yaml
+services:
+  web:
+    image: nginx:1.27-alpine       # 어떤 container image로 실행할지 결정한다.
+    ports:
+      - "18080:80"                 # host 18080 -> container 80으로 공개한다.
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+                                   # host의 ./html을 container 안 nginx 경로에 읽기 전용으로 붙인다.
+    depends_on:
+      - api                        # api service를 먼저 시작하라는 실행 순서 힌트다.
+    networks:
+      - public_net                 # 외부 traffic을 받는 영역
+      - app_net                    # backend service와 통신하는 영역
+
+  api:
+    image: node:20-alpine
+    environment:
+      DB_HOST: db                  # container끼리는 localhost가 아니라 service name으로 만난다.
+      DB_PORT: "5432"
+    networks:
+      - app_net
+      - data_net
+
+  db:
+    image: postgres:16
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+                                   # DB data는 container가 아니라 named volume에 보존한다.
+    networks:
+      - data_net                   # DB는 data 영역에만 둔다.
+
+volumes:
+  pgdata:                          # docker compose down만으로는 지워지지 않는다.
+
+networks:
+  public_net:
+  app_net:
+  data_net:
+```
+
+이 코드는 암기 대상이 아니라 독해 대상이다. 학생은 `ports`를 보면 외부 진입점을, `environment`와 service name을 보면 내부 연결을, `volumes`를 보면 data lifecycle을 설명할 수 있어야 한다.
+
+네트워크는 “보안 장벽” 하나로 과장하지 않는다. Compose network는 로컬 실습에서 service가 어느 영역에 속하는지 보여주는 구조화 도구다. 운영에서는 firewall, security group, Kubernetes NetworkPolicy, IAM 같은 통제와 함께 생각해야 한다.
+
 서비스별 확인은 architecture마다 다르다.
 
 | 서비스 유형 | 확인 예시 |

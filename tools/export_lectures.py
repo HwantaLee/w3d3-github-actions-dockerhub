@@ -292,8 +292,15 @@ def render_pdf(markdown_file: Path, output_file: Path, repo_root: Path, base: st
         )
 
 
+PDF_EXCLUDED_STEMS = {"README", "academic-foundations", "hands-on-lab"}
+
+
+def should_render_pdf(markdown_file: Path) -> bool:
+    return markdown_file.stem not in PDF_EXCLUDED_STEMS
+
+
 def pdf_sources(out_root: Path) -> list[Path]:
-    return sorted(path for path in out_root.rglob("*.md") if path.is_file())
+    return sorted(path for path in out_root.rglob("*.md") if path.is_file() and should_render_pdf(path))
 
 
 def render_pdfs(markdown_files: list[Path], repo_root: Path, base: str, chrome: str) -> int:
@@ -514,9 +521,7 @@ def main() -> int:
     if not sources:
         raise SystemExit("No markdown files found.")
 
-    if out_root.exists():
-        shutil.rmtree(out_root)
-    out_root.mkdir(parents=True)
+    out_root.mkdir(parents=True, exist_ok=True)
     render = not args.no_render_mermaid
     if render and mermaid_root.exists():
         shutil.rmtree(mermaid_root)

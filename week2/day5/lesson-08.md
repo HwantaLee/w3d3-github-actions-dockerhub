@@ -18,6 +18,56 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+Week 3 MSA로 넘어가기 전, browser traffic이 gateway를 거쳐 내부 API와 DB로 이어지는 최소 구조를 코드로 읽는다.
+
+```yaml
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "18091:80"                 # browser가 접근하는 유일한 외부 진입점
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+                                   # 정적 frontend와 /api/ reverse proxy 설정을 함께 제공
+    depends_on:
+      - api
+    networks:
+      - public_net                 # browser traffic
+      - app_net                    # internal API routing
+
+  api:
+    image: postgrest/postgrest:v12.2.8
+    environment:
+      PGRST_DB_URI: postgres://app_user:app_password@db:5432/app
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:18091/api
+                                   # 외부 기준 URL은 gateway path를 사용한다.
+    depends_on:
+      - db
+    networks:
+      - app_net
+      - data_net
+
+  db:
+    image: postgres:16
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
+
+volumes:
+  pgdata:
+
+networks:
+  public_net:
+  app_net:
+  data_net:
+```
+
+이 코드는 “frontend가 API container에 직접 붙는다”가 아니라 “browser는 gateway로 들어오고 gateway가 내부 API로 넘긴다”는 구조를 보여준다. Kubernetes로 옮기면 gateway는 Ingress/Service, API는 Deployment/Service, DB는 Stateful한 backing service 논의로 이어진다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

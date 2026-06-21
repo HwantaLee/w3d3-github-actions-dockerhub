@@ -18,6 +18,60 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+frontend 설정 API와 cache service가 app 밖으로 분리된 구조를 코드에서 읽는다.
+
+```yaml
+services:
+  web:
+    image: nginx:1.27-alpine
+    ports:
+      - "18088:80"                 # preview web 화면
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+    depends_on:
+      - redis
+      - config-api
+    networks:
+      - public_net
+      - app_net
+
+  config-api:
+    image: node:20-alpine
+    command: ["node", "server.js"]
+    ports:
+      - "18103:3000"               # runtime config 확인용 API
+    environment:
+      API_BASE_URL: http://localhost:18101
+      FEATURE_NEW_CHECKOUT: "true"
+      FEATURE_AI_REVIEW: "false"   # 기능 플래그는 image build가 아니라 runtime config로 바꾼다.
+    networks:
+      - public_net                 # 강의에서 curl로 직접 확인하기 위해 공개
+      - app_net
+      - cache_net                  # backend가 cache 영역에 접근할 수 있는 구조
+
+  redis:
+    image: redis:7-alpine          # cache는 app process 내부 변수가 아니라 별도 service다.
+    networks:
+      - cache_net
+
+  cache-writer:
+    image: redis:7-alpine
+    depends_on:
+      - redis
+    command: ["sh", "-c", "redis-cli -h redis SET compose:cache hit-from-cache-writer"]
+                                   # Redis도 localhost가 아니라 service name redis로 접근한다.
+    networks:
+      - cache_net
+
+networks:
+  public_net:
+  app_net:
+  cache_net:
+```
+
+이 구조는 나중에 Kubernetes ConfigMap/Secret, Terraform variable, 환경별 `.env` 분리로 이어진다. “설정을 image 안에 굽지 않는다”는 원칙이 핵심이다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

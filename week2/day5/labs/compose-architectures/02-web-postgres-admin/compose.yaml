@@ -9,6 +9,9 @@ services:
     depends_on:
       - identity-api
       - payment-api
+    networks:
+      - public_net
+      - app_net
 
   identity-api:
     image: node:20-alpine
@@ -18,6 +21,8 @@ services:
       - ./apps/identity-api:/app:ro
     environment:
       PORT: 3000
+    networks:
+      - app_net
 
   payment-api:
     image: node:20-alpine
@@ -27,6 +32,8 @@ services:
       - ./apps/payment-api:/app:ro
     environment:
       PORT: 3000
+    networks:
+      - app_net
 
   db:
     image: postgres:16
@@ -35,6 +42,8 @@ services:
       POSTGRES_DB: app
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
 
   db-checker:
     image: postgres:16
@@ -49,6 +58,8 @@ services:
         psql postgresql://postgres:postgres@db:5432/app -c "INSERT INTO admin_checks(note) VALUES ('admin template db ready');"
         psql postgresql://postgres:postgres@db:5432/app -c "SELECT id, note FROM admin_checks ORDER BY id DESC LIMIT 3;"
         tail -f /dev/null
+    networks:
+      - data_net
 
   adminer:
     image: adminer:4
@@ -56,6 +67,14 @@ services:
       - "18087:8080"
     depends_on:
       - db
+    networks:
+      - public_net
+      - data_net
 
 volumes:
   pgdata:
+
+networks:
+  public_net:
+  app_net:
+  data_net:

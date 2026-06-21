@@ -18,6 +18,51 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+API가 DB table을 REST endpoint로 노출할 때 connection string, schema, role이 어디에 들어가는지 확인한다.
+
+```yaml
+services:
+  api:
+    image: postgrest/postgrest:v12.2.8
+    ports:
+      - "18090:3000"               # host에서 REST API를 확인하는 공개 port
+    environment:
+      PGRST_DB_URI: postgres://app_user:app_password@db:5432/app
+                                   # DB host는 Compose service name db다.
+      PGRST_DB_SCHEMAS: api        # REST로 노출할 schema
+      PGRST_DB_ANON_ROLE: web_anon # 익명 요청에 부여할 DB role
+    depends_on:
+      - db
+    networks:
+      - public_net                 # REST API 확인용 host 공개 영역
+      - data_net                   # DB 연결 영역
+
+  db:
+    image: postgres:16
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+                                   # table, role, sample data를 초기화한다.
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
+
+  db-checker:
+    image: postgres:16
+    depends_on:
+      - db
+    command: ["sh", "-c", "until pg_isready -h db -U postgres -d app; do sleep 1; done"]
+                                   # DB 준비 상태와 초기 데이터 확인용 보조 service
+    networks:
+      - data_net
+
+networks:
+  public_net:
+  data_net:
+```
+
+PostgREST container가 running이어도 schema나 role이 틀리면 API는 정상 응답을 주지 못한다. 그래서 `curl`, `logs api`, `logs db-checker`를 함께 본다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

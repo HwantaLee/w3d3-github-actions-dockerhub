@@ -144,6 +144,12 @@ docker compose down
 ```
 
 ## 구름 EXP 배움일기
+- `Up`과 정상 응답을 구분한 순간
+- logs/inspect/exec/stats 중 가장 유용했던 명령
+- 내가 재현한 실패와 첫 확인 명령
+- cleanup에서 지우면 안 된다고 판단한 것
+- Day 5 Compose로 옮기면 편해질 option
+- Kubernetes/Terraform에서 다시 만날 것 같은 설정 분리 질문
 - `docker stats`와 Prometheus query가 어떻게 다르게 보였는가
 - log와 metric 중 원인 힌트가 더 빨리 보인 쪽은 무엇인가
 - Grafana 화면이 있어도 결국 어떤 command/output을 같이 봐야 하는가

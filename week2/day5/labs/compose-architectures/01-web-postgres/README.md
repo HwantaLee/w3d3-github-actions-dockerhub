@@ -4,6 +4,13 @@
 
 커머스 카탈로그 template이다. `frontend`는 host port로 공개되고, `catalog-api`는 products table을 REST API로 노출한다. `db`는 Compose network 내부 service name으로만 접근한다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `frontend` | 브라우저/host traffic 진입 |
+| `app_net` | `frontend`, `catalog-api` | frontend와 API 사이 application 통신 |
+| `data_net` | `catalog-api`, `db`, `db-checker` | DB 접근과 검증 전용 |
+
 ## Run
 ```bash
 docker compose config

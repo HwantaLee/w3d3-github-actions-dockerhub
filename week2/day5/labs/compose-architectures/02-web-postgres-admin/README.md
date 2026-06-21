@@ -4,6 +4,13 @@
 
 백엔드 서비스 경계 template이다. `gateway`는 외부 진입점이고, `identity-api`와 `payment-api`는 내부 service로 분리된다. `adminer`는 host port로 공개되지만 PostgreSQL은 host에 직접 공개하지 않는다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `gateway`, `adminer` | 외부에서 접근 가능한 진입점 |
+| `app_net` | `gateway`, `identity-api`, `payment-api` | gateway가 내부 API로 routing |
+| `data_net` | `adminer`, `db`, `db-checker` | DB 관리/검증 영역 |
+
 ## Run
 ```bash
 docker compose config

@@ -18,6 +18,47 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+외부에 공개되는 service와 내부 upstream service를 Compose 코드에서 구분한다.
+
+```yaml
+services:
+  proxy:
+    image: nginx:1.27-alpine
+    ports:
+      - "18089:80"                 # 외부 traffic은 proxy로만 들어온다.
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+                                   # /a/ -> web-a, /b/ -> web-b routing 규칙
+    depends_on:
+      - web-a
+      - web-b
+    networks:
+      - public_net                 # 외부 traffic 영역
+      - app_net                    # 내부 upstream 영역
+
+  web-a:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./web-a:/usr/share/nginx/html:ro
+                                   # ports가 없으므로 host에서 직접 접근하지 않는다.
+    networks:
+      - app_net
+
+  web-b:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./web-b:/usr/share/nginx/html:ro
+    networks:
+      - app_net
+
+networks:
+  public_net:
+  app_net:
+```
+
+`web-a`, `web-b`에 `ports`가 없는 것이 설계 의도다. gateway/proxy가 살아 있어도 특정 upstream이 죽으면 해당 path만 실패한다는 것을 failure drill에서 확인한다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

@@ -4,6 +4,13 @@
 
 비동기 처리 template이다. `message-api`는 HTTP 요청을 받아 Redis queue에 job을 넣고, `worker`는 queue에서 job을 꺼내 로그로 보여준다. `db`는 처리 결과를 저장할 수 있는 stateful backing service 역할이다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `message-api` | 외부 HTTP producer 진입점 |
+| `queue_net` | `message-api`, `queue`, `worker` | Redis queue와 worker 처리 영역 |
+| `data_net` | `worker`, `db` | 처리 결과 저장 확장 영역 |
+
 ## Run
 ```bash
 docker compose config

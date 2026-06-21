@@ -4,6 +4,12 @@
 
 PostgreSQL table을 REST API로 노출하는 Compose template이다. 앱 코드를 직접 작성하지 않아도 `api` service가 `db` service name으로 PostgreSQL에 연결해야만 API가 응답한다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `api` | host에서 REST API 확인 |
+| `data_net` | `api`, `db`, `db-checker` | DB connection/schema/role 검증 영역 |
+
 ## Run
 ```bash
 docker compose config

@@ -12,9 +12,14 @@ services:
       REDIS_HOST: queue
     depends_on:
       - queue
+    networks:
+      - public_net
+      - queue_net
 
   queue:
     image: redis:7-alpine
+    networks:
+      - queue_net
 
   worker:
     image: redis:7-alpine
@@ -26,6 +31,9 @@ services:
       - |
         echo "worker waiting for jobs"
         while true; do redis-cli -h queue BRPOP jobs 0; done
+    networks:
+      - queue_net
+      - data_net
 
   db:
     image: postgres:16
@@ -34,6 +42,13 @@ services:
       POSTGRES_DB: jobs
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
 
 volumes:
   pgdata:
+
+networks:
+  public_net:
+  queue_net:
+  data_net:

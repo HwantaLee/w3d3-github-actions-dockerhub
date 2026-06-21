@@ -18,6 +18,69 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+gateway가 외부 진입점을 맡고, identity/payment API는 내부 service로 남는 점을 코드에서 확인한다.
+
+```yaml
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "18086:80"                 # 외부 공개 entrypoint는 gateway 하나로 모은다.
+    volumes:
+      - ./html:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+                                   # /identity/, /payment/ routing 규칙을 nginx에 주입한다.
+    depends_on:
+      - identity-api
+      - payment-api
+    networks:
+      - public_net                 # 외부 요청을 받는 gateway 영역
+      - app_net                    # 내부 API로 routing하는 영역
+
+  identity-api:
+    image: node:20-alpine
+    command: ["node", "server.js"]
+    volumes:
+      - ./apps/identity-api:/app:ro
+    environment:
+      PORT: 3000                  # host에는 공개하지 않고 gateway가 내부 port로 호출한다.
+    networks:
+      - app_net
+
+  payment-api:
+    image: node:20-alpine
+    command: ["node", "server.js"]
+    volumes:
+      - ./apps/payment-api:/app:ro
+    environment:
+      PORT: 3000
+    networks:
+      - app_net
+
+  adminer:
+    image: adminer:4
+    ports:
+      - "18087:8080"               # DB 확인 도구이므로 실습 후 노출을 정리해야 한다.
+    depends_on:
+      - db
+    networks:
+      - public_net                 # 실습용 UI는 host에 공개된다.
+      - data_net                   # DB에는 data 영역으로 접근한다.
+
+  db:
+    image: postgres:16
+    networks:
+      - data_net                   # DB는 gateway/app 영역과 분리한다.
+
+networks:
+  public_net:
+  app_net:
+  data_net:
+```
+
+여기서 중요한 포인트는 `identity-api`, `payment-api`에 `ports`가 없다는 점이다. 사용자는 gateway로만 들어오고, 내부 API는 Compose network 안에서 service name으로만 호출된다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

@@ -18,6 +18,59 @@ docker compose up -d
 docker compose ps
 ```
 
+## compose.yaml 읽기
+HTTP 요청을 받는 producer와 background worker가 직접 연결되지 않고 queue를 사이에 두는 구조를 읽는다.
+
+```yaml
+services:
+  message-api:
+    image: node:20-alpine
+    command: ["node", "server.js"]
+    ports:
+      - "18105:3000"               # 사용자가 호출하는 공개 API
+    environment:
+      REDIS_HOST: queue            # producer는 queue service name으로 Redis에 연결한다.
+    depends_on:
+      - queue
+    networks:
+      - public_net                 # 사용자가 호출하는 HTTP API 영역
+      - queue_net                  # queue에 job을 넣는 내부 영역
+
+  queue:
+    image: redis:7-alpine          # job을 잠시 보관하는 backing service
+    networks:
+      - queue_net
+
+  worker:
+    image: redis:7-alpine
+    depends_on:
+      - queue
+    command:
+      - sh
+      - -c
+      - |
+        echo "worker waiting for jobs"
+        while true; do redis-cli -h queue BRPOP jobs 0; done
+                                   # worker는 HTTP port를 열지 않고 queue에서 job을 꺼낸다.
+    networks:
+      - queue_net
+      - data_net                   # 처리 결과를 DB에 기록하는 확장 구조를 상정한다.
+
+  db:
+    image: postgres:16
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - data_net
+
+networks:
+  public_net:
+  queue_net:
+  data_net:
+```
+
+이 template의 확인 순서는 API 응답 하나로 끝나지 않는다. `curl`로 job을 넣고, `worker logs`로 소비를 보고, 필요하면 Redis queue length와 DB 상태까지 확인한다.
+
 구성:
 
 | Service | 역할 | 공개 범위 |

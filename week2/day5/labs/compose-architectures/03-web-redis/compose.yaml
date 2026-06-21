@@ -8,6 +8,9 @@ services:
     depends_on:
       - redis
       - config-api
+    networks:
+      - public_net
+      - app_net
 
   config-api:
     image: node:20-alpine
@@ -22,9 +25,15 @@ services:
       API_BASE_URL: http://localhost:18101
       FEATURE_NEW_CHECKOUT: "true"
       FEATURE_AI_REVIEW: "false"
+    networks:
+      - public_net
+      - app_net
+      - cache_net
 
   redis:
     image: redis:7-alpine
+    networks:
+      - cache_net
 
   cache-writer:
     image: redis:7-alpine
@@ -39,6 +48,8 @@ services:
           redis-cli -h redis GET compose:cache
           sleep 5
         done
+    networks:
+      - cache_net
 
   redis-cli:
     image: redis:7-alpine
@@ -46,3 +57,10 @@ services:
     depends_on:
       - redis
     command: ["redis-cli", "-h", "redis", "PING"]
+    networks:
+      - cache_net
+
+networks:
+  public_net:
+  app_net:
+  cache_net:

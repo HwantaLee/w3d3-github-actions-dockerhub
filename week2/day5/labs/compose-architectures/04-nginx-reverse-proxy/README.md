@@ -4,6 +4,12 @@
 
 gateway/proxy pattern template이다. `web-a`와 `web-b`는 host port를 직접 공개하지 않고, 외부 traffic은 `proxy`의 `18089`로만 들어온다. proxy 설정은 service name `web-a`, `web-b`를 upstream으로 사용한다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `proxy` | 외부 HTTP 진입점 |
+| `app_net` | `proxy`, `web-a`, `web-b` | proxy와 upstream web service 통신 |
+
 ## Run
 ```bash
 docker compose config

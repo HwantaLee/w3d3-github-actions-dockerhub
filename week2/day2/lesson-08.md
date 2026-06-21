@@ -36,7 +36,7 @@ flowchart TD
   Fail[SELECT 실패] --> Table{table이 있는가}
   Table -->|없음| Schema[table 생성 여부 확인]
   Table -->|있음| Mount{volume target 맞는가}
-  Mount -->|아님| FixMount[/var/lib/postgresql/data로 수정]
+  Mount -->|아님| FixMount["/var/lib/postgresql/data로 수정"]
   Mount -->|맞음| Net{client와 DB가 같은 network인가}
   Net -->|아님| FixNet[--network paperclip-day2-net]
   Net -->|맞음| Host[container name, password, readiness 확인]

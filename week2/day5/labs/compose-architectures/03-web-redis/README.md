@@ -4,6 +4,13 @@
 
 프론트엔드 플랫폼 template이다. `web`은 정적 preview를 제공하고, `config-api`는 API endpoint와 feature flag를 JSON으로 제공한다. `cache-writer`는 Redis service name `redis`로 접속해 값을 반복 기록한다.
 
+## Network areas
+| Network | 포함 service | 의미 |
+|---|---|---|
+| `public_net` | `web`, `config-api` | browser/curl 확인 영역 |
+| `app_net` | `web`, `config-api` | frontend와 config API 영역 |
+| `cache_net` | `config-api`, `redis`, `cache-writer`, `redis-cli` | backend/cache 접근 영역 |
+
 ## Run
 ```bash
 docker compose config
