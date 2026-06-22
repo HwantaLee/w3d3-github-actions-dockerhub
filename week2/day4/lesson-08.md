@@ -177,6 +177,7 @@ curl -G -s 'http://localhost:13100/loki/api/v1/query_range' \
 | WSL/Linux | cAdvisor가 Docker data root를 못 읽음 | `docker info --format '{{.DockerRootDir}}'`로 실제 DockerRootDir을 확인해야 함 |
 | WSL/Docker Desktop | `mkdir /var/lib/docker: read-only file system` | `/var/lib/docker` bind mount source를 만들 수 없는 환경. 기본 실행으로 돌아가고 `host-mount` profile은 선택 처리 |
 | WSL/Linux/macOS | Grafana에서 Prometheus 연결 실패 | datasource URL을 `localhost:19090`이 아니라 `http://prometheus:9090`으로 설정 |
+| WSL/Linux/macOS | `Post "http://localhost:19090/api/v1/query": connect: connection refused` | Grafana가 아직 잘못된 URL을 보고 있음. Data source 편집 화면을 새로 열고 URL을 `http://prometheus:9090`으로 저장 |
 | WSL/Linux/macOS | `port is already allocated` | 이미 실행 중인 container가 host port를 점유한 상태. `docker ps`로 충돌 port를 찾음 |
 | WSL/Linux/macOS | Loki instant query 오류 | log query는 시간 범위가 필요하므로 `query_range`를 사용 |
 | macOS | `date +%s%N`이 동작하지 않음 | BSD `date`와 GNU `date` 옵션 차이 |

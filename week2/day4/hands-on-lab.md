@@ -676,6 +676,7 @@ Troubleshooting:
 | WSL/Linux | cAdvisor가 `/var/lib/docker`를 못 읽음 | `export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"` 후 `docker compose --profile host-mount up -d cadvisor promtail` |
 | WSL/Docker Desktop | `mkdir /var/lib/docker: read-only file system` | 기본 `docker compose up -d`로 돌아가고 `docker compose logs`, `docker stats` 중심으로 진행 |
 | WSL/Linux/macOS | Grafana에서 Prometheus 연결 실패 | Data source URL은 `localhost:19090`이 아니라 `http://prometheus:9090` |
+| WSL/Linux/macOS | `Post "http://localhost:19090/api/v1/query": connect: connection refused` | Grafana가 아직 잘못된 URL을 보고 있음. Data source 편집 화면을 새로 열고 URL을 `http://prometheus:9090`으로 저장 |
 | WSL/Linux/macOS | `port is already allocated` | `docker ps`로 점유 port 확인. 이 lab은 cAdvisor `18086` 사용 |
 | WSL/Linux/macOS | Loki instant query 오류 | `/loki/api/v1/query_range` 사용 |
 | macOS | `date +%s%N`이 nanosecond로 안 나옴 | macOS용 `date -u -v-5M` 예시 사용 |

@@ -270,6 +270,7 @@ docker compose logs log-generator
 | Grafana login fails | `docker compose logs grafana` | password typo or old `grafana-data` volume |
 | Prometheus has no cAdvisor target | `docker compose logs prometheus` | scrape target unavailable |
 | Grafana Prometheus data source fails | Grafana Data source URL | `localhost:19090`이 아니라 `http://prometheus:9090` 사용 |
+| `Post "http://localhost:19090/api/v1/query": connect: connection refused` | Grafana Data source URL | Grafana가 아직 잘못된 URL을 보고 있음. Data source 편집 화면을 새로 열고 URL을 `http://prometheus:9090`으로 저장 |
 | cAdvisor container exits | `docker compose logs cadvisor` | host mount/device restriction |
 | Loki has no logs | `docker compose logs promtail` | Docker log path mount restriction |
 | `mkdir /var/lib/docker: read-only file system` | `docker compose --profile host-mount up -d cadvisor promtail` output | Docker Desktop/WSL host mount source path restriction |
