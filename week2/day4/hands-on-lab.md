@@ -547,7 +547,6 @@ Data deletion risk:
 
 ```bash
 cd /mnt/d/paperclip/week2/day4/labs/observability-preview
-export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"
 docker compose config
 docker compose --profile load config
 docker compose up -d
@@ -569,16 +568,40 @@ Open:
 ```text
 Grafana:    http://localhost:13000  admin / practice-only
 Prometheus: http://localhost:19090
-cAdvisor:   http://localhost:18086
 ```
+
+기본 실행은 Docker data root를 mount하지 않는다. Docker Desktop/WSL/macOS에서 `/var/lib/docker`가 read-only로 막히는 경우가 있기 때문에, cAdvisor와 Promtail은 선택 profile로 분리한다.
+
+선택 심화:
+
+```bash
+export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"
+docker compose --profile host-mount up -d cadvisor promtail
+docker compose ps
+```
+
+성공하면 cAdvisor를 연다.
+
+```text
+cAdvisor: http://localhost:18086
+```
+
+다음 에러가 나오면 기본 preview로 돌아간다.
+
+```text
+Error response from daemon: error while creating mount source path '/var/lib/docker':
+mkdir /var/lib/docker: read-only file system
+```
+
+이 에러는 app이 아니라 host mount 제약이다. 이 경우 `docker compose logs`와 `docker stats` 확인만으로 진행한다.
 
 Grafana Explore에서 확인한다.
 
 | Source | Query | 의미 |
 |---|---|---|
 | Prometheus | `up` | scrape 대상이 살아 있는지 확인 |
-| Prometheus | `container_memory_usage_bytes` | container memory metrics 확인 |
-| Loki | `{job="docker"}` | Docker container log 확인 |
+| Prometheus | `container_memory_usage_bytes` | `host-mount` 성공 시 container memory metrics 확인 |
+| Loki | `{job="docker"}` | `host-mount` 성공 시 Docker container log 확인 |
 
 Loki를 curl로 검증할 때는 instant `query`가 아니라 range query를 사용한다.
 
@@ -634,14 +657,15 @@ CPU spike가 보이면 docker logs/compose logs로 어떤 container가 무엇을
 docker compose stop cpu-spike
 ```
 
-환경에 따라 Docker Desktop/WSL에서 Promtail이 `/var/lib/docker/containers`를 읽지 못할 수 있다. 이 경우에도 `docker compose logs`로 일반 로그를 확인하고, Prometheus/cAdvisor metrics 확인까지를 preview 성공으로 본다.
+환경에 따라 Docker Desktop/WSL에서 Promtail이 `/var/lib/docker/containers`를 읽지 못할 수 있다. 이 경우에도 `docker compose logs`로 일반 로그를 확인하고, Grafana/Prometheus UI가 뜨는 것까지를 preview 성공으로 본다.
 
 Troubleshooting:
 
 | 환경 | 오류/증상 | 힌트 |
 |---|---|---|
 | WSL/Linux | `docker-credential-desktop.exe` not found | `DOCKER_CONFIG` 임시 디렉터리에 빈 `config.json`을 두고 실행 |
-| WSL/Linux | cAdvisor가 `/var/lib/docker`를 못 읽음 | `export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"` 후 재실행 |
+| WSL/Linux | cAdvisor가 `/var/lib/docker`를 못 읽음 | `export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"` 후 `docker compose --profile host-mount up -d cadvisor promtail` |
+| WSL/Docker Desktop | `mkdir /var/lib/docker: read-only file system` | 기본 `docker compose up -d`로 돌아가고 `docker compose logs`, `docker stats` 중심으로 진행 |
 | WSL/Linux/macOS | `port is already allocated` | `docker ps`로 점유 port 확인. 이 lab은 cAdvisor `18086` 사용 |
 | WSL/Linux/macOS | Loki instant query 오류 | `/loki/api/v1/query_range` 사용 |
 | macOS | `date +%s%N`이 nanosecond로 안 나옴 | macOS용 `date -u -v-5M` 예시 사용 |

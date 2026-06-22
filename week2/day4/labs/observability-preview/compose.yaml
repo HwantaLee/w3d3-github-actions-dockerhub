@@ -56,8 +56,6 @@ services:
       - "19090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
-    depends_on:
-      - cadvisor
     networks:
       - observe-net
 
@@ -80,6 +78,7 @@ services:
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
+    profiles: ["host-mount"]
     ports:
       - "18086:8080"
     volumes:
@@ -108,6 +107,7 @@ services:
 
   promtail:
     image: grafana/promtail:3.2.1
+    profiles: ["host-mount"]
     command:
       - -config.file=/etc/promtail/config.yml
     volumes:

@@ -17,23 +17,22 @@ inspect/exec: 지금 적용된 설정과 내부 상태가 무엇인가
 | `log-generator` | none | 일반 log를 계속 출력하는 sample container |
 | `load-generator` | none | `sample-web`에 반복 HTTP 요청 |
 | `cpu-spike` | none | 선택 profile, CPU spike 체험 |
-| `cadvisor` | `18086` | Docker container CPU/memory/network metrics 노출 |
+| `cadvisor` | `18086` | 선택 profile, Docker container CPU/memory/network metrics 노출 |
 | `prometheus` | `19090` | cAdvisor metrics scrape |
 | `loki` | `13100` | container log 저장 |
-| `promtail` | none | Docker container log를 Loki로 전달 |
+| `promtail` | none | 선택 profile, Docker container log를 Loki로 전달 |
 | `grafana` | `13000` | Prometheus metrics와 Loki logs 시각화 |
 
 ## Run
-먼저 OS별로 Docker log 경로를 확인한다. cAdvisor와 Promtail은 container 내부 상태를 보기 위해 Docker engine의 실제 data root를 mount해야 한다.
+기본 실행은 host의 Docker data root를 mount하지 않는다. Docker Desktop, WSL, macOS 환경에서 `/var/lib/docker` mount가 막혀도 preview 자체는 진행되어야 하기 때문이다.
 
 | 환경 | 권장 확인 |
 |---|---|
-| WSL/Linux | `docker info --format '{{.DockerRootDir}}'` 결과를 `DOCKER_ROOT_DIR`로 export |
-| macOS Docker Desktop | Docker engine이 Linux VM 안에서 동작하므로 경로 mount가 제한될 수 있음. Grafana/Prometheus UI 확인을 우선하고, log 수집이 안 되면 `docker compose logs`로 대체 |
+| WSL/Linux | 기본 실행 후, 선택 심화에서만 `DOCKER_ROOT_DIR` 확인 |
+| macOS Docker Desktop | Docker engine이 Linux VM 안에서 동작하므로 host mount는 선택 심화로만 진행 |
 
 ```bash
 cd /mnt/d/paperclip/week2/day4/labs/observability-preview
-export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"
 docker compose config
 docker compose --profile load config
 docker compose up -d
@@ -45,9 +44,7 @@ Expected:
 ```text
 grafana      running
 prometheus   running
-cadvisor     running
 loki         running
-promtail     running
 sample-web   running
 load-generator running
 ```
@@ -67,7 +64,7 @@ level=info service=log-generator event=heartbeat
 ```
 
 ## Impact drill: stats snapshot vs metrics timeline
-`docker stats`는 지금 이 순간의 값이다. Prometheus/Grafana는 시간이 지나며 값이 어떻게 변했는지 본다. 차이를 느끼기 위해 CPU spike container를 profile로 켠다.
+`docker stats`는 지금 이 순간의 값이다. 기본 preview에서는 먼저 snapshot을 확인한다. cAdvisor `host-mount` profile이 성공한 환경에서는 Prometheus/Grafana로 시간이 지나며 값이 어떻게 변했는지도 본다.
 
 ```bash
 docker compose --profile load up -d cpu-spike
@@ -89,6 +86,8 @@ Grafana Explore > Prometheus에서 다음 query를 넣는다.
 rate(container_cpu_usage_seconds_total[1m])
 ```
 
+이 query는 `host-mount` profile로 cAdvisor가 떠 있는 환경에서 의미가 있다. 기본 실행만 한 상태라면 Prometheus는 뜨지만 cAdvisor target은 없을 수 있다.
+
 판단:
 
 | 관찰 도구 | 보이는 것 | 한계 |
@@ -106,14 +105,13 @@ docker compose stop cpu-spike
 ## Check Prometheus
 ```bash
 curl -s http://localhost:19090/-/ready
-curl -s 'http://localhost:19090/api/v1/query?query=up' | grep cadvisor
+curl -s 'http://localhost:19090/api/v1/query?query=up'
 ```
 
 Expected:
 
 ```text
 Prometheus Server is Ready.
-cadvisor
 ```
 
 Prometheus UI:
@@ -149,8 +147,49 @@ admin / practice-only
 | 화면 | 확인 |
 |---|---|
 | Connections > Data sources | Prometheus, Loki datasource가 있는가 |
-| Explore > Prometheus | `up`, `container_memory_usage_bytes` query가 되는가 |
-| Explore > Loki | `{job="docker"}` log query가 되는가 |
+| Explore > Prometheus | `up` query가 되는가 |
+| Explore > Prometheus | `host-mount` 성공 시 `container_memory_usage_bytes` query가 되는가 |
+| Explore > Loki | `host-mount` 성공 시 `{job="docker"}` log query가 되는가 |
+
+## Optional host-mount profile
+cAdvisor와 Promtail은 Docker engine 내부의 data root와 log file을 mount한다. 그래서 환경 영향을 크게 받는다.
+
+WSL/Linux에서 선택적으로 시도한다.
+
+```bash
+export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"
+docker compose --profile host-mount up -d cadvisor promtail
+docker compose ps
+```
+
+접속:
+
+```text
+http://localhost:18086
+```
+
+다음 에러가 나오면 수업에서는 실패를 정상적인 환경 차이 사례로 다룬다.
+
+```text
+Error response from daemon: error while creating mount source path '/var/lib/docker':
+mkdir /var/lib/docker: read-only file system
+```
+
+의미:
+
+| 관찰 | 해석 |
+|---|---|
+| `/var/lib/docker` source path 생성 실패 | Docker engine/host 경계에서 해당 경로를 만들거나 노출할 수 없음 |
+| 기본 `docker compose up -d`는 성공 | preview stack 자체 문제는 아님 |
+| `cadvisor`, `promtail`만 실패 | host mount 기반 수집기의 환경 제약 |
+
+대체 확인:
+
+```bash
+docker compose logs sample-web --tail 20
+docker compose logs log-generator --tail 20
+docker stats --no-stream
+```
 
 ## Check Loki logs
 Promtail이 Docker log file을 읽을 수 있는 환경이면 Grafana Explore에서 다음 query가 동작한다.
@@ -209,6 +248,7 @@ docker compose logs log-generator
 | Prometheus has no cAdvisor target | `docker compose logs prometheus` | scrape target unavailable |
 | cAdvisor container exits | `docker compose logs cadvisor` | host mount/device restriction |
 | Loki has no logs | `docker compose logs promtail` | Docker log path mount restriction |
+| `mkdir /var/lib/docker: read-only file system` | `docker compose --profile host-mount up -d cadvisor promtail` output | Docker Desktop/WSL host mount source path restriction |
 | port already allocated | `docker compose ps`, `docker ps` | local port conflict |
 | CPU spike가 계속 남음 | `docker compose ps` | `cpu-spike` profile container stop 필요 |
 
@@ -216,7 +256,8 @@ docker compose logs log-generator
 | 증상 | 확인 명령 | 조치 |
 |---|---|---|
 | `docker-credential-desktop.exe` 오류 | `cat ~/.docker/config.json` | 실습 중에는 임시 config로 우회: `mkdir -p /tmp/paperclip-docker-config && printf '{}\n' > /tmp/paperclip-docker-config/config.json`, 이후 `DOCKER_CONFIG=/tmp/paperclip-docker-config docker compose up -d` |
-| cAdvisor가 `/var/lib/docker`를 못 읽음 | `docker info --format '{{.DockerRootDir}}'` | `export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"` 후 다시 `docker compose up -d` |
+| cAdvisor가 `/var/lib/docker`를 못 읽음 | `docker info --format '{{.DockerRootDir}}'` | `export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"` 후 `docker compose --profile host-mount up -d cadvisor promtail` |
+| `mkdir /var/lib/docker: read-only file system` | 에러 출력의 mount source path | 기본 `docker compose up -d`로 돌아가고 `docker compose logs`, `docker stats` 중심으로 진행 |
 | `port is already allocated` | `docker ps --format 'table {{.Names}}\t{{.Ports}}'` | 충돌 중인 container를 멈추거나 compose port를 변경. 이 lab은 cAdvisor를 `18086`으로 사용 |
 | Loki API에서 `log queries are not supported as an instant query type` | 호출한 URL 확인 | `/loki/api/v1/query`가 아니라 `/loki/api/v1/query_range` 사용 |
 

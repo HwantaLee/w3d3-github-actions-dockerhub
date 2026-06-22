@@ -25,13 +25,15 @@ Loki/Grafana: log를 query하고 탐색한다
 | `log-generator` | 일반 log sample | `docker compose logs`, Loki |
 | `load-generator` | 반복 HTTP 요청 생성 | nginx access 증가 |
 | `cpu-spike` | 선택 profile, CPU spike 생성 | `docker stats`, Prometheus query |
-| `cadvisor` | Docker container metrics 노출 | Prometheus target |
+| `cadvisor` | 선택 profile, Docker container metrics 노출 | Prometheus target |
 | `prometheus` | metrics scrape/query | `up`, CPU/memory query |
 | `loki` | log 저장 | Grafana Explore |
-| `promtail` | Docker log 전달 | Loki ingest |
+| `promtail` | 선택 profile, Docker log 전달 | Loki ingest |
 | `grafana` | metrics/logs 탐색 UI | Explore |
 
 ## 실습 명령
+기본 실행은 host의 Docker data root를 mount하지 않는다. Docker Desktop, WSL, macOS 환경에서 `/var/lib/docker`가 read-only로 막히는 경우가 있기 때문이다.
+
 ```bash
 cd /mnt/d/paperclip/week2/day4/labs/observability-preview
 docker compose config
@@ -55,7 +57,40 @@ Open:
 ```text
 Grafana:    http://localhost:13000  admin / practice-only
 Prometheus: http://localhost:19090
-cAdvisor:   http://localhost:18086
+```
+
+기본 실행의 성공 기준은 `sample-web`, `log-generator`, `loki`, `prometheus`, `grafana`가 올라오고 일반 로그를 확인하는 것이다.
+
+## 선택 심화: cAdvisor/Promtail host mount
+cAdvisor와 Promtail은 Docker engine의 내부 data root를 읽어야 해서 OS와 Docker Desktop 구성에 영향을 받는다. 성공하면 container metrics와 Docker log file 수집까지 볼 수 있지만, 실패해도 Day 4 preview 실패로 보지 않는다.
+
+WSL/Linux에서 시도:
+
+```bash
+export DOCKER_ROOT_DIR="$(docker info --format '{{.DockerRootDir}}')"
+docker compose --profile host-mount up -d cadvisor promtail
+docker compose ps
+```
+
+접속:
+
+```text
+cAdvisor: http://localhost:18086
+```
+
+다음 에러가 나오면 host mount 제약이다.
+
+```text
+Error response from daemon: error while creating mount source path '/var/lib/docker':
+mkdir /var/lib/docker: read-only file system
+```
+
+이 에러는 container 내부 문제가 아니라 Docker engine이 bind mount source path를 만들거나 노출할 수 없는 환경이라는 뜻이다. 이 경우에는 `cadvisor`, `promtail`을 포기하고 다음으로 대체한다.
+
+```bash
+docker compose logs sample-web --tail 20
+docker compose logs log-generator --tail 20
+docker stats --no-stream
 ```
 
 ## Impact drill
@@ -91,9 +126,9 @@ docker compose stop cpu-spike
 | Source | Query | 의미 |
 |---|---|---|
 | Prometheus | `up` | scrape 대상이 살아 있는지 확인 |
-| Prometheus | `container_memory_usage_bytes` | container memory metrics 확인 |
-| Prometheus | `rate(container_cpu_usage_seconds_total[1m])` | CPU 사용률 변화 확인 |
-| Loki | `{job="docker"}` | Docker container log 확인 |
+| Prometheus | `container_memory_usage_bytes` | `host-mount` profile 성공 시 container memory metrics 확인 |
+| Prometheus | `rate(container_cpu_usage_seconds_total[1m])` | `host-mount` profile 성공 시 CPU 사용률 변화 확인 |
+| Loki | `{job="docker"}` | `host-mount` profile 성공 시 Docker container log 확인 |
 
 curl로 Loki를 확인할 때는 시간 범위가 있는 endpoint를 사용한다. Grafana Explore는 화면의 time range를 함께 보내지만, API를 직접 호출하면 그 범위를 명시해야 한다.
 
@@ -123,13 +158,14 @@ curl -G -s 'http://localhost:13100/loki/api/v1/query_range' \
   --data-urlencode 'limit=5'
 ```
 
-환경에 따라 Docker Desktop/WSL에서 Promtail이 `/var/lib/docker/containers`를 읽지 못할 수 있다. 이 경우에도 `docker compose logs`로 일반 로그를 확인하고, Prometheus/cAdvisor metrics 확인까지를 preview 성공으로 본다.
+환경에 따라 Docker Desktop/WSL에서 Promtail이 `/var/lib/docker/containers`를 읽지 못할 수 있다. 이 경우에도 `docker compose logs`로 일반 로그를 확인하고, Grafana/Prometheus UI가 뜨는 것까지를 preview 성공으로 본다.
 
 ## OS별 troubleshooting
 | 환경 | 오류/증상 | 수업에서 잡는 포인트 |
 |---|---|---|
 | WSL/Linux | `docker-credential-desktop.exe` not found | Docker CLI가 Windows credential helper 설정을 참조했지만 WSL PATH에서 실행 파일을 찾지 못한 상태 |
 | WSL/Linux | cAdvisor가 Docker data root를 못 읽음 | `docker info --format '{{.DockerRootDir}}'`로 실제 DockerRootDir을 확인해야 함 |
+| WSL/Docker Desktop | `mkdir /var/lib/docker: read-only file system` | `/var/lib/docker` bind mount source를 만들 수 없는 환경. 기본 실행으로 돌아가고 `host-mount` profile은 선택 처리 |
 | WSL/Linux/macOS | `port is already allocated` | 이미 실행 중인 container가 host port를 점유한 상태. `docker ps`로 충돌 port를 찾음 |
 | WSL/Linux/macOS | Loki instant query 오류 | log query는 시간 범위가 필요하므로 `query_range`를 사용 |
 | macOS | `date +%s%N`이 동작하지 않음 | BSD `date`와 GNU `date` 옵션 차이 |
