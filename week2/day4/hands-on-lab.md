@@ -612,6 +612,27 @@ Grafana Explore에서 확인한다.
 | Prometheus | `container_memory_usage_bytes` | `host-mount` 성공 시 container memory metrics 확인 |
 | Loki | `{job="docker"}` | `host-mount` 성공 시 Docker container log 확인 |
 
+container 또는 service별 필터링:
+
+```promql
+container_memory_usage_bytes{name=~".*grafana.*"}
+container_memory_usage_bytes{container_label_com_docker_compose_service="grafana"}
+container_memory_usage_bytes{container_label_com_docker_compose_service=~"grafana|prometheus|loki"}
+rate(container_cpu_usage_seconds_total{name=~".*cpu-spike.*"}[1m])
+```
+
+`name`은 실제 container name이고, `container_label_com_docker_compose_service`는 Compose service name이다. 수업에서는 service 단위로 보기 쉬운 `container_label_com_docker_compose_service`를 먼저 사용한다.
+
+차트 legend가 너무 길면 query가 아니라 Grafana panel의 Legend 값을 바꾼다.
+
+| 원하는 legend | Grafana Legend 값 |
+|---|---|
+| container name만 표시 | `{{name}}` |
+| Compose service만 표시 | `{{container_label_com_docker_compose_service}}` |
+| image 이름만 표시 | `{{image}}` |
+
+이 lab에는 `Dashboards > Paperclip Labs > W2D4 Observability Preview` 대시보드가 provision되어 있다. memory panel은 service 이름, CPU panel은 container name만 legend에 나오도록 설정되어 있다.
+
 Loki를 curl로 검증할 때는 instant `query`가 아니라 range query를 사용한다.
 
 WSL/Linux:

@@ -140,6 +140,33 @@ docker compose stop cpu-spike
 | Prometheus | `rate(container_cpu_usage_seconds_total[1m])` | `host-mount` profile 성공 시 CPU 사용률 변화 확인 |
 | Loki | `{job="docker"}` | `host-mount` profile 성공 시 Docker container log 확인 |
 
+container별로 좁혀서 보고 싶으면 label filter를 쓴다.
+
+| 기준 | PromQL 예시 | 언제 쓰는가 |
+|---|---|---|
+| container name | `container_memory_usage_bytes{name=~"observability-preview-grafana-1"}` | 실제 container 이름으로 정확히 찾을 때 |
+| container name 패턴 | `container_memory_usage_bytes{name=~".*grafana.*"}` | 이름 일부만 기억할 때 |
+| Compose service | `container_memory_usage_bytes{container_label_com_docker_compose_service="grafana"}` | Compose service 단위로 볼 때 |
+| 여러 service | `container_memory_usage_bytes{container_label_com_docker_compose_service=~"grafana|prometheus|loki"}` | 관찰 stack 일부만 볼 때 |
+
+CPU도 같은 방식으로 필터링한다.
+
+```promql
+rate(container_cpu_usage_seconds_total{name=~".*cpu-spike.*"}[1m])
+```
+
+수업에서는 `name`보다 `container_label_com_docker_compose_service`를 먼저 권장한다. container name은 project name과 번호가 붙어서 바뀔 수 있지만, Compose service name은 실습 구조를 설명하기 좋다.
+
+차트 legend가 너무 지저분하면 query가 아니라 panel의 Legend 값을 바꾼다.
+
+| 원하는 legend | Grafana Legend 값 |
+|---|---|
+| container name만 표시 | `{{name}}` |
+| Compose service만 표시 | `{{container_label_com_docker_compose_service}}` |
+| image 이름만 표시 | `{{image}}` |
+
+예를 들어 query는 그대로 두고 Legend를 `{{name}}`으로 설정하면 차트 하단에는 `observability-preview-grafana-1`처럼 container name만 나온다. 이 lab에는 `Dashboards > Paperclip Labs > W2D4 Observability Preview` 대시보드가 provision되어 있으며, memory panel은 service 이름, CPU panel은 container name만 legend에 표시되도록 구성되어 있다.
+
 curl로 Loki를 확인할 때는 시간 범위가 있는 endpoint를 사용한다. Grafana Explore는 화면의 time range를 함께 보내지만, API를 직접 호출하면 그 범위를 명시해야 한다.
 
 WSL/Linux:

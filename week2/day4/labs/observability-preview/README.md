@@ -138,6 +138,27 @@ rate(container_cpu_usage_seconds_total[1m])
 rate(container_network_receive_bytes_total[1m])
 ```
 
+Filter examples:
+
+```promql
+container_memory_usage_bytes{name=~".*grafana.*"}
+container_memory_usage_bytes{container_label_com_docker_compose_service="grafana"}
+container_memory_usage_bytes{container_label_com_docker_compose_service=~"grafana|prometheus|loki"}
+rate(container_cpu_usage_seconds_total{name=~".*cpu-spike.*"}[1m])
+```
+
+`name`은 실제 container name이고, `container_label_com_docker_compose_service`는 Compose service name이다. 수업에서는 service 단위로 설명하기 쉬운 `container_label_com_docker_compose_service`를 먼저 사용한다.
+
+Legend cleanup:
+
+| 원하는 legend | Grafana Legend 값 |
+|---|---|
+| container name만 표시 | `{{name}}` |
+| Compose service만 표시 | `{{container_label_com_docker_compose_service}}` |
+| image 이름만 표시 | `{{image}}` |
+
+Grafana panel에서 query 결과 label 전체가 legend로 나오면 너무 길다. Query options의 Legend 값을 `{{name}}` 또는 `{{container_label_com_docker_compose_service}}`로 지정한다.
+
 ## Check Grafana
 Open:
 
@@ -159,6 +180,7 @@ admin / practice-only
 | Explore > Prometheus | `up` query가 되는가 |
 | Explore > Prometheus | `host-mount` 성공 시 `container_memory_usage_bytes` query가 되는가 |
 | Explore > Loki | `host-mount` 성공 시 `{job="docker"}` log query가 되는가 |
+| Dashboards > Paperclip Labs | `W2D4 Observability Preview` dashboard에서 legend가 service/container 이름만 보이는가 |
 
 Prometheus datasource 설정:
 
