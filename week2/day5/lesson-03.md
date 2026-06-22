@@ -92,6 +92,19 @@ networks:
 | `adminer` | DB 관리 UI | host `18087` |
 | `db-checker` | DB 연결 확인 app | logs로 결과 확인 |
 
+## 트래픽/부하 성향 노트
+백엔드 경계 구조에서는 모든 외부 요청이 gateway를 먼저 통과한다. 하지만 실제 CPU 병목은 gateway보다 내부 API의 business logic에서 생기는 경우가 많다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `gateway` | route별 요청이 모두 진입 | routing/TLS/logging이 많으면 증가 | connection buffer | route별 4xx/5xx, upstream error |
+| `identity-api` | 로그인/사용자 조회 traffic | token 검증, 권한 계산에서 증가 | session/cache 연동 시 증가 | auth 실패율, latency |
+| `payment-api` | 결제/정산 요청 traffic | validation, 외부 PG 연동 처리에서 증가 | retry queue나 idempotency store | 중복 요청, timeout |
+| `db` | user/payment metadata 저장 | index 없는 조회, transaction에서 증가 | connection, buffer/cache | lock, slow query |
+| `adminer` | 운영 traffic이 아니라 관리 traffic | 낮음 | session | 수업 후 노출 정리 |
+
+이 구조의 핵심은 “gateway가 바쁘다”와 “business API가 무겁다”를 분리하는 것이다. gateway log는 입구 증거이고, 실제 원인은 identity/payment API나 DB에 있을 수 있다.
+
 ## Check
 ```bash
 curl -I http://localhost:18086

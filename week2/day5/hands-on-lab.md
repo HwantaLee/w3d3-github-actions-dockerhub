@@ -21,6 +21,18 @@ docker compose ps
 | `queue_net` | producer/queue/worker 통신 영역 | `message-api`, `queue`, `worker` |
 | `data_net` | DB와 volume이 있는 stateful 영역 | `db`, `db-checker` |
 
+각 template을 실행할 때 다음 질문도 같이 기록한다.
+
+| 질문 | 기록 예시 |
+|---|---|
+| 외부 traffic은 어디로 들어오는가 | `gateway:18091`, `proxy:18089`, `frontend:18085` |
+| 내부 traffic은 어디로 흐르는가 | `gateway -> api -> db`, `message-api -> queue -> worker` |
+| CPU가 무거워질 가능성이 큰 service는 무엇인가 | `worker`, `api`, `payment-api` |
+| memory/state pressure가 큰 service는 무엇인가 | `db`, `redis`, `queue` |
+| traffic이 늘면 제일 먼저 볼 증거는 무엇인가 | `logs`, API latency, queue length, DB query |
+
+이 표는 정답 맞히기용이 아니다. 아키텍처 그림을 보고 “어디가 입구이고, 어디가 계산하고, 어디가 상태를 들고 있는지”를 말하기 위한 기록표다.
+
 확인 후 정리한다.
 
 ```bash
@@ -181,5 +193,8 @@ week2-day5-msa-preview
 | 외부 진입점 | host port |
 | 내부 service name | `db`, `redis`, `api`, `web-a` 등 |
 | 연결 증거 | curl result, DB query, Redis result, worker logs |
+| traffic 집중 지점 | gateway/API/queue/DB 중 하나 |
+| CPU 부하 후보 | worker/API/proxy 중 하나와 이유 |
+| memory/state 부하 후보 | DB/Redis/queue/volume 중 하나와 이유 |
 | cleanup 선택 | `down` 또는 `down -v` 이유 |
 | Week 3 질문 | dependency/failure/scale 관련 질문 |

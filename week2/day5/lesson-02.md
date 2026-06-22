@@ -81,6 +81,18 @@ networks:
 | `db` | PostgreSQL 16 | Compose network 내부 |
 | `db-checker` | DB 연결 확인 app | logs로 결과 확인 |
 
+## 트래픽/부하 성향 노트
+커머스 카탈로그 구조에서는 읽기 traffic이 많다. 상품 목록, 검색, 상세 조회가 반복되므로 API와 DB의 read path가 핵심이다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `frontend` | 정적 파일 요청이 몰림 | 낮음. gzip/TLS를 붙이면 증가 | 낮음 | access log, 4xx/5xx |
+| `catalog-api` | 상품 조회 API traffic 집중 | query 변환, JSON 응답 생성 시 증가 | connection pool 설정에 영향 | API latency, error log |
+| `db` | read query 반복 | 정렬/필터/인덱스 부재 시 증가 | buffer/cache, table/index size | slow query, connection 수 |
+| `db-checker` | 수업용 보조 traffic | 거의 없음 | 없음 | DB readiness evidence |
+
+실무에서는 catalog API를 여러 개로 늘리거나 cache를 붙일 수 있다. 하지만 DB index가 부실하면 API scale out만으로 해결되지 않는다.
+
 ## Check
 ```bash
 curl -I http://localhost:18085

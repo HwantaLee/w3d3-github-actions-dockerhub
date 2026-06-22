@@ -82,6 +82,18 @@ networks:
 | `cache-writer` | Redis에 값을 쓰는 sample app | logs로 결과 확인 |
 | `redis-cli` | 수동 확인 도구 | `--profile tool`로 실행 |
 
+## 트래픽/부하 성향 노트
+프론트엔드 플랫폼 구조에서는 web traffic과 config traffic을 분리해서 본다. config API는 단순해 보여도 모든 브라우저 시작 시점에 호출되면 의외로 중요해진다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `web` | 정적 파일, SPA asset 요청 | 낮음. build asset 압축/캐시 정책 영향 | 낮음 | cache-control, 404 |
+| `config-api` | 앱 시작/새로고침 시 반복 호출 | feature rule 계산이 복잡하면 증가 | config snapshot/cache | `/config` latency, error |
+| `redis` | cache read/write 집중 | 단순 command는 낮음 | key 수, value 크기, eviction | memory usage, key count |
+| `cache-writer` | 수업용 write traffic | 낮음 | 없음 | Redis write evidence |
+
+Redis는 빠르지만 무한한 저장소가 아니다. cache key가 계속 늘면 memory pressure와 eviction이 생기고, 이때 app latency가 갑자기 흔들릴 수 있다.
+
 ## Check
 ```bash
 curl -I http://localhost:18088

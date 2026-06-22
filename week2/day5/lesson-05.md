@@ -67,6 +67,17 @@ networks:
 | `web-a` | 내부 web app A | Compose network 내부 |
 | `web-b` | 내부 web app B | Compose network 내부 |
 
+## 트래픽/부하 성향 노트
+reverse proxy 구조에서는 모든 외부 traffic이 `proxy`에 모인다. 하지만 path별로 실제 부하는 `web-a`, `web-b` 중 한쪽에 치우칠 수 있다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `proxy` | 전체 외부 요청 진입 | TLS termination, 압축, access log가 많으면 증가 | connection buffer | access/error log, upstream status |
+| `web-a` | `/a/` path traffic | 정적이면 낮음, API면 app logic 영향 | app cache/session 여부 | `/a/` 응답 시간 |
+| `web-b` | `/b/` path traffic | path별 기능 차이에 따라 달라짐 | app cache/session 여부 | `/b/` 응답 시간 |
+
+proxy CPU가 낮아도 특정 upstream이 죽으면 사용자에게는 장애로 보인다. 그래서 gateway graph만 보지 말고 upstream별 status와 latency를 나눠서 봐야 한다.
+
 ## Check
 ```bash
 curl -s http://localhost:18089/a/

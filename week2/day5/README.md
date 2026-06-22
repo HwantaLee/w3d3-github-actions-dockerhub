@@ -64,6 +64,21 @@ Service type별 추가 확인:
 | Worker | `docker compose logs worker --tail 40` |
 | Gateway | public port로 접근, 내부 service port는 직접 열지 않음 |
 
+## Architecture Load Notes
+아키텍처를 설명할 때는 연결선만 보지 않는다. 어떤 service에 트래픽이 몰리고, 어떤 service가 CPU 또는 memory pressure에 민감한지도 같이 기록한다.
+
+| Template | 트래픽이 몰리는 지점 | CPU 부하가 커지기 쉬운 지점 | 메모리/상태 부하가 커지기 쉬운 지점 | 먼저 볼 증거 |
+|---|---|---|---|---|
+| `01-web-postgres` | `frontend`, `catalog-api` | `catalog-api`의 query 처리 | `db` buffer/cache, `pgdata` | API latency, DB query/log |
+| `02-web-postgres-admin` | `gateway` | `identity-api`, `payment-api` | `db`, Adminer session | route별 응답, gateway log |
+| `03-web-redis` | `web`, `config-api` | `config-api` JSON 생성/feature 계산 | `redis` cache memory | Redis key, config response |
+| `04-nginx-reverse-proxy` | `proxy` | `proxy` TLS/routing, upstream app | upstream별 connection | proxy access/error log |
+| `05-queue-worker-db` | `message-api`, `queue` | `worker` job 처리 | `queue` backlog, `db` write | queue length, worker log |
+| `06-api-postgrest` | `api` | `api` query translation | `db` connection/table cache | API status, DB init/log |
+| `07-frontend-gateway-api-db` | `gateway` | `api` request processing | `db` state/connection | gateway/API logs, DB readiness |
+
+이 표는 capacity planning을 정밀하게 하는 표가 아니다. 수업에서는 “어느 service부터 확인할 것인가”를 정하는 운영 감각을 만드는 용도로 사용한다.
+
 ## 주의할 점
 | 위험 | 확인 지점 |
 |---|---|

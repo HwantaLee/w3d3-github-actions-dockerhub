@@ -20,15 +20,17 @@ Compose는 `docker run` 명령을 길게 적는 편의 도구가 아니다. appl
 
 ## Architecture Coverage
 
-| Template | 회사형 시나리오 | 확인 증거 |
-|---|---|---|
-| Commerce catalog | frontend, catalog API, products DB | HTTP 200, `/products`, DB query |
-| Backend boundary | gateway, identity API, payment API, DB UI | `/identity/users`, `/payment/payments`, Adminer server `db` |
-| Frontend platform | config API, feature flag, cache backing service | `/config`, Redis `GET`, cache writer logs |
-| Nginx reverse proxy | gateway, upstream routing | `/a/`, `/b/`, proxy logs |
-| Messaging worker | HTTP producer, Redis queue, worker | `/publish`, worker logs, DB query |
-| API + PostgreSQL | API layer, DB schema/role | `/tasks` JSON response |
-| Frontend + gateway + API + DB | MSA preview | frontend marker, `/api/services` response |
+| Template | 회사형 시나리오 | 확인 증거 | 부하 관찰 포인트 |
+|---|---|---|---|
+| Commerce catalog | frontend, catalog API, products DB | HTTP 200, `/products`, DB query | read traffic, API latency, DB query/cache |
+| Backend boundary | gateway, identity API, payment API, DB UI | `/identity/users`, `/payment/payments`, Adminer server `db` | route별 traffic, API CPU, DB connection |
+| Frontend platform | config API, feature flag, cache backing service | `/config`, Redis `GET`, cache writer logs | config traffic, Redis memory/eviction |
+| Nginx reverse proxy | gateway, upstream routing | `/a/`, `/b/`, proxy logs | proxy entrypoint, upstream별 status/latency |
+| Messaging worker | HTTP producer, Redis queue, worker | `/publish`, worker logs, DB query | queue length, worker CPU, DB write |
+| API + PostgreSQL | API layer, DB schema/role | `/tasks` JSON response | API request rate, DB query/connection |
+| Frontend + gateway + API + DB | MSA preview | frontend marker, `/api/services` response | gateway traffic, API dependency, DB readiness |
+
+Day 5에서 capacity planning을 정밀하게 계산하지는 않는다. 대신 각 구조에서 traffic ingress, CPU-heavy service, memory/state-heavy service를 구분해 Week 3 MSA와 Kubernetes의 scaling/readiness 질문으로 연결한다.
 
 ## Official Links
 

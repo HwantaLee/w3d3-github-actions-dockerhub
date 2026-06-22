@@ -80,6 +80,18 @@ networks:
 | `worker` | job consumer | logs로 결과 확인 |
 | `db` | 처리 결과 저장 대상 | Compose network 내부 |
 
+## 트래픽/부하 성향 노트
+queue/worker 구조에서는 사용자 요청 traffic과 background 처리 부하가 분리된다. API가 빠르게 200을 반환해도 worker가 밀리면 실제 업무 처리는 지연될 수 있다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `message-api` | job publish 요청이 몰림 | payload 검증/직렬화에서 증가 | 짧은 request buffer | publish 성공률, latency |
+| `queue` | enqueue/dequeue 집중 | Redis command 자체는 낮음 | backlog length, memory | `LLEN jobs`, memory |
+| `worker` | 사용자 직접 traffic 없음 | job 처리 로직이 무거우면 가장 큼 | batch buffer, retry state | worker throughput, error log |
+| `db` | 처리 결과 write | transaction, index update에서 증가 | WAL, buffer/cache, volume | write latency, lock |
+
+이 구조의 핵심 지표는 HTTP 200만이 아니다. queue length가 계속 증가하면 worker capacity가 부족하다는 신호다.
+
 ## Check
 ```bash
 curl -s 'http://localhost:18105/publish?job=send-email:42'

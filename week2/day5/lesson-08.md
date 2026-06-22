@@ -76,6 +76,17 @@ networks:
 | `api` | PostgREST API | Compose network 내부 |
 | `db` | PostgreSQL 16, init SQL 실행 | Compose network 내부 |
 
+## 트래픽/부하 성향 노트
+MSA preview 구조에서는 browser traffic이 gateway에 모이고, API와 DB는 내부 dependency로 이어진다. 외부에서 보이는 증상은 gateway에서 시작되지만 원인은 API나 DB일 수 있다.
+
+| Service | 트래픽 성향 | CPU 부하 | 메모리/상태 부하 | 운영에서 먼저 볼 것 |
+|---|---|---|---|---|
+| `gateway` | 모든 browser/API path 진입 | routing, compression, TLS 적용 시 증가 | connection buffer | access/error log, upstream status |
+| `api` | `/api/` traffic 집중 | query 변환, JSON 응답 생성 | DB connection 관리 | API status, latency |
+| `db` | API dependency, stateful data | query/index/transaction에서 증가 | volume, buffer/cache, connection | readiness, slow query |
+
+트래픽이 늘면 gateway를 늘릴지, API를 늘릴지, DB를 튜닝할지 판단해야 한다. 이 판단은 “어디가 public entrypoint인가”만으로는 부족하고, CPU/메모리/connection pressure를 같이 봐야 한다.
+
 ## Check
 ```bash
 curl -s http://localhost:18091 | grep week2-day5-msa-preview
