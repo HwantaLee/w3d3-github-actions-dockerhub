@@ -45,6 +45,58 @@ services:
     networks:
       - msa-net
 
+  catalog-api:
+    build: ./catalog-api
+    environment:
+      SERVICE_NAME: catalog-api
+      DB_DSN: postgresql://paperclip:${POSTGRES_PASSWORD:-paperclip-local-only}@db:5432/paperclip
+    ports:
+      - "18120:8081"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - msa-net
+
+  order-api:
+    build: ./order-api
+    environment:
+      SERVICE_NAME: order-api
+      DB_DSN: postgresql://paperclip:${POSTGRES_PASSWORD:-paperclip-local-only}@db:5432/paperclip
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_NAME: order-events
+    ports:
+      - "18121:8082"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - msa-net
+
+  order-worker:
+    build: ./order-worker
+    environment:
+      SERVICE_NAME: order-worker
+      DB_DSN: postgresql://paperclip:${POSTGRES_PASSWORD:-paperclip-local-only}@db:5432/paperclip
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      QUEUE_NAME: order-events
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - msa-net
+
+  redis:
+    image: redis:7-alpine
+    networks:
+      - msa-net
+
   db:
     image: postgres:16-alpine
     environment:
