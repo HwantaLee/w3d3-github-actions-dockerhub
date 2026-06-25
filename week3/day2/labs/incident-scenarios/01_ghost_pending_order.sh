@@ -11,6 +11,13 @@ echo "[request_id] ${REQ_ID}"
 echo
 echo "[1] Start stack"
 docker compose up --build -d >/dev/null
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  if curl -fsS http://localhost:18121/health >/dev/null 2>&1; then
+    break
+  fi
+  sleep 1
+done
+curl -fsS http://localhost:18121/health >/dev/null
 
 echo
 echo "[2] Stop Redis before order request"
