@@ -26,7 +26,8 @@ Git 이론
 - PR, merge, squash, rebase, revert, tag 기준을 운영 관점으로 설명한다.
 - unit test, SAST, DAST가 CI/CD gate에서 맡는 역할을 설명한다.
 - GitHub Secrets의 장점과 단점을 설명한다.
-- GitHub Actions workflow의 event, job, step, runner, secret을 읽고 작성한다.
+- GitHub Actions workflow의 `name`, `on`, `jobs`, `runs-on`, `steps`, `uses`, `run`, `env`, `secrets`를 읽고 작성한다.
+- GitHub-hosted runner, cache, self-hosted runner의 차이를 설명한다.
 - Docker image를 로컬에서 build/run하고, Actions로 Docker Hub에 push하는 흐름을 설명한다.
 - Docker Hub에서 생성된 image를 확인하고 로컬에서 pull/run하는 검증 절차를 작성한다.
 
@@ -38,7 +39,7 @@ Git 이론
 | 3교시 | 인프라 엔지니어의 GitHub 관리 전략 | IaC repo, protected branch, required check, secret 정책 |
 | 4교시 | Branch 전략: dev/stage/prod | environment branch와 promotion 전략 비교 |
 | 5교시 | PR, merge, rebase, revert, tag 운영 | sandbox conflict/revert/tag |
-| 6교시 | GitHub Actions 1: 코드, workflow, 품질 gate | unit test, SAST, DAST, `.gitignore`, `.dockerignore`, local build |
+| 6교시 | GitHub Actions 1: 코드, workflow 작성, runner computing | workflow YAML 작성법, runner, cache, unit test, SAST, DAST, local build |
 | 7교시 | GitHub Actions 2: Secrets, Docker Hub push, 대체 도구 | secrets, buildx, push, Docker Hub 확인, Jenkins/TeamCity/CodePipeline |
 | 8교시 | 개인 repo Docker Hub push 회고 | workflow 작성, step 시간 분석, 보강 포인트 정리 |
 
@@ -80,6 +81,7 @@ docker logout
 | unit test | 수 초~수 분 | 기본 동작 회귀 |
 | SAST/secret scan | 수 초~수 분 | 위험 코드, secret 노출 |
 | Docker build | 수십 초~수 분 | build 실패, Dockerfile 오류 |
+| GHA cache restore/save | 수 초~수십 초 | 반복 build 시간 감소 |
 | DAST smoke check | 수 초~수 분 | 실행 후 health 실패 |
 | Docker Hub push | network 시간 | registry artifact 누락 |
 
@@ -87,7 +89,9 @@ docker logout
 - [ ] 개발자 GitHub 흐름과 인프라 GitHub 흐름의 차이를 설명했다.
 - [ ] dev/stage/prod branch 전략의 장단점을 설명했다.
 - [ ] protected branch와 required status check의 목적을 설명했다.
-- [ ] GitHub Actions workflow에서 event/job/step/runner/secret을 찾았다.
+- [ ] GitHub Actions workflow에서 `on`, `jobs`, `steps`, `uses`, `run`, `env`, `secrets`를 찾고 작성했다.
+- [ ] GitHub-hosted runner가 매 실행마다 새 환경으로 시작해 cache가 비어 있을 수 있음을 설명했다.
+- [ ] `type=gha` cache와 self-hosted runner의 장단점을 설명했다.
 - [ ] unit test, SAST, DAST의 차이를 설명했다.
 - [ ] GitHub Secrets의 장단점을 설명했다.
 - [ ] sample app을 로컬에서 Docker build/run 했다.

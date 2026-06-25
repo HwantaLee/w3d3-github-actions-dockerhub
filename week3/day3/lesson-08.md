@@ -41,20 +41,72 @@
 w3d3-github-actions-dockerhub
 ```
 
-repository에는 최소한 다음 파일이 있어야 한다.
+수업 workflow를 그대로 쓰려면 repository에는 최소한 다음 파일이 있어야 한다.
 
 ```text
 .
-├── app.py
-├── Dockerfile
-├── .dockerignore
-├── test_app.py
+├── week3/
+│   └── day3/
+│       └── labs/
+│           ├── dockerhub-app/
+│           │   ├── app.py
+│           │   ├── Dockerfile
+│           │   ├── .dockerignore
+│           │   └── test_app.py
+│           └── quality-gates/
+│               ├── unit-test.sh
+│               ├── sast-scan.sh
+│               ├── dast-health-check.sh
+│               └── run-all-local.sh
 └── .github/
     └── workflows/
         └── dockerhub-publish.yml
 ```
 
 이미 repository를 가진 학생은 새 repo를 만들지 않아도 된다. 다만 운영 repository가 아니라 실습용 branch나 sandbox repository에서 수행한다.
+
+## 복사할 파일
+8교시에서 기본으로 복사할 파일은 workflow YAML 하나다.
+
+| 강의 repository 원본 | 개인 repository 대상 |
+|---|---|
+| `week3/day3/labs/github-actions/dockerhub-publish.yml` | `.github/workflows/dockerhub-publish.yml` |
+
+WSL 또는 Mac 기준 복사 예시:
+
+```bash
+COURSE_REPO=/mnt/d/paperclip
+MY_REPO=/path/to/my/w3d3-github-actions-dockerhub
+
+cd "$MY_REPO"
+mkdir -p .github/workflows
+
+cp "$COURSE_REPO/week3/day3/labs/github-actions/dockerhub-publish.yml" .github/workflows/dockerhub-publish.yml
+```
+
+복사 후 확인:
+
+```bash
+ls -al .github/workflows
+sed -n '1,220p' .github/workflows/dockerhub-publish.yml
+```
+
+전제 조건:
+
+| 필요 파일 | 이유 |
+|---|---|
+| `week3/day3/labs/dockerhub-app/` | Docker build context |
+| `week3/day3/labs/quality-gates/` | unit/SAST/DAST step 실행 |
+
+앞 실습에서 위 파일을 이미 개인 repository에 넣었다면 workflow YAML만 복사하면 된다. 파일이 없다면 다음 보조 명령으로 샘플도 함께 가져온다.
+
+```bash
+mkdir -p week3/day3/labs
+cp -R "$COURSE_REPO/week3/day3/labs/dockerhub-app" week3/day3/labs/
+cp -R "$COURSE_REPO/week3/day3/labs/quality-gates" week3/day3/labs/
+```
+
+`dockerhub-publish.yml`의 `APP_DIR`가 `week3/day3/labs/dockerhub-app`로 되어 있으므로, app 경로를 다르게 만들었다면 workflow의 `APP_DIR`도 같이 수정한다.
 
 ## Workflow 작성 체크
 workflow에는 step이 한 덩어리로 뭉쳐 있으면 안 된다. 시간이 어디서 쓰였는지 보기 위해 step을 나눠야 한다.
@@ -79,7 +131,8 @@ Actions run detail 화면에서 각 step의 실행 시간을 적는다.
 | Checkout repository |  | repo 크기, submodule | 불필요한 파일 제외 |
 | Unit test |  | test 수, fixture 준비 | 빠른 test/느린 test 분리 |
 | SAST scan |  | scan rule, scan 범위 | 대상 경로 명확화 |
-| Docker build |  | base image pull, cache miss | `.dockerignore`, build cache |
+| Docker build |  | base image pull, cache miss | `.dockerignore`, `type=gha` cache |
+| Cache restore/save |  | cache size, network | cache 대상 조정 |
 | DAST health check |  | container boot, retry | health endpoint 단순화 |
 | Docker Hub push |  | image size, network | image 최적화, layer 줄이기 |
 
@@ -89,6 +142,7 @@ Actions run detail 화면에서 각 step의 실행 시간을 적는다.
 Unit test는 2초였지만 Docker build가 48초였다.
 빌드 시간이 긴 이유는 base image pull과 cache miss 때문이었다.
 .dockerignore를 정리하고 alpine 기반 image를 쓰면 다음 실행에서 줄어들 수 있다.
+GHA cache를 적용한 뒤 같은 workflow를 한 번 더 실행하면 cold build와 warm build 차이를 비교할 수 있다.
 ```
 
 ## GitHub Secrets 회고
@@ -135,6 +189,7 @@ docker logout
 | DAST | `/health` 외에 API smoke test가 필요한가 |
 | Tag | `latest` 외에 version tag가 있는가 |
 | Cache | Docker build cache를 써야 하는가 |
+| Runner | GitHub-hosted runner로 충분한가, self-hosted runner가 필요한가 |
 | 권한 | protected branch, required check가 필요한가 |
 | 배포 | Docker Hub push 뒤 Kubernetes 배포로 이어질 수 있는가 |
 
@@ -146,6 +201,7 @@ docker logout
 
 unit test는 2초, SAST는 1초, Docker build는 42초, DAST는 5초, Docker Hub push는 18초가 걸렸다.
 가장 오래 걸린 단계는 Docker build였고, base image pull과 cache miss가 원인으로 보였다.
+`type=gha` cache를 적용한 뒤 두 번째 실행에서는 build 시간이 줄어드는지 비교해보고 싶다.
 
 GitHub Secrets를 쓰니 Docker Hub token을 workflow에 직접 쓰지 않아도 되어 편했다.
 하지만 workflow 수정 권한이 넓으면 secret도 위험해질 수 있으므로 protected branch와 review가 필요하다고 느꼈다.
@@ -188,12 +244,16 @@ branch -> PR -> CI -> image push -> registry 확인 -> deploy
 | Unit test |  |  |
 | SAST |  |  |
 | Docker build |  |  |
+| Cache restore/save |  |  |
 | DAST |  |  |
 | Docker Hub push |  |  |
 
 ## Reflection
 - 가장 오래 걸린 step:
 - 그 이유:
+- GitHub-hosted runner에서 느껴진 한계:
+- cold build와 warm build 차이:
+- self-hosted runner가 필요해 보이는 상황:
 - 자동화가 수동 배포보다 나았던 점:
 - GitHub Secrets를 쓰며 느낀 장점:
 - GitHub Secrets에서 조심해야 할 점:

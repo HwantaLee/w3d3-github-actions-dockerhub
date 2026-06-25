@@ -38,11 +38,15 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build local image for DAST
-        run: |
-          docker build \
-            --build-arg APP_VERSION=${{ steps.meta.outputs.version }} \
-            -t ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }} \
-            ${{ env.APP_DIR }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ env.APP_DIR }}
+          load: true
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            APP_VERSION=${{ steps.meta.outputs.version }}
 
       - name: Run DAST health check
         env:
@@ -64,6 +68,8 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
             ${{ secrets.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           build-args: |
             APP_VERSION=${{ steps.meta.outputs.version }}
 
