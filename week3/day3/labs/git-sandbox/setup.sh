@@ -21,13 +21,13 @@ git add app.txt
 git commit -q -m "initial app"
 
 git switch -q -c feature/change-message
-sed -i 's/message=hello from main/message=hello from feature/' app.txt
+sed -i '' 's/message=hello from main/message=hello from feature/' app.txt
 git add app.txt
 git commit -q -m "change message on feature"
 
 git switch -q main
 git switch -q -c hotfix/main-message
-sed -i 's/message=hello from main/message=hello from hotfix/' app.txt
+sed -i '' 's/message=hello from main/message=hello from hotfix/' app.txt
 git add app.txt
 git commit -q -m "hotfix message on main line"
 

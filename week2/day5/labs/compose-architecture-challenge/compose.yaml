@@ -1,0 +1,77 @@
+services:
+  gateway:
+    image: nginx:1.27-alpine
+    ports:
+      - "18090:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - identity-api
+      - payment-api
+    networks:
+      - public_net
+      - app_net
+
+  identity-api:
+    image: postgrest/postgrest:v12.2.8
+    environment:
+      PGRST_DB_URI: postgres://app_user:app_password@db:5432/app
+      PGRST_DB_ANON_ROLE: web_anon
+    depends_on:
+      - db
+    networks:
+      - app_net
+      - data_net
+
+  payment-api:
+    build: ./payment-api
+    environment:
+      PORT: 3000
+      REDIS_HOST: queue
+      REDIS_PORT: 6379
+    depends_on:
+      - queue
+    networks:
+      - app_net
+      - data_net
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app_user
+      POSTGRES_PASSWORD: app_password
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - data_net
+
+  queue:
+    image: redis:7-alpine
+    networks:
+      - data_net
+
+  worker:
+    image: redis:7-alpine
+    depends_on:
+      - queue
+    command:
+      - sh
+      - -c
+      - |
+        echo "worker waiting for jobs"
+        while true; do
+          redis-cli -h queue BRPOP jobs 0
+        done
+    networks:
+      - data_net
+
+volumes:
+  pgdata:
+
+networks:
+  public_net:
+  app_net:
+  data_net:

@@ -27,7 +27,10 @@ http.createServer(async (req, res) => {
   res.setHeader("content-type", "application/json; charset=utf-8");
   try {
     if (req.url === "/health") {
-      res.end(JSON.stringify({ service: "message-api", status: "ok" }));
+      res.end(JSON.stringify({
+        service: "payment-api",
+        status: "ok"
+      }));
       return;
     }
     if (req.url.startsWith("/publish")) {

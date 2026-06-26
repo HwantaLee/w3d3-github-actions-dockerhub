@@ -1,6 +1,6 @@
 services:
   gateway:
-    image: nginx:1.27-alpine
+    image: nginx:1.31-alpine
     ports:
       - "18086:80"
     volumes:
@@ -14,7 +14,7 @@ services:
       - app_net
 
   identity-api:
-    image: node:20-alpine
+    image: node:22-alpine
     working_dir: /app
     command: ["node", "server.js"]
     volumes:
@@ -25,7 +25,7 @@ services:
       - app_net
 
   payment-api:
-    image: node:20-alpine
+    image: node:22-alpine
     working_dir: /app
     command: ["node", "server.js"]
     volumes:
